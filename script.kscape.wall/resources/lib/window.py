@@ -20,9 +20,11 @@ import xbmcgui
 from . import geometry as G
 from . import state
 from .library import fetch_movies, play
+from .model import merge_duplicates
 from .skins import choose_skin
 from .ranking import rank_related
-from .wallmodel import Wall, camera_target, cell_origin, clip_outside, ease_out_cubic
+from .wallmodel import (Wall, camera_target, cell_origin, clip_outside, ease_out_back,
+                        ease_out_cubic)
 
 POOL = G.POOL_COLS * G.POOL_ROWS
 MOVES = {
@@ -39,6 +41,7 @@ HOME = xbmcgui.Window(10000)
 ADDON = xbmcaddon.Addon('script.kscape.wall')
 PROP_CAM = 'kscape.cam'
 PROP_FRONT = 'kscape.front'
+PROP_FRAME = 'kscape.frame'
 PROP_LAST = 'kscape.lastmovie'
 
 
@@ -131,11 +134,15 @@ class WallWindow(xbmcgui.WindowXML):
         self.reduced = (ADDON.getSettingBool('reduced_motion')
                         or xbmc.getCondVisibility('Skin.HasSetting(ReducedMotion)'))
         self.auto_shuffle = ADDON.getSettingBool('auto_shuffle')
+        self.merge = ADDON.getSettingBool('merge_duplicates')
+        self.frame_pos = None            # frame target position (wall pixels)
+        self.frame_anim = None           # (start time, start position, duration ms)
+        self.frame_token = 0
         self.reload_pending = False
         self.monitor = LibraryMonitor(self._library_changed)
 
         self.status.setLabel(ADDON.getLocalizedString(32001))
-        movies = fetch_movies()
+        movies = self._fetch()
         if not movies:
             self.status.setLabel(ADDON.getLocalizedString(32002))
             self.ready = True
@@ -209,7 +216,7 @@ class WallWindow(xbmcgui.WindowXML):
         self.focus = (c, r)
         self.last_input = time.time()
         self._hide_panel()
-        self._set_frame()
+        self._set_frame(animate=True)
         self._pan(camera_target(self.wall, self.focus))
 
     # ---- camera ----------------------------------------------------------------------------
@@ -260,10 +267,36 @@ class WallWindow(xbmcgui.WindowXML):
         for k, cell in self._slot_cells():
             pool.bind(k, cell, wall.at(*cell))
 
-    def _set_frame(self):
+    def _visual_frame(self, now):
+        if not self.frame_anim:
+            return self.frame_pos
+        t0, frm, dur = self.frame_anim
+        p = (now - t0) * 1000.0 / dur if dur else 1.0
+        e = ease_out_back(p) if G.FRAME_TWEEN == 'back' else ease_out_cubic(p)
+        return (frm[0] + (self.frame_pos[0] - frm[0]) * e, frm[1] + (self.frame_pos[1] - frm[1]) * e)
+
+    def _set_frame(self, animate=False):
+        """Move the focus frame; animated moves glide from wherever the frame is drawn now."""
         x, y = cell_origin(*self.focus)
-        self.frame.setPosition(x - G.FRAME, y - G.FRAME)
+        target = (x - G.FRAME, y - G.FRAME)
+        now = time.time()
+        animate = animate and not self.reduced and self.frame_pos is not None
+        if animate:
+            vis = self._visual_frame(now)
+            dx, dy = int(round(vis[0] - target[0])), int(round(vis[1] - target[1]))
+            self.frame_token += 1
+            self.frame.setAnimations([('Conditional',
+                f'effect=slide start={dx},{dy} end=0,0 time={G.FRAME_MS} tween={G.FRAME_TWEEN} '
+                f'easing=out reversible=false condition={_is(PROP_FRAME, self.frame_token)}')])
+            self.frame_anim = (now, vis, G.FRAME_MS)
+        else:
+            self.frame.setAnimations([])
+            self.frame_anim = None
+        self.frame.setPosition(*target)
+        self.frame_pos = target
         self.frame.setVisible(True)
+        if animate:
+            HOME.setProperty(PROP_FRAME, str(self.frame_token))
 
     # ---- info panel ------------------------------------------------------------------------
 
@@ -320,6 +353,7 @@ class WallWindow(xbmcgui.WindowXML):
             ('shuffle', ADDON.getLocalizedString(32021)),
             ('auto', ADDON.getLocalizedString(32022).format(on_off(self.auto_shuffle))),
             ('motion', ADDON.getLocalizedString(32023).format(on_off(self.reduced))),
+            ('merge', ADDON.getLocalizedString(32029).format(on_off(self.merge))),
             ('reload', ADDON.getLocalizedString(32024)),
             ('skin', ADDON.getLocalizedString(32025)),
             ('exit', ADDON.getLocalizedString(32026)),
@@ -341,6 +375,10 @@ class WallWindow(xbmcgui.WindowXML):
         elif choice == 'motion':
             self.reduced = not self.reduced
             ADDON.setSettingBool('reduced_motion', self.reduced)
+        elif choice == 'merge':
+            self.merge = not self.merge
+            ADDON.setSettingBool('merge_duplicates', self.merge)
+            self._reload()
         elif choice == 'reload':
             self._reload()
         elif choice == 'skin':
@@ -354,18 +392,26 @@ class WallWindow(xbmcgui.WindowXML):
     def _library_changed(self):
         self.reload_pending = True
 
+    def _fetch(self):
+        movies = fetch_movies()
+        return merge_duplicates(movies) if self.merge else movies
+
     def _reload(self):
         """Rebuild the wall from the library, keeping the focused movie when it still exists."""
         self.reload_pending = False
         self._finish_shuffle()
         current = self.wall.at(*self.focus)
-        movies = fetch_movies()
+        movies = self._fetch()
         if not movies:
             return
         self.wall = Wall.column_major(movies)
         self.history = []
         self.front.shown = [None] * POOL       # posters/badges may have changed
         cell = self.wall.cell_of(current.movieid) if current else None
+        if cell is None and current:
+            # The focused copy was merged away: stay on the copy that represents that title.
+            cell = next((self.wall.cell_of(m.movieid) for m in self.wall.movies()
+                         if (m.title, m.year) == (current.title, current.year)), None)
         self.focus = cell or (0, 0)
         self.shuffled_for = None
         self._hide_panel()

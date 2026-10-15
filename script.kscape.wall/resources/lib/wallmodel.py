@@ -97,6 +97,15 @@ def ease_out_cubic(p):
     return 1 - (1 - p) ** 3
 
 
+BACK_OVERSHOOT = 1.70158
+
+
+def ease_out_back(p, s=BACK_OVERSHOOT):
+    """Matches Kodi's tween="back" easing="out": overshoots slightly, then settles."""
+    p = max(0.0, min(1.0, p)) - 1
+    return p * p * ((s + 1) * p + s) + 1
+
+
 def clip_outside(origin, target, rect, margin):
     """Where a cover travelling origin -> target should start/end if target is off-screen.
 

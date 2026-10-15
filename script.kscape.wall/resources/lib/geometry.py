@@ -20,9 +20,13 @@ POOL_ROWS = 6
 # Info panel occupies this many cells beside the focused cover.
 PANEL_CELLS = 3
 
-# Motion (milliseconds unless noted). Reference: focus jumps instantly, wall glides;
-# synopsis ~1.1 s after the last move; shuffle ~2 s later, lasting ~1.9 s.
-PAN_MS = 350
+# Motion (milliseconds unless noted). The focus frame glides to the next cover with a soft
+# overshoot (Kodi tween "back"; "elastic" is available but wobbles several times), and the wall
+# follows with a long ease-out so it settles gently instead of stopping short.
+# Synopsis ~1.1 s after the last move; shuffle ~2 s later, lasting ~1.9 s (reference video).
+FRAME_MS = 420
+FRAME_TWEEN = 'back'
+PAN_MS = 600
 PANEL_DELAY_S = 1.1
 SHUFFLE_DELAY_S = 3.2
 FLIGHT_MS = 1150

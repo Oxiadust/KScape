@@ -11,8 +11,8 @@ own library artwork. It is not affiliated with Kaleidescape and uses none of its
 
 - **Cover wall.** Opens at startup. About 9 × 3.6 covers are visible, bleeding off every edge,
   in title order running down the columns and across to the right.
-- **Camera follow.** The amber focus frame jumps to the next cover instantly, then the wall
-  glides (0.35 s) to bring it back to the centre.
+- **Camera follow.** The amber focus frame glides to the next cover with a soft overshoot
+  (0.42 s), and the wall follows with a long ease-out (0.6 s) that settles gently.
 - **Synopsis panel.** About 1.1 s after you stop on a movie, a blue panel with its title and
   synopsis opens beside it (on whichever side has room).
 - **Related-cover shuffle.** About 3.2 s after you stop, every cover flies to a new cell so the
@@ -21,6 +21,8 @@ own library artwork. It is not affiliated with Kaleidescape and uses none of its
 - **Quality badges.** Covers show **HDR** or **UHD** when Kodi has stream details for the file.
 - **Library aware.** The wall reloads itself after a library scan or clean, keeping your place.
 - **Remembers where you were**, across Kodi restarts.
+- **One cover per movie.** Duplicate copies (same title and year) show as one cover by default;
+  the copy with a resume point, then the best quality, is the one kept and played.
 - **Playback controls** in the same style: play/pause, back/forward 30 s, audio track, subtitles
   (both cycle in place), stop, plus a title strip and an info screen.
 
@@ -31,7 +33,7 @@ own library artwork. It is not affiliated with Kaleidescape and uses none of its
 | Arrows | Move across the wall (stops at the edges, no wrap-around) |
 | Select / Enter | Play the movie (resumes from the last position if there is one) |
 | Back / Esc | Undo the last shuffle; with nothing left to undo, leave the wall |
-| Menu / C / Info | Wall menu: shuffle now, automatic shuffle on/off, reduce motion on/off, reload library, switch skin, exit |
+| Menu / C / Info | Wall menu: shuffle now, automatic shuffle on/off, reduce motion on/off, show duplicates once on/off, reload library, switch skin, exit |
 
 During playback: **OK / Menu** opens the controls, **Info** shows the movie's details, **Back** closes them,
 and the usual Kodi playback keys (pause, seek, stop) keep working.
@@ -76,9 +78,11 @@ kscape has no Kodi Settings screens of its own. To leave it:
 Stored as add-on settings of `script.kscape.wall` and toggled from the wall menu:
 
 - **Shuffle related covers automatically** (on). Off: use *Shuffle related covers now*.
+- **Show each movie once** (on). Off: every library entry gets its own cover.
 - **Reduce motion** (off). On: no glide or flight; covers swap in place.
 
-Motion timings, sizes and the pool size live in
+Motion timings and easing (`FRAME_TWEEN`: `back` for one soft overshoot, or `elastic` for a
+bouncier settle), sizes and the pool size live in
 [`script.kscape.wall/resources/lib/geometry.py`](script.kscape.wall/resources/lib/geometry.py).
 
 ## How the shuffle works
@@ -139,7 +143,9 @@ against real data. Kodi screenshots take about a second, so check motion with sl
 - No Kodi Settings or add-on browser screens, and no audio/subtitle settings dialogs (the playback
   controls cycle tracks instead): kscape is only the wall. Use another skin for system
   configuration (see *Switching back*).
-- Duplicate library entries (e.g. several editions of one film) each get their own cover.
+- Duplicates are matched on title and year, the only thing Kodi's metadata offers. Entries the
+  scraper misidentified as the same film (for example several different films all matched to
+  one title) are merged too; fix the match in Kodi (*Refresh* on the item) or turn the option off.
 - Badges depend on Kodi's stream details, which it records only after reading the files.
 - Tested on macOS with Kodi 21.3 at 1080p and a 384-movie library. Not yet tested at 4K, on
   low-power devices, or with a real 5,000-movie library (ranking and placement for 5,000 movies

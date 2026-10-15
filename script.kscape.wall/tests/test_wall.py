@@ -7,10 +7,10 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from resources.lib import geometry as G  # noqa: E402
-from resources.lib.model import Movie, badge_for  # noqa: E402
+from resources.lib.model import Movie, badge_for, merge_duplicates  # noqa: E402
 from resources.lib.ranking import rank_related, score  # noqa: E402
-from resources.lib.wallmodel import (Wall, camera_target, clip_outside, ease_out_cubic,  # noqa: E402
-                                     grid_rows)
+from resources.lib.wallmodel import (Wall, camera_target, clip_outside, ease_out_back,  # noqa: E402
+                                     ease_out_cubic, grid_rows)
 
 
 def movie(i, title, year=2000, genres=(), directors=(), cast=(), setid=0, tags=()):
@@ -65,6 +65,25 @@ class BadgeTest(unittest.TestCase):
                                 'art': {'thumb': 't.jpg'}, 'resume': {'position': 12.5},
                                 'streamdetails': {'video': [{'width': 3840, 'hdrtype': 'dolbyvision'}]}})
         self.assertEqual((m.cast, m.poster, m.resume_position, m.badge), (('A', 'B'), 't.jpg', 12.5, 'HDR'))
+
+
+class DuplicatesTest(unittest.TestCase):
+    def copy(self, i, title, year=2017, resume=0.0, badge='', poster=True):
+        return Movie(i, title, title.lower(), year, frozenset(), frozenset(), (), 0, frozenset(),
+                     f'p{i}' if poster else '', '', 6000, resume, badge)
+
+    def test_keeps_one_per_title_and_year_in_order(self):
+        a, b, c = self.copy(1, 'Alien'), self.copy(2, 'Wonder Woman'), self.copy(3, 'wonder  woman')
+        d = self.copy(4, 'Wonder Woman', year=1974)
+        self.assertEqual([m.movieid for m in merge_duplicates([a, b, c, d])], [1, 2, 4])
+
+    def test_prefers_resume_then_quality_then_poster(self):
+        plain, uhd, hdr = self.copy(1, 'X'), self.copy(2, 'X', badge='UHD'), self.copy(3, 'X', badge='HDR')
+        self.assertEqual(merge_duplicates([plain, uhd, hdr])[0].movieid, 3)
+        watched = self.copy(4, 'X', resume=600.0)
+        self.assertEqual(merge_duplicates([hdr, watched])[0].movieid, 4)
+        no_art = self.copy(5, 'Y', poster=False)
+        self.assertEqual(merge_duplicates([no_art, self.copy(6, 'Y')])[0].movieid, 6)
 
 
 class WallTest(unittest.TestCase):
@@ -132,6 +151,9 @@ class WallTest(unittest.TestCase):
         self.assertEqual(ease_out_cubic(0), 0)
         self.assertEqual(ease_out_cubic(1), 1)
         self.assertGreater(ease_out_cubic(0.5), 0.5)
+        self.assertAlmostEqual(ease_out_back(0), 0)
+        self.assertAlmostEqual(ease_out_back(1), 1)
+        self.assertGreater(max(ease_out_back(i / 100) for i in range(101)), 1.05)   # overshoots
 
 
 if __name__ == '__main__':

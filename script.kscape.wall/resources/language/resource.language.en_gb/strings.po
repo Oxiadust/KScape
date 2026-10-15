@@ -29,6 +29,15 @@ msgctxt "#32012"
 msgid "Reduce motion"
 msgstr ""
 
+msgctxt "#32013"
+msgid "Show each movie once (hide duplicate copies)"
+msgstr ""
+
+#. Menu toggle; {} is replaced by On or Off
+msgctxt "#32029"
+msgid "Show duplicates once: {}"
+msgstr ""
+
 msgctxt "#32020"
 msgid "kscape"
 msgstr ""
