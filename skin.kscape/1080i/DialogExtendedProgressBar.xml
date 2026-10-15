@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodi fills ids 30 (heading), 31 (message), 32 (progress). -->
+<window>
+	<depth>DepthMax</depth>
+	<controls>
+		<control type="group">
+			<left>1300</left>
+			<top>940</top>
+			<control type="image">
+				<width>560</width>
+				<height>100</height>
+				<texture colordiffuse="E6141418">white.png</texture>
+			</control>
+			<control type="label" id="30">
+				<left>20</left>
+				<top>12</top>
+				<width>520</width>
+				<height>34</height>
+				<font>kscape_small</font>
+				<textcolor>FFFFFFFF</textcolor>
+			</control>
+			<control type="label" id="31">
+				<left>20</left>
+				<top>46</top>
+				<width>520</width>
+				<height>30</height>
+				<font>kscape_small</font>
+				<textcolor>FFA0A0A8</textcolor>
+			</control>
+			<control type="progress" id="32">
+				<left>20</left>
+				<top>82</top>
+				<width>520</width>
+				<height>4</height>
+				<texturebg colordiffuse="40FFFFFF">white.png</texturebg>
+				<midtexture colordiffuse="FFFFFFFF">white.png</midtexture>
+			</control>
+		</control>
+	</controls>
+</window>

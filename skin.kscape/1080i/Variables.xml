@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+	<variable name="PosterArt">
+		<value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
+		<value>$INFO[ListItem.Art(thumb)]</value>
+	</variable>
+
+	<variable name="PosterFallbackLabel">
+		<value condition="ListItem.IsParentFolder">..</value>
+		<value>$INFO[ListItem.Label]$INFO[ListItem.Year,[CR](,)]</value>
+	</variable>
+
+	<!-- Bottom strip: focused title, then metadata ordered so genre (least important) truncates first. -->
+	<variable name="WallTitleLabel">
+		<value condition="Container(50).ListItem.IsParentFolder">$LOCALIZE[31013]</value>
+		<value>$INFO[Container(50).ListItem.Label]</value>
+	</variable>
+
+	<variable name="WallMetaLabel">
+		<value condition="Container(50).ListItem.IsParentFolder"></value>
+		<value>$INFO[Container(50).ListItem.Year,   ]$INFO[Container(50).ListItem.Duration(mins),   ·   , $LOCALIZE[31014]]$INFO[Container(50).ListItem.Genre,   ·   ]</value>
+	</variable>
+</includes>

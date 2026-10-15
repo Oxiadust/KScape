@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Video library browser. View 50 is the cover wall. -->
+<window>
+	<defaultcontrol always="true">50</defaultcontrol>
+	<views>50</views>
+	<controls>
+		<control type="image">
+			<description>Background</description>
+			<width>1920</width>
+			<height>1080</height>
+			<texture>background.png</texture>
+		</control>
+
+		<control type="panel" id="50">
+			<description>Cover wall</description>
+			<left>30</left>
+			<top>20</top>
+			<width>1870</width>
+			<height>1000</height>
+			<!-- Kodi wraps a container when an edge action is empty or points at itself. Pointing at
+			     the never-visible control 59 makes the wall stop at its edges instead. -->
+			<!-- Never put a <visible> condition on this view: Kodi only fills visible views, so hiding
+			     it while empty leaves it empty forever. The lone ".." card is hidden in the layouts. -->
+			<onup>59</onup>
+			<ondown>59</ondown>
+			<onleft>59</onleft>
+			<onright>59</onright>
+			<orientation>vertical</orientation>
+			<scrolltime tween="cubic" easing="out">220</scrolltime>
+			<preloaditems>2</preloaditems>
+			<viewtype label="31012">panel</viewtype>
+			<itemlayout width="170" height="250">
+				<control type="group">
+					<visible>!ListItem.IsParentFolder | Integer.IsGreater(Container(50).NumItems,0)</visible>
+					<include content="PosterCard">
+						<param name="tint" value="FFD0D0D0"/>
+					</include>
+				</control>
+			</itemlayout>
+			<focusedlayout width="170" height="250">
+				<control type="group">
+					<description>Kodi adds ".." to empty listings even with parent items off; draw nothing for it.</description>
+					<visible>!ListItem.IsParentFolder | Integer.IsGreater(Container(50).NumItems,0)</visible>
+					<animation effect="zoom" start="100" end="108" center="80,120" time="180" tween="cubic" easing="out" condition="!Skin.HasSetting(ReducedMotion)">Focus</animation>
+					<control type="image">
+						<description>Soft shadow</description>
+						<left>-30</left>
+						<top>-22</top>
+						<width>220</width>
+						<height>300</height>
+						<texture border="32">shadow.png</texture>
+					</control>
+					<control type="image">
+						<description>Focus frame (always visible, also with reduced motion)</description>
+						<left>-3</left>
+						<top>-3</top>
+						<width>166</width>
+						<height>246</height>
+						<texture colordiffuse="FFF2F2F2">white.png</texture>
+					</control>
+					<include content="PosterCard"/>
+				</control>
+			</focusedlayout>
+		</control>
+
+		<control type="button" id="59">
+			<description>Edge stop target for the wall (never focusable)</description>
+			<visible>false</visible>
+		</control>
+
+		<control type="group">
+			<description>Info strip</description>
+			<left>40</left>
+			<top>1028</top>
+			<visible>Integer.IsGreater(Container(50).NumItems,0)</visible>
+			<control type="grouplist">
+				<description>Title truncates first so year/genre/runtime stay visible</description>
+				<width>1500</width>
+				<height>40</height>
+				<orientation>horizontal</orientation>
+				<itemgap>0</itemgap>
+				<usecontrolcoords>true</usecontrolcoords>
+				<control type="label">
+					<width max="860">auto</width>
+					<height>40</height>
+					<aligny>center</aligny>
+					<font>kscape13</font>
+					<textcolor>FFF2F2F2</textcolor>
+					<label>$VAR[WallTitleLabel]</label>
+				</control>
+				<control type="label">
+					<width max="640">auto</width>
+					<height>40</height>
+					<aligny>center</aligny>
+					<font>kscape13</font>
+					<textcolor>FF9A9AA2</textcolor>
+					<label>$VAR[WallMetaLabel]</label>
+				</control>
+			</control>
+			<control type="label">
+				<left>1540</left>
+				<width>300</width>
+				<height>40</height>
+				<align>right</align>
+				<aligny>center</aligny>
+				<font>kscape_small</font>
+				<textcolor>FF808088</textcolor>
+				<label>$INFO[Container(50).CurrentItem]$INFO[Container(50).NumItems, / ]</label>
+			</control>
+		</control>
+
+		<control type="group">
+			<description>Empty and loading states</description>
+			<left>360</left>
+			<top>460</top>
+			<control type="label">
+				<width>1200</width>
+				<height>60</height>
+				<align>center</align>
+				<font>kscape_title</font>
+				<textcolor>FFE6E6EA</textcolor>
+				<label>$LOCALIZE[31010]</label>
+				<visible>Integer.IsEqual(Container(50).NumItems,0) + !Container.IsUpdating</visible>
+			</control>
+			<control type="label">
+				<top>80</top>
+				<width>1200</width>
+				<height>40</height>
+				<align>center</align>
+				<font>kscape13</font>
+				<textcolor>FF808088</textcolor>
+				<label>$LOCALIZE[31011]</label>
+				<visible>Integer.IsEqual(Container(50).NumItems,0) + !Container.IsUpdating</visible>
+			</control>
+			<control type="label">
+				<top>40</top>
+				<width>1200</width>
+				<height>40</height>
+				<align>center</align>
+				<font>kscape13</font>
+				<textcolor>FF808088</textcolor>
+				<label>$LOCALIZE[31015]</label>
+				<visible>Container.IsUpdating + Integer.IsEqual(Container(50).NumItems,0)</visible>
+			</control>
+		</control>
+	</controls>
+</window>

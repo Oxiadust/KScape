@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<depth>DepthMax</depth>
+	<controls>
+		<control type="group">
+			<visible>!Window.IsActive(startup)</visible>
+			<left>1820</left>
+			<top>980</top>
+			<control type="image">
+				<width>40</width>
+				<height>40</height>
+				<texture colordiffuse="80FFFFFF">pointer.png</texture>
+				<animation effect="fade" start="100" end="30" time="600" pulse="true" condition="true">Conditional</animation>
+			</control>
+		</control>
+	</controls>
+</window>

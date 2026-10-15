@@ -1,0 +1,39 @@
+# Kodi Media Center language file
+# Addon Name: kscape
+# Addon id: skin.kscape
+# Addon Provider: kscape contributors
+msgid ""
+msgstr ""
+"Project-Id-Version: skin.kscape\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_GB\n"
+
+msgctxt "#31001"
+msgid "kscape"
+msgstr ""
+
+msgctxt "#31010"
+msgid "Your movie library is empty"
+msgstr ""
+
+msgctxt "#31011"
+msgid "Add a movie source and scan it into the library, then return here."
+msgstr ""
+
+msgctxt "#31012"
+msgid "Wall"
+msgstr ""
+
+msgctxt "#31013"
+msgid "Back"
+msgstr ""
+
+#. Minutes suffix for runtime, e.g. "117 min"
+msgctxt "#31014"
+msgid "min"
+msgstr ""
+
+msgctxt "#31015"
+msgid "Loading library…"
+msgstr ""

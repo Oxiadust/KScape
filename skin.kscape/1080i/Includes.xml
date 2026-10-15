@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<includes>
+	<include file="Variables.xml"/>
+
+	<!-- Wall geometry (literal values; Kodi does not expand constants in attributes):
+	     160x240 poster (2:3) in a 170x250 cell, 11 columns x 4 rows. -->
+
+	<!-- One cover. $PARAM[tint] dims unfocused covers so the selection reads without heavy framing. -->
+	<include name="PosterCard">
+		<param name="tint" default="FFFFFFFF"/>
+		<definition>
+			<control type="image">
+				<description>Card behind missing/loading art</description>
+				<width>160</width>
+				<height>240</height>
+				<texture colordiffuse="FF1A1A1F">white.png</texture>
+			</control>
+			<control type="textbox">
+				<description>Title under the art: revealed when art is missing, broken, or still loading</description>
+				<left>12</left>
+				<top>12</top>
+				<width>136</width>
+				<height>216</height>
+				<align>center</align>
+				<aligny>center</aligny>
+				<font>kscape_small</font>
+				<textcolor>FFC8C8D0</textcolor>
+				<label>$VAR[PosterFallbackLabel]</label>
+			</control>
+			<control type="image">
+				<description>Cover art</description>
+				<width>160</width>
+				<height>240</height>
+				<aspectratio>scale</aspectratio>
+				<fadetime>120</fadetime>
+				<texture background="true" colordiffuse="$PARAM[tint]">$VAR[PosterArt]</texture>
+			</control>
+			<control type="image">
+				<description>Watched-progress hairline (resume point)</description>
+				<top>236</top>
+				<width>160</width>
+				<height>4</height>
+				<texture colordiffuse="B0000000">white.png</texture>
+				<visible>ListItem.IsResumable</visible>
+			</control>
+			<control type="progress">
+				<top>236</top>
+				<width>160</width>
+				<height>4</height>
+				<info>ListItem.PercentPlayed</info>
+				<texturebg/>
+				<midtexture colordiffuse="FFE8E8E8">white.png</midtexture>
+				<visible>ListItem.IsResumable</visible>
+			</control>
+		</definition>
+	</include>
+</includes>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="script.kscape.wall" version="0.1.0" name="kscape wall" provider-name="kscape contributors">
+	<requires>
+		<import addon="xbmc.python" version="3.0.1"/>
+	</requires>
+	<extension point="xbmc.python.script" library="default.py">
+		<provides>video</provides>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en_GB">Animated movie cover wall with relationship-based shuffle</summary>
+		<description lang="en_GB">Browse the Kodi movie library as a cover wall; related covers rearrange around the selected movie. Not affiliated with Kaleidescape.</description>
+		<license>GPL-2.0-only</license>
+		<platform>all</platform>
+	</extension>
+</addon>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="skin.kscape" version="0.1.0" name="kscape" provider-name="kscape contributors">
+	<requires>
+		<import addon="xbmc.gui" version="5.17.0"/>
+	</requires>
+	<extension point="xbmc.gui.skin" debugging="false">
+		<res width="1920" height="1080" aspect="16:9" default="true" folder="1080i"/>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en_GB">Dense, cinematic movie-cover wall for Kodi, inspired by Kaleidescape</summary>
+		<description lang="en_GB">An original Kodi skin: an edge-to-edge poster wall, a movie details view, and an optional relationship-based ordering helper. Not affiliated with Kaleidescape.</description>
+		<license>GPL-2.0-only</license>
+		<platform>all</platform>
+		<assets>
+			<icon>resources/icon.png</icon>
+			<fanart>resources/fanart.png</fanart>
+		</assets>
+	</extension>
+</addon>

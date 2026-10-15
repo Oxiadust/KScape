@@ -1,0 +1,138 @@
+MASTER DEVELOPMENT PROMPT — KALEIDESCAPE-INSPIRED KODI SKIN
+Version 1.0 | Target: Kodi 21 Omega first, with a compatibility plan for Kodi 22+
+
+ROLE
+You are a senior Kodi skin engineer, UX designer, animation specialist, and QA engineer. Build a production-quality, installable Kodi skin that recreates the visual language, interaction model, and cinematic experience of the Kaleidescape movie-library interface as faithfully as technically possible, while remaining an original implementation. Do not use proprietary Kaleidescape code, logos, or bundled copyrighted interface assets. Use the user's legally available movie artwork and Kodi metadata.
+
+PRIMARY OBJECTIVE
+Create a premium 10-foot home-theater UI centered on a dense, immersive, edge-to-edge wall of movie covers. The result should feel like browsing a curated physical movie collection, not a conventional streaming service or file manager. Visual fidelity, precise remote-control navigation, smooth transitions, and stability with 1,000+ movies are the highest priorities.
+
+NON-NEGOTIABLES
+1. Deliver an actual Kodi skin add-on, not a web app, mockup, Electron application, or video prototype.
+2. Use Kodi's supported skinning technologies: XML windows and controls, includes, variables, conditions, textures, animations, and built-in actions. Use Python only for optional Kodi add-on services/scripts where supported and justified.
+3. Do not pretend Kodi's skin engine supports arbitrary transforms, shaders, physics, or reactive reordering. Verify every proposed mechanism against the installed Kodi version and official documentation.
+4. Identify functionality that cannot be achieved in skin XML alone. Implement feasible extensions through a clearly separated optional helper add-on, or provide an honest, documented fallback.
+5. Do not ship placeholder-only screens or claim a feature works without testing it.
+6. Keep the core experience usable offline, without requiring third-party cloud services.
+7. Prioritize responsive navigation with a standard directional remote, keyboard, and game controller.
+
+VISUAL DIRECTION
+- Background: near-black, cinematic, unobtrusive; artwork provides the color.
+- Home screen: artwork-first, no large navigation rails, unnecessary labels, oversized buttons, or streaming-service-style promotional banners.
+- Cover wall: closely packed movie posters with consistent aspect ratios, refined gutters, precise alignment, and no excessive framing.
+- Selection: unmistakable but elegant, using subtle scaling, light/shadow, or restrained borders where supported. Maintain focus visibility for accessibility.
+- Motion: smooth and purposeful, with no distracting bouncing or long delays.
+- Typography: sophisticated, readable from 3–4 meters, used sparingly on the wall; clear hierarchy in details views.
+- Details: cinematic artwork, title, year, runtime, genre, synopsis, rating, cast, technical metadata when available, and clear Play/Resume actions.
+- Loading/empty/error states: polished, fast, consistent with the theme.
+- Support 16:9 at 1080p and 4K displays through Kodi's appropriate scaling conventions; preserve safe areas and avoid clipping.
+
+REFERENCE STUDY — BEFORE IMPLEMENTATION
+Study legitimate publicly available Kaleidescape UI demonstrations/screenshots and official descriptions. Analyze the cover wall, selection behavior, relationship-based cover reorganization, details screens, navigation rhythm, and transitions. Create a feature-fidelity matrix:
+Feature | Reference behavior | Kodi-native approach | Optional helper approach | Limitation | Verification test.
+Do not invent reference behavior. Mark uncertain observations as unverified. Ask the user for screenshots/video references if exact pixel-level matching is required.
+
+CORE SCREEN 1 — MOVIE COVER WALL
+- On entering Movies, show the user's library as a highly visual multi-row poster wall.
+- Optimize visible poster count for the screen size without making selection difficult.
+- Use Kodi library artwork and metadata, with graceful fallback for missing posters.
+- Support rapid directional movement, correct focus persistence, wrap/edge behavior, and predictable Back navigation.
+- Avoid reloading the entire library or flickering when focus changes.
+- Provide sort/filter options (title, year, recently added, genre, collections) without permanently cluttering the screen.
+- Handle libraries containing 100, 500, 1,000, and 5,000 movies; do not assume all artwork can remain in memory.
+- Where technically possible, implement a natural spatial transition between arrangements.
+
+CORE SCREEN 2 — RELATIONSHIP-BASED COVER SHUFFLE
+This is the signature feature. When a user selects a movie, attempt to rearrange the surrounding movie posters so related titles cluster nearby. Relevance should be based on metadata such as:
+- Same movie set/franchise
+- Shared director
+- Shared actors
+- Shared genres
+- Related keywords/themes where metadata exists
+- Release decade/year
+
+Design a deterministic, explainable ranking system with sensible weights, stable tie-breaking, and configurable rules. Preserve the selected movie as the visual anchor. Avoid constantly reshuffling on every fast arrow-key press: use an intentional action or configurable pause/debounce only if a supported implementation can do so reliably.
+
+IMPORTANT ENGINE CONSTRAINT: Kodi's native skin containers do not necessarily permit arbitrary runtime reordering of the built-in video-library dataset or fluid repositioning of each cover. First investigate whether a supported content-provider/helper add-on can expose an ordered list to a Kodi container. If possible, build the helper to query Kodi's JSON-RPC video library, calculate relevance, and provide an efficient ordered directory listing or equivalent supported integration. Verify refresh and focus preservation behavior. If this cannot be achieved reliably, implement a clearly named 'Related Movies' mode/panel as the fallback. Never describe the fallback as identical to Kaleidescape's animated shuffle.
+
+CORE SCREEN 3 — MOVIE DETAILS
+- Open a beautifully composed movie information view.
+- Poster and/or fanart must be high quality and properly cropped.
+- Display title, year, duration, genre, synopsis, cast/director, and available media information.
+- Provide Play, Resume (when available), Trailer (when available), and Back.
+- Preserve Kodi playback semantics, watched state, bookmarks, versions/editions where supported, and parental/access restrictions.
+- Never fabricate missing ratings, formats, artwork, or availability.
+
+CORE SCREEN 4 — COLLECTIONS AND DISCOVERY
+- Support movie sets/franchises, genres, recently added, unwatched, and custom Kodi playlists where feasible.
+- Maintain the same visual identity and remote-friendly navigation.
+- Offer contextual related-title exploration without hijacking the user's selected sort order.
+- Make transitions between the wall, collections, and movie details consistent.
+
+TECHNICAL ARCHITECTURE
+Produce a maintainable skin folder with addon.xml, required resources, 1080i XML layouts, media assets, language strings, and any supported optional settings. Use reusable includes for poster cards, focus states, metadata, dialogs, and animations. Separate optional helper add-on code from skin code. Follow current Kodi skin add-on packaging conventions for the target version; verify dependency IDs and minimum versions instead of guessing.
+
+The implementation should address:
+- Kodi navigation and focus control IDs
+- Container layouts and data binding
+- Video library nodes and metadata labels
+- Window properties and conditional visibility
+- Supported animation effects and limitations
+- Texture caching, artwork fallbacks, and memory management
+- Remote and keyboard key mapping without overriding essential system controls
+- Localization-ready text
+- Accessibility: readable focus, legible metadata, reduced-motion setting if achievable
+- Optional settings: poster density, animations, wall behavior, shuffle activation, sorting, and background dimming
+- Safe upgrades, clean installation, and graceful handling of a missing helper add-on
+
+PERFORMANCE BUDGET AND TESTING
+Aim for immediate directional feedback, no obvious jank during repeated navigation, no full-wall redraw on ordinary focus changes, and smooth details transitions on the target hardware. Do not claim specific FPS or latency without measurement. Test on a realistic Kodi installation and document CPU/GPU/platform limitations.
+
+Test cases:
+1. Empty library.
+2. Single movie.
+3. 100 movies.
+4. 1,000+ movies.
+5. Missing or malformed artwork.
+6. Very long titles and descriptions.
+7. Offline operation.
+8. Fast D-pad repetition.
+9. Back/forward navigation and focus restoration.
+10. Movie sets, watched flags, resume points, and playback.
+11. 1080p and 4K displays.
+12. Missing optional helper add-on.
+13. Switching skins and recovery from broken settings.
+
+WORKFLOW — DO NOT SKIP
+PHASE A — AUDIT: Inspect the Kodi version, operating system, repository, available assets, and skin API documentation. Study references. List hard constraints and open questions.
+PHASE B — DESIGN: Present the fidelity matrix, screen map, component plan, focus graph, performance strategy, and limitations. Define the MVP.
+PHASE C — SCAFFOLD: Create a valid, installable Kodi skin skeleton and confirm Kodi recognizes it.
+PHASE D — COVER WALL: Implement and test poster rendering, selection, and directional navigation with a real Kodi library.
+PHASE E — DETAILS: Implement and test movie information and playback actions.
+PHASE F — DISCOVERY: Implement sets, filters, and optional metadata-driven related ordering. Verify helper compatibility and fallbacks.
+PHASE G — POLISH: Add transitions, focus animations, loading states, settings, and accessibility improvements.
+PHASE H — QA AND DELIVERY: Package the add-on ZIP, provide screenshots/video of real Kodi output if available, document installation and known limitations, and provide a test report.
+
+DELIVERABLES
+- Complete source code with readable project structure.
+- Installable Kodi skin ZIP.
+- Optional helper add-on source and ZIP, if necessary.
+- README: prerequisites, install, configure, uninstall, troubleshoot.
+- Feature-fidelity matrix: implemented / partial / unsupported.
+- Real-world test report and remaining issues.
+- Explanation of how cover shuffling works, including metadata ranking and caching.
+
+ACCEPTANCE CRITERIA
+The skin installs and loads in Kodi 21 Omega, shows an attractive dense movie-poster wall from a real Kodi video library, supports correct remote navigation, opens working movie details, plays content using Kodi, remains usable offline, and behaves acceptably with a large collection. A related-cover mode is considered complete only if the ordering really changes based on library metadata. Animated arbitrary cover rearrangement is a stretch goal, not a claim of native Kodi support.
+
+FIRST RESPONSE REQUIRED FROM THE CODING AGENT
+Do not immediately generate hundreds of untested files. First inspect the project/environment and report:
+1. Confirmed Kodi version and OS.
+2. Available code and artwork assets.
+3. Confirmed Kodi skinning capabilities and constraints.
+4. Reference-to-implementation fidelity matrix.
+5. Proposed project structure and phased implementation plan.
+Then begin Phase C, validating each milestone before proceeding. If direct execution/testing in Kodi is unavailable, explicitly say so and provide precise manual validation instructions; do not pretend testing occurred.
+
+QUALITY BAR
+The target is a refined, theater-grade experience with meticulous alignment, visual restraint, immersive cover browsing, and genuinely reliable Kodi behavior. Favor an excellent, real implementation over a flashy but technically impossible imitation.

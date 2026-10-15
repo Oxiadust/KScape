@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Open straight onto the cover wall. The animated wall needs script.kscape.wall; without it,
+     fall back to the native poster wall. Closing the wall returns to Home. -->
+<window>
+	<onload>ReplaceWindow(Home)</onload>
+	<onload condition="System.AddonIsEnabled(script.kscape.wall)">RunScript(script.kscape.wall)</onload>
+	<onload condition="!System.AddonIsEnabled(script.kscape.wall)">ActivateWindow(Videos,videodb://movies/titles/,return)</onload>
+	<controls/>
+</window>

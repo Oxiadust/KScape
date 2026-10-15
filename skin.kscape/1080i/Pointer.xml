@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodi requires image ids 1-4 (normal, drag, drag-alt, click). -->
+<window>
+	<controls>
+		<control type="image" id="1">
+			<width>24</width>
+			<height>24</height>
+			<texture>pointer.png</texture>
+		</control>
+		<control type="image" id="2">
+			<width>24</width>
+			<height>24</height>
+			<texture>pointer.png</texture>
+		</control>
+		<control type="image" id="3">
+			<width>24</width>
+			<height>24</height>
+			<texture>pointer.png</texture>
+		</control>
+		<control type="image" id="4">
+			<width>24</width>
+			<height>24</height>
+			<texture colordiffuse="FFB0B0B0">pointer.png</texture>
+		</control>
+	</controls>
+</window>

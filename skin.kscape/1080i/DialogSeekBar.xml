@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<visible>Window.IsActive(fullscreenvideo) + [Player.Seeking | Player.HasPerformedSeek(3) | Player.Paused | Player.Forwarding | Player.Rewinding | Player.ShowInfo]</visible>
+	<controls>
+		<control type="group">
+			<left>120</left>
+			<top>980</top>
+			<control type="progress">
+				<width>1680</width>
+				<height>6</height>
+				<info>Player.Progress</info>
+				<texturebg colordiffuse="40FFFFFF">white.png</texturebg>
+				<midtexture colordiffuse="FFFFFFFF">white.png</midtexture>
+			</control>
+			<control type="label">
+				<top>20</top>
+				<width>1680</width>
+				<height>40</height>
+				<font>kscape_small</font>
+				<textcolor>FFD0D0D8</textcolor>
+				<label>$INFO[Player.Time]$INFO[Player.Duration, / ]</label>
+			</control>
+		</control>
+	</controls>
+</window>

@@ -1,0 +1,35 @@
+"""Wall geometry and motion timing, shared by the window and the XML generator.
+
+Sizes are 1080p skin pixels. Values were measured from the Kaleidescape reference video
+(video/navigation.mp4): ~9 columns and ~3.6 rows visible, covers bleeding off every edge.
+"""
+
+SCREEN_W = 1920
+SCREEN_H = 1080
+
+COVER_W = 186
+COVER_H = 279          # 2:3
+PITCH_X = 210          # 24 px horizontal gutter
+PITCH_Y = 297          # 18 px vertical gutter
+FRAME = 10             # amber focus frame thickness
+
+# Recycled cover pool: enough cells to cover the screen plus slack for a camera glide.
+POOL_COLS = 13
+POOL_ROWS = 6
+
+# Info panel occupies this many cells beside the focused cover.
+PANEL_CELLS = 3
+
+# Motion (milliseconds unless noted). Reference: focus jumps instantly, wall glides;
+# synopsis ~1.1 s after the last move; shuffle ~2 s later, lasting ~1.9 s.
+PAN_MS = 350
+PANEL_DELAY_S = 1.1
+SHUFFLE_DELAY_S = 3.2
+FLIGHT_MS = 1150
+FLIGHT_JITTER_MS = 350
+FLIGHT_DELAY_MAX_MS = 300
+FLIGHT_SHRINK = 72     # percent scale at mid-flight
+DEPART_MS = 900
+
+WALL_MIN_ROWS = 3
+WALL_MAX_ROWS = 10

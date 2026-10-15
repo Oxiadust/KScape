@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+	<defaultcontrol always="true">9000</defaultcontrol>
+	<controls>
+		<control type="image">
+			<description>Background</description>
+			<width>1920</width>
+			<height>1080</height>
+			<texture>background.png</texture>
+		</control>
+		<control type="list" id="9000">
+			<description>Main menu</description>
+			<left>160</left>
+			<top>400</top>
+			<width>600</width>
+			<height>280</height>
+			<orientation>vertical</orientation>
+			<scrolltime>0</scrolltime>
+			<itemlayout width="600" height="70">
+				<control type="label">
+					<width>600</width>
+					<height>70</height>
+					<aligny>center</aligny>
+					<font>kscape_title</font>
+					<textcolor>FF6E6E76</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</itemlayout>
+			<focusedlayout width="600" height="70">
+				<control type="label">
+					<width>600</width>
+					<height>70</height>
+					<aligny>center</aligny>
+					<font>kscape_title</font>
+					<textcolor>FFF2F2F2</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+			</focusedlayout>
+			<content>
+				<item>
+					<label>$LOCALIZE[342]</label>
+					<onclick condition="System.AddonIsEnabled(script.kscape.wall)">RunScript(script.kscape.wall)</onclick>
+					<onclick condition="!System.AddonIsEnabled(script.kscape.wall)">ActivateWindow(Videos,videodb://movies/titles/,return)</onclick>
+				</item>
+				<item>
+					<label>$LOCALIZE[5]</label>
+					<onclick>ActivateWindow(Settings)</onclick>
+				</item>
+				<item>
+					<label>$LOCALIZE[13012]</label>
+					<onclick>Quit</onclick>
+				</item>
+			</content>
+		</control>
+	</controls>
+</window>

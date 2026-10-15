@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodi drives progress id 29999 with the current volume. -->
+<window>
+	<depth>DepthMax</depth>
+	<controls>
+		<control type="group">
+			<visible>!Window.IsActive(startup)</visible>
+			<left>760</left>
+			<top>60</top>
+			<control type="progress" id="29999">
+				<width>400</width>
+				<height>6</height>
+				<texturebg colordiffuse="40FFFFFF">white.png</texturebg>
+				<midtexture colordiffuse="FFFFFFFF">white.png</midtexture>
+			</control>
+		</control>
+	</controls>
+</window>

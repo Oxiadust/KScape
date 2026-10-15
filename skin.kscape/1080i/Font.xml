@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fonts>
+	<!-- arial.ttf resolves to Kodi's core media/Fonts when the skin does not ship it. -->
+	<fontset id="Default" idloc="31001">
+		<font>
+			<name>font13</name>
+			<filename>arial.ttf</filename>
+			<size>26</size>
+		</font>
+		<font>
+			<name>kscape_small</name>
+			<filename>arial.ttf</filename>
+			<size>22</size>
+		</font>
+		<font>
+			<name>kscape13</name>
+			<filename>arial.ttf</filename>
+			<size>26</size>
+		</font>
+		<font>
+			<name>kscape_title</name>
+			<filename>arial.ttf</filename>
+			<size>40</size>
+		</font>
+		<font>
+			<name>kscape_panel_title</name>
+			<filename>arial.ttf</filename>
+			<size>40</size>
+			<style>bold</style>
+		</font>
+		<font>
+			<name>kscape_panel_body</name>
+			<filename>arial.ttf</filename>
+			<size>29</size>
+			<linespacing>1.1</linespacing>
+		</font>
+	</fontset>
+</fonts>
