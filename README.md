@@ -18,6 +18,17 @@ own library artwork. It is not affiliated with Kaleidescape and uses none of its
 - **Related-cover shuffle.** About 3.2 s after you stop, every cover flies to a new cell so the
   most related movies end up closest to the one you picked. That movie and its panel stay put;
   covers leaving the screen fly off and newcomers fly in from the edges.
+- **Movie info.** Select on a cover slides up a large panel over the wall: poster, the
+  rating and facts line (runtime, video quality, aspect ratio, country, year), synopsis, genres,
+  cast, director and collection, with **Return / Resume Movie / Play Movie / Play Trailer**.
+  Resume and Trailer only appear when Kodi has a resume point or trailer for that movie.
+- **List view.** The library as a table: the focused movie sits in a tall blue band with its
+  poster and up to four genres, cast members and directors; the other rows show one line per
+  column. Left/Right move between the Title, Genre, Cast, Director, Year, Time, Rating and
+  Quality columns, scrolling the columns sideways. Moving up or down while Genre, Year, Time,
+  Rating, Quality or Title is focused re-sorts the list by it, keeping the movie under the band.
+  Sorting by genre lists a movie under each of its genres; the genre it is listed under is
+  shown in amber.
 - **Quality badges.** Covers show **HDR** or **UHD** when Kodi has stream details for the file.
 - **Library aware.** The wall reloads itself after a library scan or clean, keeping your place.
 - **Remembers where you were**, across Kodi restarts.
@@ -31,9 +42,16 @@ own library artwork. It is not affiliated with Kaleidescape and uses none of its
 | Key | Action |
 | --- | --- |
 | Arrows | Move across the wall (stops at the edges, no wrap-around) |
-| Select / Enter | Play the movie (resumes from the last position if there is one) |
+| Select / Enter | Open the movie info screen |
+| Play | Play the movie (resumes from the last position if there is one) |
 | Back / Esc | Undo the last shuffle; with nothing left to undo, leave the wall |
-| Menu / C / Info | Wall menu: shuffle now, automatic shuffle on/off, reduce motion on/off, show duplicates once on/off, reload library, switch skin, exit |
+| Menu / C / Info | Wall menu: list view, shuffle now, automatic shuffle on/off, reduce motion on/off, show duplicates once on/off, reload library, switch skin, exit |
+
+In the **list view**: Up/Down move through movies, Left/Right between columns, Select opens the
+info screen, Play plays, Back returns to the cover wall on the same movie, and Menu offers
+cover wall / switch skin / exit. The view you were in is remembered across restarts.
+
+On the **info screen**: Up/Down choose an action, Select runs it, Back returns.
 
 During playback: **OK / Menu** opens the controls, **Info** shows the movie's details, **Back** closes them,
 and the usual Kodi playback keys (pause, seek, stop) keep working.
@@ -111,12 +129,14 @@ Back undoes shuffles from a history stack.
 ```
 skin.kscape/              Kodi skin: startup routing, minimal Home, dialogs, playback controls,
                           fallback poster grid
-script.kscape.wall/       The cover wall add-on (Python + generated window XML)
-  resources/lib/          geometry, model, ranking, wallmodel (pure Python), library, skins, state,
-                          window
-  tests/                  unit tests for ranking, placement, badges
+script.kscape.wall/       The cover wall add-on (Python + window XML)
+  resources/lib/          geometry, model, ranking, wallmodel, info, listmodel (pure Python);
+                          library, cache, skins, state, window (wall), details (info screen),
+                          listwindow (list view)
+  tests/                  unit tests for ranking, placement, badges, info text, list sorting
 tools/
   gen_wall_xml.py         generates the wall window XML from geometry.py (do not hand-edit the XML)
+  gen_list_xml.py         generates the list view XML from listmodel.py (likewise)
   build_zips.sh           installable ZIPs into dist/
   kodi_smoke_test.sh      launches an isolated test Kodi (temporary HOME, JSON-RPC port 9091)
   kodi_nav_test.py        drives the test Kodi over JSON-RPC
@@ -129,6 +149,7 @@ tools/
 ```sh
 (cd script.kscape.wall && python3 -m unittest discover -s tests)   # unit tests
 python3 tools/gen_wall_xml.py                                       # after changing geometry.py
+python3 tools/gen_list_xml.py                                       # after changing listmodel.py
 tools/kodi_smoke_test.sh                                            # isolated Kodi with both add-ons
 python3 -I tools/kodi_nav_test.py                                   # scripted navigation checks
 ```
@@ -150,5 +171,13 @@ against real data. Kodi screenshots take about a second, so check motion with sl
 - Tested on macOS with Kodi 21.3 at 1080p and a 384-movie library. Not yet tested at 4K, on
   low-power devices, or with a real 5,000-movie library (ranking and placement for 5,000 movies
   take about 55 ms on the development Mac).
+- The info screen lays out its right-hand column from estimated line counts (Kodi cannot
+  measure text for scripts): a long synopsis scrolls inside its box, and an unusually long cast
+  list is cut at three lines.
+- The video aspect ratio on the info screen is the encoded video's, as Kodi reports it, so a
+  letterboxed 2.39 film encoded at 16:9 shows 1.78.
+- The list view takes a snapshot of the library when it opens; library changes made while it is
+  open appear the next time you open it.
+- Kaleidescape's *Play Scene* and *Movie Store* entries have no Kodi equivalent and are not offered.
 - A key press during a camera glide may show a one-frame jump; not observed, not ruled out.
 - The reference video used to match the motion is kept out of the repository.

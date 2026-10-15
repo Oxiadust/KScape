@@ -1,13 +1,16 @@
 """Movie record built from Kodi JSON-RPC VideoLibrary.GetMovies results (pure Python)."""
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import FrozenSet, Tuple
 
 MAX_CAST = 8
 
 JSONRPC_PROPERTIES = [
     'title', 'sorttitle', 'year', 'genre', 'director', 'cast', 'set', 'setid', 'tag',
-    'art', 'plot', 'runtime', 'file', 'resume', 'playcount', 'streamdetails',
+    'art', 'plot', 'runtime', 'file', 'resume', 'playcount', 'streamdetails', 'mpaa',
 ]
+# Cast is ~70% of the cost of listing a large library (28 of 41 s for 5,000 movies on the
+# development Mac) and only the shuffle ranking needs it, so it is fetched separately.
+LIGHT_PROPERTIES = [p for p in JSONRPC_PROPERTIES if p != 'cast']
 
 
 def badge_for(streamdetails):
@@ -39,6 +42,7 @@ class Movie:
     runtime: int                   # seconds
     resume_position: float
     badge: str = ''
+    mpaa: str = ''                 # as scraped, e.g. 'Rated PG-13'
 
     @classmethod
     def from_jsonrpc(cls, m):
@@ -59,7 +63,25 @@ class Movie:
             runtime=int(m.get('runtime') or 0),
             resume_position=float((m.get('resume') or {}).get('position') or 0),
             badge=badge_for(m.get('streamdetails')),
+            mpaa=m.get('mpaa') or '',
         )
+
+    def to_cache(self):
+        d = asdict(self)
+        for key in ('genres', 'directors', 'tags'):
+            d[key] = sorted(d[key])
+        d['cast'] = list(d['cast'])
+        return d
+
+    @classmethod
+    def from_cache(cls, d):
+        return cls(**dict(d, genres=frozenset(d['genres']), directors=frozenset(d['directors']),
+                          tags=frozenset(d['tags']), cast=tuple(d['cast'])))
+
+    def looks_same(self, other):
+        """True when the cover would render identically (cast-only changes are invisible)."""
+        return (self.poster, self.badge, self.title, self.year) == \
+               (other.poster, other.badge, other.title, other.year)
 
 
 BADGE_RANK = {'HDR': 2, 'UHD': 1, '': 0}

@@ -83,3 +83,106 @@ msgstr ""
 msgctxt "#32031"
 msgid "Off"
 msgstr ""
+
+#. Runtime; {} is a number
+msgctxt "#32040"
+msgid "{} hour"
+msgstr ""
+
+msgctxt "#32041"
+msgid "{} hours"
+msgstr ""
+
+msgctxt "#32042"
+msgid "{} minute"
+msgstr ""
+
+msgctxt "#32043"
+msgid "{} minutes"
+msgstr ""
+
+#. Video aspect ratio; {} is e.g. 1.78
+msgctxt "#32044"
+msgid "{} aspect ratio"
+msgstr ""
+
+#. List view column headings
+msgctxt "#32050"
+msgid "Title"
+msgstr ""
+
+msgctxt "#32051"
+msgid "Genre"
+msgstr ""
+
+msgctxt "#32052"
+msgid "Cast"
+msgstr ""
+
+msgctxt "#32053"
+msgid "Director"
+msgstr ""
+
+msgctxt "#32054"
+msgid "Year"
+msgstr ""
+
+msgctxt "#32055"
+msgid "Time"
+msgstr ""
+
+msgctxt "#32056"
+msgid "Rating"
+msgstr ""
+
+msgctxt "#32057"
+msgid "Quality"
+msgstr ""
+
+#. Info screen headings
+msgctxt "#32061"
+msgid "Synopsis"
+msgstr ""
+
+msgctxt "#32062"
+msgid "Genres"
+msgstr ""
+
+msgctxt "#32063"
+msgid "Cast"
+msgstr ""
+
+msgctxt "#32064"
+msgid "Director"
+msgstr ""
+
+msgctxt "#32065"
+msgid "Collection"
+msgstr ""
+
+#. Info screen menu
+msgctxt "#32066"
+msgid "Return"
+msgstr ""
+
+msgctxt "#32067"
+msgid "Resume Movie"
+msgstr ""
+
+msgctxt "#32068"
+msgid "Play Movie"
+msgstr ""
+
+msgctxt "#32069"
+msgid "Play Trailer"
+msgstr ""
+
+#. Switch from the list view to the cover wall
+msgctxt "#32070"
+msgid "Cover wall"
+msgstr ""
+
+#. Switch from the cover wall to the list view
+msgctxt "#32071"
+msgid "List view"
+msgstr ""

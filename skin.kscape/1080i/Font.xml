@@ -40,5 +40,43 @@
 			<size>29</size>
 			<linespacing>1.1</linespacing>
 		</font>
+		<font>
+			<name>kscape_info_head</name>
+			<filename>arial.ttf</filename>
+			<size>34</size>
+			<style>bold</style>
+		</font>
+		<font>
+			<name>kscape_info_label</name>
+			<filename>arial.ttf</filename>
+			<size>29</size>
+			<style>bold</style>
+		</font>
+		<font>
+			<name>kscape_menu</name>
+			<filename>arial.ttf</filename>
+			<size>31</size>
+		</font>
+		<font>
+			<name>kscape_list_row</name>
+			<filename>arial.ttf</filename>
+			<size>31</size>
+		</font>
+		<font>
+			<name>kscape_list_head</name>
+			<filename>arial.ttf</filename>
+			<size>23</size>
+			<style>bold</style>
+		</font>
+		<font>
+			<name>kscape_list_value</name>
+			<filename>arial.ttf</filename>
+			<size>27</size>
+		</font>
+		<font>
+			<name>kscape_list_title</name>
+			<filename>arial.ttf</filename>
+			<size>44</size>
+		</font>
 	</fontset>
 </fonts>

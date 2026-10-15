@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Movie info screen (resources/lib/details.py). Hand-written; the right-hand column
+     (210-261) is positioned by Python, so those controls carry no <visible> tags. -->
+<window>
+	<defaultcontrol always="true">100</defaultcontrol>
+	<controls>
+		<control type="group">
+			<description>Panel: slides up from the bottom edge, as in the reference</description>
+			<left>96</left>
+			<top>48</top>
+			<animation effect="slide" start="0,1032" end="0,0" time="420" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1)">WindowOpen</animation>
+			<animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1)">WindowOpen</animation>
+			<animation effect="slide" start="0,0" end="0,1032" time="300" tween="cubic" easing="in" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1)">WindowClose</animation>
+			<control type="image">
+				<description>Shadow on the wall</description>
+				<left>-24</left>
+				<top>-24</top>
+				<width>1776</width>
+				<height>1032</height>
+				<texture colordiffuse="90000000">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<width>1728</width>
+				<height>984</height>
+				<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<description>Left column</description>
+				<top>64</top>
+				<width>480</width>
+				<height>920</height>
+				<texture colordiffuse="FF184CB9">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<description>Header strip</description>
+				<width>1728</width>
+				<height>64</height>
+				<texture colordiffuse="FF3876E4">kscape-white.png</texture>
+			</control>
+			<control type="label">
+				<left>30</left>
+				<width>1660</width>
+				<height>64</height>
+				<aligny>center</aligny>
+				<font>kscape_info_head</font>
+				<textcolor>FFFFFFFF</textcolor>
+				<label>$INFO[Window.Property(title)]</label>
+			</control>
+
+			<control type="group">
+				<description>Poster with fallback card and quality badge</description>
+				<left>30</left>
+				<top>88</top>
+				<control type="image">
+					<width>420</width>
+					<height>630</height>
+					<texture colordiffuse="FF1A1A1F">kscape-white.png</texture>
+				</control>
+				<control type="textbox">
+					<left>24</left>
+					<top>24</top>
+					<width>372</width>
+					<height>582</height>
+					<align>center</align>
+					<aligny>center</aligny>
+					<font>kscape_panel_title</font>
+					<textcolor>FFC8C8D0</textcolor>
+					<label>$INFO[Window.Property(title)]</label>
+					<visible>String.IsEmpty(Window.Property(poster))</visible>
+				</control>
+				<control type="image">
+					<width>420</width>
+					<height>630</height>
+					<aspectratio>scale</aspectratio>
+					<fadetime>150</fadetime>
+					<texture background="true">$INFO[Window.Property(poster)]</texture>
+				</control>
+				<control type="group">
+					<left>330</left>
+					<top>588</top>
+					<visible>!String.IsEmpty(Window.Property(badge))</visible>
+					<control type="image">
+						<width>80</width>
+						<height>32</height>
+						<texture colordiffuse="FFF5A01A">kscape-white.png</texture>
+					</control>
+					<control type="image">
+						<left>2</left>
+						<top>2</top>
+						<width>76</width>
+						<height>28</height>
+						<texture colordiffuse="F0141210">kscape-white.png</texture>
+					</control>
+					<control type="label">
+						<width>80</width>
+						<height>32</height>
+						<align>center</align>
+						<aligny>center</aligny>
+						<font>kscape_badge</font>
+						<textcolor>FFF5A01A</textcolor>
+						<label>$INFO[Window.Property(badge)]</label>
+					</control>
+				</control>
+			</control>
+
+			<control type="list" id="100">
+				<description>Return / Resume / Play / Trailer</description>
+				<top>734</top>
+				<width>480</width>
+				<height>240</height>
+				<onup>100</onup>
+				<ondown>100</ondown>
+				<onleft>100</onleft>
+				<onright>100</onright>
+				<scrolltime>0</scrolltime>
+				<itemlayout width="480" height="60">
+					<control type="label">
+						<left>30</left>
+						<width>300</width>
+						<height>60</height>
+						<aligny>center</aligny>
+						<font>kscape_menu</font>
+						<textcolor>FFD6E2FF</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+					<control type="label">
+						<left>300</left>
+						<width>150</width>
+						<height>60</height>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>kscape_small</font>
+						<textcolor>FFA9C2F2</textcolor>
+						<label>$INFO[ListItem.Label2]</label>
+					</control>
+				</itemlayout>
+				<focusedlayout width="480" height="60">
+					<control type="image">
+						<width>480</width>
+						<height>60</height>
+						<texture colordiffuse="FF4E8DF2">kscape-white.png</texture>
+					</control>
+					<control type="label">
+						<left>30</left>
+						<width>300</width>
+						<height>60</height>
+						<aligny>center</aligny>
+						<font>kscape_menu</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+					<control type="label">
+						<left>300</left>
+						<width>150</width>
+						<height>60</height>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>kscape_small</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<label>$INFO[ListItem.Label2]</label>
+					</control>
+				</focusedlayout>
+			</control>
+
+			<control type="textbox" id="210">
+				<description>Rating; runtime, quality, aspect, country, year</description>
+				<left>530</left>
+				<top>88</top>
+				<width>1150</width>
+				<height>114</height>
+				<font>kscape_panel_body</font>
+				<textcolor>FFF0F4FF</textcolor>
+			</control>
+			<control type="label" id="220">
+				<left>530</left>
+				<width>1150</width>
+				<height>44</height>
+				<font>kscape_info_label</font>
+				<textcolor>FFFFFFFF</textcolor>
+			</control>
+			<control type="textbox" id="221">
+				<description>Synopsis</description>
+				<left>530</left>
+				<width>1150</width>
+				<height>228</height>
+				<font>kscape_panel_body</font>
+				<textcolor>FFF0F4FF</textcolor>
+				<autoscroll delay="6000" time="3000" repeat="8000">true</autoscroll>
+			</control>
+			<control type="label" id="230">
+				<left>530</left>
+				<width>220</width>
+				<height>38</height>
+				<font>kscape_info_label</font>
+				<textcolor>FFFFFFFF</textcolor>
+			</control>
+			<control type="textbox" id="231">
+				<left>770</left>
+				<width>910</width>
+				<height>38</height>
+				<font>kscape_panel_body</font>
+				<textcolor>FFF0F4FF</textcolor>
+			</control>
+			<control type="label" id="240">
+				<left>530</left>
+				<width>220</width>
+				<height>38</height>
+				<font>kscape_info_label</font>
+				<textcolor>FFFFFFFF</textcolor>
+			</control>
+			<control type="textbox" id="241">
+				<left>770</left>
+				<width>910</width>
+				<height>76</height>
+				<font>kscape_panel_body</font>
+				<textcolor>FFF0F4FF</textcolor>
+			</control>
+			<control type="label" id="250">
+				<left>530</left>
+				<width>220</width>
+				<height>38</height>
+				<font>kscape_info_label</font>
+				<textcolor>FFFFFFFF</textcolor>
+			</control>
+			<control type="textbox" id="251">
+				<left>770</left>
+				<width>910</width>
+				<height>38</height>
+				<font>kscape_panel_body</font>
+				<textcolor>FFF0F4FF</textcolor>
+			</control>
+			<control type="label" id="260">
+				<left>530</left>
+				<width>220</width>
+				<height>38</height>
+				<font>kscape_info_label</font>
+				<textcolor>FFFFFFFF</textcolor>
+			</control>
+			<control type="textbox" id="261">
+				<left>770</left>
+				<width>910</width>
+				<height>38</height>
+				<font>kscape_panel_body</font>
+				<textcolor>FFF0F4FF</textcolor>
+			</control>
+		</control>
+	</controls>
+</window>

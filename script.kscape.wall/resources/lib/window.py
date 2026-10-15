@@ -9,18 +9,22 @@ Two slot pools (A, B) double-buffer the shuffle: the new arrangement is bound in
 pool while it is held transparent, then one property change hides the old covers that
 re-appear elsewhere, flies the departing ones off-screen and flies the new ones into place.
 """
+import json
 import random
 import threading
 import time
+from dataclasses import replace
 
 import xbmc
 import xbmcaddon
 import xbmcgui
 
 from . import geometry as G
-from . import state
-from .library import fetch_movies, play
-from .model import merge_duplicates
+from . import cache, state
+from .details import show_details
+from .library import fetch_cast, fetch_movie, fetch_movies, library_total, play, play_trailer
+from .listwindow import show_list
+from .model import Movie, merge_duplicates
 from .skins import choose_skin
 from .ranking import rank_related
 from .wallmodel import (Wall, camera_target, cell_origin, clip_outside, ease_out_back,
@@ -33,7 +37,8 @@ MOVES = {
     xbmcgui.ACTION_MOVE_UP: (0, -1),
     xbmcgui.ACTION_MOVE_DOWN: (0, 1),
 }
-SELECT = (xbmcgui.ACTION_SELECT_ITEM, xbmcgui.ACTION_PLAYER_PLAY)
+SELECT = (xbmcgui.ACTION_SELECT_ITEM,)
+PLAY = (xbmcgui.ACTION_PLAYER_PLAY,)
 BACK = (xbmcgui.ACTION_NAV_BACK, xbmcgui.ACTION_PREVIOUS_MENU)
 MENU = (xbmcgui.ACTION_CONTEXT_MENU, xbmcgui.ACTION_SHOW_INFO)
 
@@ -43,6 +48,7 @@ PROP_CAM = 'kscape.cam'
 PROP_FRONT = 'kscape.front'
 PROP_FRAME = 'kscape.frame'
 PROP_LAST = 'kscape.lastmovie'
+PROP_REDUCED = 'kscape.reduced'         # read by the info screen's slide-in animation
 
 
 def _is(prop, value):
@@ -95,11 +101,13 @@ class Pool:
 
 
 class LibraryMonitor(xbmc.Monitor):
-    """Flags the wall for a reload when Kodi finishes scanning or cleaning the video library."""
+    """Reports library changes: whole-library ones (scan, clean, removal) and single movie edits
+    (refreshed metadata, or the play count and resume point Kodi saves after watching)."""
 
-    def __init__(self, on_change):
+    def __init__(self, on_change, on_movie):
         super().__init__()
         self.on_change = on_change
+        self.on_movie = on_movie
 
     def onScanFinished(self, library):
         if library == 'video':
@@ -107,6 +115,21 @@ class LibraryMonitor(xbmc.Monitor):
 
     def onCleanFinished(self, library):
         if library == 'video':
+            self.on_change()
+
+    def onNotification(self, sender, method, data):
+        if method not in ('VideoLibrary.OnUpdate', 'VideoLibrary.OnRemove'):
+            return
+        try:
+            info = json.loads(data or '{}')
+        except ValueError:
+            return
+        item = info.get('item', info)
+        if item.get('type') != 'movie' or not item.get('id'):
+            return
+        if method == 'VideoLibrary.OnUpdate':
+            self.on_movie(int(item['id']))
+        else:
             self.on_change()
 
 
@@ -133,23 +156,39 @@ class WallWindow(xbmcgui.WindowXML):
         self.panel.setVisible(False)
         self.reduced = (ADDON.getSettingBool('reduced_motion')
                         or xbmc.getCondVisibility('Skin.HasSetting(ReducedMotion)'))
+        HOME.setProperty(PROP_REDUCED, '1' if self.reduced else '')
         self.auto_shuffle = ADDON.getSettingBool('auto_shuffle')
         self.merge = ADDON.getSettingBool('merge_duplicates')
         self.frame_pos = None            # frame target position (wall pixels)
         self.frame_anim = None           # (start time, start position, duration ms)
         self.frame_token = 0
-        self.reload_pending = False
-        self.monitor = LibraryMonitor(self._library_changed)
+        self.library_gen = 0             # bumped by every full reload; stale results are dropped
+        self.loading = False             # a full reload is running in the background
+        self.reload_again = False        # another change arrived while it was running
+        self.pending_library = None      # reloaded movies waiting for an idle moment
+        self.paused = False              # the info screen or list view is on top of the wall
+        self.monitor = LibraryMonitor(self._start_reload, self._movie_changed)
 
         self.status.setLabel(ADDON.getLocalizedString(32001))
-        movies = self._fetch()
+        t0 = time.perf_counter()
+        total = library_total()
+        cached = cache.load(total) if total else None
+        if cached:
+            movies = [Movie.from_cache(d) for d in cached['movies']]
+            self.cast_complete = cached['complete']
+        else:
+            movies = fetch_movies()
+            self.cast_complete = False
+        xbmc.log(f'kscape.wall: {len(movies)} movies from {"cache" if cached else "library"} in '
+                 f'{1000 * (time.perf_counter() - t0):.0f} ms', xbmc.LOGINFO)
         if not movies:
             self.status.setLabel(ADDON.getLocalizedString(32002))
             self.ready = True
             return
         self.status.setLabel('')
 
-        self.wall = Wall.column_major(movies)
+        self.all_movies = movies         # every library entry; the wall may merge duplicates
+        self.wall = Wall.column_major(self._visible(movies))
         self.history = []                # (wall, focus) before each shuffle, for Back
         self.cam = (0, 0)
         self.cam_anim = None             # (start time, start camera, duration ms)
@@ -168,6 +207,12 @@ class WallWindow(xbmcgui.WindowXML):
         self._pan(camera_target(self.wall, self.focus), animate=False)
         self.ready = True
         threading.Thread(target=self._dwell_loop, daemon=True).start()
+        if cached and cached['stale']:
+            self._start_reload()
+        elif not self.cast_complete:
+            threading.Thread(target=self._load_cast, args=(total, self.library_gen), daemon=True).start()
+        if state.load().get('view') == 'list':
+            self._open_list()             # the list view was in use when Kodi last closed
 
     def _close(self):
         self.closing = True
@@ -192,10 +237,13 @@ class WallWindow(xbmcgui.WindowXML):
             if aid in BACK:
                 self._close()             # empty library
             return
+        overlay = None
         with self.lock:
             if aid in MOVES:
                 self._move(*MOVES[aid])
             elif aid in SELECT:
+                overlay = 'details'
+            elif aid in PLAY:
                 movie = self.wall.at(*self.focus)
                 if movie:
                     self._remember(movie)
@@ -206,7 +254,63 @@ class WallWindow(xbmcgui.WindowXML):
                 else:
                     self._close()
             elif aid in MENU:
-                self._menu()
+                overlay = self._menu()
+        # Opened outside the lock: the wall's background work waits on `paused`, not the lock.
+        if overlay == 'details':
+            self._open_details()
+        elif overlay == 'list':
+            self._open_list()
+
+    # ---- info screen and list view -------------------------------------------------------------
+
+    def _open_details(self):
+        with self.lock:
+            movie = self.wall.at(*self.focus)
+            if not movie:
+                return
+            self.paused = True
+            self._hide_panel()
+        try:
+            choice, details = show_details(movie)
+        finally:
+            with self.lock:
+                self.paused = False
+                self.last_input = time.time()
+        if choice in ('play', 'resume'):
+            self._remember(movie)
+            play(movie, resume=choice == 'resume')
+        elif choice == 'trailer' and details and details.get('trailer'):
+            play_trailer(details['trailer'])
+
+    def _open_list(self):
+        with self.lock:
+            self.paused = True
+            self._hide_panel()
+            current = self.wall.at(*self.focus)
+            movies = self._visible(self.all_movies)
+        state.save(view='list')
+        try:
+            result, movieid = show_list(movies, current.movieid if current else None)
+        finally:
+            with self.lock:
+                self.paused = False
+                self.last_input = time.time()
+        with self.lock:
+            cell = self.wall.cell_of(movieid) if movieid is not None else None
+            if cell and cell != self.focus:
+                self._finish_shuffle()
+                self.focus = cell
+                self._set_frame()
+                self._pan(camera_target(self.wall, self.focus), animate=False)
+            if result == 'wall':
+                state.save(view='wall')
+            elif result == 'skin':
+                skin = choose_skin()
+                if skin:
+                    self.pending_skin = skin
+                    self._close()
+            elif result == 'exit':
+                self._close()
 
     def _move(self, dx, dy):
         c, r = self.focus[0] + dx, self.focus[1] + dy
@@ -328,14 +432,15 @@ class WallWindow(xbmcgui.WindowXML):
             time.sleep(0.05)
             with self.lock:
                 now = time.time()
-                if xbmc.getCondVisibility('Player.HasVideo'):
-                    self.last_input = now     # wall is behind the video: stay idle
+                if self.paused or xbmc.getCondVisibility('Player.HasVideo'):
+                    self.last_input = now     # wall is covered: stay idle
                     continue
                 if self.shuffle_until and now >= self.shuffle_until:
                     self._finish_shuffle()
                 idle = now - self.last_input
-                if self.reload_pending and idle >= 1.0 and not self.shuffle_until:
-                    self._reload()
+                if self.pending_library is not None and idle >= 1.0 and not self.shuffle_until:
+                    movies, self.pending_library = self.pending_library, None
+                    self._apply_library(movies)
                     continue
                 if not self.panel_shown and idle >= G.PANEL_DELAY_S:
                     self._show_panel()
@@ -350,6 +455,7 @@ class WallWindow(xbmcgui.WindowXML):
     def _menu(self):
         on_off = lambda flag: ADDON.getLocalizedString(32030 if flag else 32031)
         items = [
+            ('list', ADDON.getLocalizedString(32071)),
             ('shuffle', ADDON.getLocalizedString(32021)),
             ('auto', ADDON.getLocalizedString(32022).format(on_off(self.auto_shuffle))),
             ('motion', ADDON.getLocalizedString(32023).format(on_off(self.reduced))),
@@ -361,6 +467,8 @@ class WallWindow(xbmcgui.WindowXML):
         i = xbmcgui.Dialog().select(ADDON.getLocalizedString(32020), [label for _, label in items])
         choice = items[i][0] if i >= 0 else None
         self.last_input = time.time()
+        if choice == 'list':
+            return 'list'
         if choice == 'shuffle':
             movie = self.wall.at(*self.focus)
             if movie:
@@ -375,12 +483,14 @@ class WallWindow(xbmcgui.WindowXML):
         elif choice == 'motion':
             self.reduced = not self.reduced
             ADDON.setSettingBool('reduced_motion', self.reduced)
+            HOME.setProperty(PROP_REDUCED, '1' if self.reduced else '')
         elif choice == 'merge':
             self.merge = not self.merge
             ADDON.setSettingBool('merge_duplicates', self.merge)
-            self._reload()
+            self._apply_library(self.all_movies)
         elif choice == 'reload':
-            self._reload()
+            cache.discard()
+            self._start_reload()
         elif choice == 'skin':
             skin = choose_skin()
             if skin:
@@ -389,22 +499,96 @@ class WallWindow(xbmcgui.WindowXML):
         elif choice == 'exit':
             self._close()
 
-    def _library_changed(self):
-        self.reload_pending = True
-
-    def _fetch(self):
-        movies = fetch_movies()
+    def _visible(self, movies):
         return merge_duplicates(movies) if self.merge else movies
 
-    def _reload(self):
-        """Rebuild the wall from the library, keeping the focused movie when it still exists."""
-        self.reload_pending = False
+    # Library data is fetched on background threads (a large library takes tens of seconds) and
+    # applied under the lock, so the wall stays responsive while it loads.
+
+    def _load_cast(self, total, gen):
+        """Fill in cast for the shuffle ranking after the wall is already showing."""
+        t0 = time.perf_counter()
+        cast = fetch_cast()
+        with self.lock:
+            if self.closing or gen != self.library_gen:
+                return
+            self.all_movies = [replace(m, cast=cast.get(m.movieid, ())) for m in self.all_movies]
+            self._patch({m.movieid: m for m in self.all_movies})
+            self.cast_complete = True
+            snapshot = list(self.all_movies)
+        xbmc.log(f'kscape.wall: cast for {len(cast)} movies in {1000 * (time.perf_counter() - t0):.0f} ms',
+                 xbmc.LOGINFO)
+        cache.save(total, [m.to_cache() for m in snapshot], complete=True)
+
+    def _start_reload(self):
+        """Re-read the whole library in the background; it is applied once the wall is idle."""
+        if self.loading:
+            self.reload_again = True
+            return
+        self.loading = True
+        self.library_gen += 1
+        threading.Thread(target=self._reload_worker, args=(self.library_gen,), daemon=True).start()
+
+    def _reload_worker(self, gen):
+        while True:
+            self.reload_again = False
+            total = library_total()
+            movies = fetch_movies()
+            cast = fetch_cast()
+            if not self.reload_again:
+                break
+        movies = [replace(m, cast=cast.get(m.movieid, ())) for m in movies]
+        with self.lock:
+            self.loading = False
+            if self.closing or gen != self.library_gen or not movies:
+                return
+            self.pending_library = movies
+            self.cast_complete = True
+        cache.save(total, [m.to_cache() for m in movies], complete=True)
+
+    def _movie_changed(self, movieid):
+        """One movie changed (e.g. watched): patch it in place without re-laying out the wall."""
+        threading.Thread(target=self._refresh_movie, args=(movieid,), daemon=True).start()
+
+    def _refresh_movie(self, movieid):
+        movie = fetch_movie(movieid)
+        with self.lock:
+            if self.closing or not hasattr(self, 'all_movies'):
+                return
+            known = any(m.movieid == movieid for m in self.all_movies)
+            if movie is None or not known:
+                self._start_reload()              # added or vanished: needs a full re-read
+                return
+            if not self.cast_complete:
+                current = next(m for m in self.all_movies if m.movieid == movieid)
+                movie = replace(movie, cast=current.cast)
+            self.all_movies = [movie if m.movieid == movieid else m for m in self.all_movies]
+            self._patch({movieid: movie})
+            snapshot, complete = list(self.all_movies), self.cast_complete
+        cache.save(len(snapshot), [m.to_cache() for m in snapshot], complete=complete)
+
+    def _patch(self, by_id):
+        """Swap updated movies into the wall and Back history, keeping every cell in place."""
+        def patched(wall):
+            return Wall(wall.rows, wall.cols,
+                        [by_id.get(m.movieid, m) if m is not None else None for m in wall.cells])
+        old = {m.movieid: m for m in self.wall.movies()}
+        self.wall = patched(self.wall)
+        self.history = [(patched(w), f) for w, f in self.history]
+        changed = {mid for mid, m in by_id.items() if mid in old and not old[mid].looks_same(m)}
+        if changed:
+            self.front.shown = [None if mid in changed else mid for mid in self.front.shown]
+            self._rebind(self.front)
+
+    def _apply_library(self, movies):
+        """Rebuild the wall from `movies`, keeping the focused movie when it still exists."""
         self._finish_shuffle()
         current = self.wall.at(*self.focus)
-        movies = self._fetch()
-        if not movies:
+        self.all_movies = movies
+        visible = self._visible(movies)
+        if not visible:
             return
-        self.wall = Wall.column_major(movies)
+        self.wall = Wall.column_major(visible)
         self.history = []
         self.front.shown = [None] * POOL       # posters/badges may have changed
         cell = self.wall.cell_of(current.movieid) if current else None
@@ -417,13 +601,17 @@ class WallWindow(xbmcgui.WindowXML):
         self._hide_panel()
         self._set_frame()
         self._pan(camera_target(self.wall, self.focus), animate=False)
-        xbmc.log(f'kscape.wall: reloaded {len(movies)} movies', xbmc.LOGINFO)
+        xbmc.log(f'kscape.wall: applied library of {len(visible)} covers', xbmc.LOGINFO)
 
     # ---- shuffle ---------------------------------------------------------------------------
 
     def _shuffle_related(self, anchor):
+        t0 = time.perf_counter()
         ranked = rank_related(anchor, self.wall.movies())
+        t1 = time.perf_counter()
         new = self.wall.arranged_around(self.focus, ranked, blocked=self.panel_cells)
+        xbmc.log(f'kscape.wall: shuffle {len(ranked)} movies: rank {1000 * (t1 - t0):.1f} ms, '
+                 f'place {1000 * (time.perf_counter() - t1):.1f} ms', xbmc.LOGINFO)
         self.history.append((self.wall, self.focus))
         self._transition(new, anchor_id=anchor.movieid)
 
