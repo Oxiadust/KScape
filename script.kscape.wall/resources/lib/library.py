@@ -6,7 +6,7 @@ import xbmc
 from .model import JSONRPC_PROPERTIES, Movie
 
 
-def _rpc(method, params):
+def rpc(method, params):
     req = {'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params}
     res = json.loads(xbmc.executeJSONRPC(json.dumps(req)))
     if 'error' in res:
@@ -17,7 +17,7 @@ def _rpc(method, params):
 
 def fetch_movies():
     """All library movies in title order (leading articles ignored, as Kodi lists them)."""
-    result = _rpc('VideoLibrary.GetMovies', {
+    result = rpc('VideoLibrary.GetMovies', {
         'properties': JSONRPC_PROPERTIES,
         'sort': {'method': 'sorttitle', 'order': 'ascending', 'ignorearticle': True},
     })
@@ -26,5 +26,5 @@ def fetch_movies():
 
 def play(movie):
     """Play through Kodi's player, resuming from the saved bookmark when there is one."""
-    _rpc('Player.Open', {'item': {'movieid': movie.movieid},
+    rpc('Player.Open', {'item': {'movieid': movie.movieid},
                          'options': {'resume': movie.resume_position > 0}})

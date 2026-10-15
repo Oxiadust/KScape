@@ -5,8 +5,9 @@ Control ids (k = 0..POOL-1):
   900          focus sink (keeps Kodi delivering actions to the window)
   1000         camera group: positioned at -camera, glides via runtime slide animations
   1001         amber focus frame (inside camera group, under the covers)
-  1100+k       pool A cover slot group; 1300+k fallback title textbox; 1500+k poster
-  2100+k       pool B cover slot group; 2300+k fallback title textbox; 2500+k poster
+  10000+k      pool A cover slot group; +200 fallback title textbox; +400 poster;
+               +600 quality badge group; +800 badge label
+  20000+k      pool B, same offsets
   1900         info panel group; 1901 title; 1902 synopsis
   1950         status label (loading / empty library), outside the camera group
 
@@ -23,6 +24,8 @@ POOL = G.POOL_COLS * G.POOL_ROWS
 CARD = 'FF1A1A1F'
 AMBER = 'FFF5A01A'
 PANEL_BLUE = 'FF1F5BD3'
+PANEL_TEXT_H = 152            # four 37.6 px lines of kscape_panel_body; no clipped partial line
+BADGE_W, BADGE_H = 58, 28     # reference: small amber-outlined "HDR"/"UHD" tag, bottom right
 
 
 def slot(base):
@@ -51,6 +54,30 @@ def slot(base):
 					<height>{G.COVER_H}</height>
 					<aspectratio>scale</aspectratio>
 					<fadetime>120</fadetime>
+				</control>
+				<control type="group" id="{base + 600 + k}">
+					<left>{G.COVER_W - BADGE_W - 8}</left>
+					<top>{G.COVER_H - BADGE_H - 8}</top>
+					<control type="image">
+						<width>{BADGE_W}</width>
+						<height>{BADGE_H}</height>
+						<texture colordiffuse="{AMBER}">kscape-white.png</texture>
+					</control>
+					<control type="image">
+						<left>2</left>
+						<top>2</top>
+						<width>{BADGE_W - 4}</width>
+						<height>{BADGE_H - 4}</height>
+						<texture colordiffuse="F0141210">kscape-white.png</texture>
+					</control>
+					<control type="label" id="{base + 800 + k}">
+						<width>{BADGE_W}</width>
+						<height>{BADGE_H}</height>
+						<align>center</align>
+						<aligny>center</aligny>
+						<font>kscape_badge</font>
+						<textcolor>{AMBER}</textcolor>
+					</control>
 				</control>
 			</control>''')
     return '\n'.join(out)
@@ -85,8 +112,8 @@ def main():
 				<height>{G.COVER_H + 2 * G.FRAME}</height>
 				<texture colordiffuse="{AMBER}">kscape-white.png</texture>
 			</control>
-{slot(1100)}
-{slot(2100)}
+{slot(10000)}
+{slot(20000)}
 			<control type="group" id="1900">
 				<description>Info panel beside the focused cover</description>
 				<width>{panel_w}</width>
@@ -110,7 +137,7 @@ def main():
 					<left>34</left>
 					<top>88</top>
 					<width>{panel_w - 68}</width>
-					<height>{G.COVER_H - 112}</height>
+					<height>{PANEL_TEXT_H}</height>
 					<font>kscape_panel_body</font>
 					<textcolor>FFF0F4FF</textcolor>
 				</control>

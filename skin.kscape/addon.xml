@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="skin.kscape" version="0.1.0" name="kscape" provider-name="kscape contributors">
+<addon id="skin.kscape" version="0.2.0" name="kscape" provider-name="kscape contributors">
 	<requires>
 		<import addon="xbmc.gui" version="5.17.0"/>
 	</requires>

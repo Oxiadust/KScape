@@ -16,3 +16,61 @@ msgstr ""
 msgctxt "#32002"
 msgid "Your movie library is empty"
 msgstr ""
+
+msgctxt "#32010"
+msgid "Cover wall"
+msgstr ""
+
+msgctxt "#32011"
+msgid "Shuffle related covers automatically"
+msgstr ""
+
+msgctxt "#32012"
+msgid "Reduce motion"
+msgstr ""
+
+msgctxt "#32020"
+msgid "kscape"
+msgstr ""
+
+msgctxt "#32021"
+msgid "Shuffle related covers now"
+msgstr ""
+
+#. Menu toggle; {} is replaced by On or Off
+msgctxt "#32022"
+msgid "Automatic shuffle: {}"
+msgstr ""
+
+#. Menu toggle; {} is replaced by On or Off
+msgctxt "#32023"
+msgid "Reduce motion: {}"
+msgstr ""
+
+msgctxt "#32024"
+msgid "Reload library"
+msgstr ""
+
+msgctxt "#32025"
+msgid "Switch to another skin…"
+msgstr ""
+
+msgctxt "#32026"
+msgid "Exit the wall"
+msgstr ""
+
+msgctxt "#32027"
+msgid "Choose a skin"
+msgstr ""
+
+msgctxt "#32028"
+msgid "No other skins are installed."
+msgstr ""
+
+msgctxt "#32030"
+msgid "On"
+msgstr ""
+
+msgctxt "#32031"
+msgid "Off"
+msgstr ""

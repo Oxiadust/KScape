@@ -7,7 +7,7 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from resources.lib import geometry as G  # noqa: E402
-from resources.lib.model import Movie  # noqa: E402
+from resources.lib.model import Movie, badge_for  # noqa: E402
 from resources.lib.ranking import rank_related, score  # noqa: E402
 from resources.lib.wallmodel import (Wall, camera_target, clip_outside, ease_out_cubic,  # noqa: E402
                                      grid_rows)
@@ -50,6 +50,21 @@ class RankingTest(unittest.TestCase):
         lead = movie(20, 'Lead', 1980, cast=['Tom Hanks'])
         cameo = movie(21, 'Cameo', 1980, cast=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'Tom Hanks'])
         self.assertGreater(score(ANCHOR, lead), score(ANCHOR, cameo))
+
+
+class BadgeTest(unittest.TestCase):
+    def test_badges(self):
+        self.assertEqual(badge_for({'video': [{'width': 3840, 'height': 2160, 'hdrtype': 'hdr10'}]}), 'HDR')
+        self.assertEqual(badge_for({'video': [{'width': 3840, 'height': 1600, 'hdrtype': ''}]}), 'UHD')
+        self.assertEqual(badge_for({'video': [{'width': 1920, 'height': 1080, 'hdrtype': ''}]}), '')
+        self.assertEqual(badge_for(None), '')
+
+    def test_from_jsonrpc(self):
+        m = Movie.from_jsonrpc({'movieid': 5, 'title': 'X', 'year': 2001, 'genre': ['Drama'],
+                                'cast': [{'name': 'B', 'order': 1}, {'name': 'A', 'order': 0}],
+                                'art': {'thumb': 't.jpg'}, 'resume': {'position': 12.5},
+                                'streamdetails': {'video': [{'width': 3840, 'hdrtype': 'dolbyvision'}]}})
+        self.assertEqual((m.cast, m.poster, m.resume_position, m.badge), (('A', 'B'), 't.jpg', 12.5, 'HDR'))
 
 
 class WallTest(unittest.TestCase):

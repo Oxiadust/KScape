@@ -43,8 +43,10 @@
 					<onclick condition="!System.AddonIsEnabled(script.kscape.wall)">ActivateWindow(Videos,videodb://movies/titles/,return)</onclick>
 				</item>
 				<item>
-					<label>$LOCALIZE[5]</label>
-					<onclick>ActivateWindow(Settings)</onclick>
+					<!-- kscape has no Settings screens: offer a way back to a full skin instead. -->
+					<label>$LOCALIZE[31016]</label>
+					<onclick>RunScript(script.kscape.wall,switchskin)</onclick>
+					<visible>System.AddonIsEnabled(script.kscape.wall)</visible>
 				</item>
 				<item>
 					<label>$LOCALIZE[13012]</label>

@@ -4,12 +4,16 @@ Usage: python3 -I tools/kodi_nav_test.py
 Prints the focused window/item after each step so focus behaviour can be checked.
 """
 import json
+import os
 import socket
 import time
 
+# Test Kodi listens on 9091 (see kodi_smoke_test.sh); set KSCAPE_RPC_PORT=9090 for a real Kodi.
+PORT = int(os.environ.get('KSCAPE_RPC_PORT', '9091'))
+
 
 def rpc(method, params=None):
-    s = socket.create_connection(('127.0.0.1', 9090), timeout=10)
+    s = socket.create_connection(('127.0.0.1', PORT), timeout=10)
     s.sendall(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params or {}}).encode())
     buf, depth, started = b'', 0, False
     while True:

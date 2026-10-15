@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodi contract: 1 heading, 3 simple list, 6 detailed list, 5/8 extra buttons, 7 cancel. -->
+<window>
+	<defaultcontrol always="true">3</defaultcontrol>
+	<depth>DepthDialog</depth>
+	<controls>
+		<control type="image">
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="B0000000">white.png</texture>
+		</control>
+		<control type="group">
+			<left>610</left>
+			<top>220</top>
+			<animation effect="fade" start="0" end="100" time="160">WindowOpen</animation>
+			<animation effect="fade" start="100" end="0" time="120">WindowClose</animation>
+			<control type="image">
+				<width>700</width>
+				<height>640</height>
+				<texture colordiffuse="F2141418">white.png</texture>
+			</control>
+			<control type="label" id="1">
+				<left>40</left>
+				<top>28</top>
+				<width>620</width>
+				<height>50</height>
+				<font>kscape_panel_title</font>
+				<textcolor>FFFFFFFF</textcolor>
+			</control>
+			<control type="list" id="3">
+				<left>20</left>
+				<top>100</top>
+				<width>660</width>
+				<height>500</height>
+				<onup>3</onup>
+				<ondown>3</ondown>
+				<onright>7</onright>
+				<scrolltime>120</scrolltime>
+				<itemlayout width="660" height="70">
+					<control type="label">
+						<left>20</left>
+						<width>620</width>
+						<height>70</height>
+						<aligny>center</aligny>
+						<font>kscape13</font>
+						<textcolor>FFB8B8C0</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+				</itemlayout>
+				<focusedlayout width="660" height="70">
+					<control type="image">
+						<width>660</width>
+						<height>70</height>
+						<texture colordiffuse="FFF5A01A">white.png</texture>
+						<visible>Control.HasFocus(3)</visible>
+					</control>
+					<control type="label">
+						<left>20</left>
+						<width>620</width>
+						<height>70</height>
+						<aligny>center</aligny>
+						<font>kscape13</font>
+						<textcolor>FF141418</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+				</focusedlayout>
+			</control>
+			<control type="list" id="6">
+				<description>Detailed list: same look, used when items carry a second line</description>
+				<left>20</left>
+				<top>100</top>
+				<width>660</width>
+				<height>500</height>
+				<onup>6</onup>
+				<ondown>6</ondown>
+				<onright>7</onright>
+				<scrolltime>120</scrolltime>
+				<itemlayout width="660" height="70">
+					<control type="label">
+						<left>20</left>
+						<width>620</width>
+						<height>70</height>
+						<aligny>center</aligny>
+						<font>kscape13</font>
+						<textcolor>FFB8B8C0</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+				</itemlayout>
+				<focusedlayout width="660" height="70">
+					<control type="image">
+						<width>660</width>
+						<height>70</height>
+						<texture colordiffuse="FFF5A01A">white.png</texture>
+						<visible>Control.HasFocus(6)</visible>
+					</control>
+					<control type="label">
+						<left>20</left>
+						<width>620</width>
+						<height>70</height>
+						<aligny>center</aligny>
+						<font>kscape13</font>
+						<textcolor>FF141418</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+				</focusedlayout>
+			</control>
+			<control type="grouplist">
+				<description>Extra and cancel buttons (Kodi shows the ones it needs)</description>
+				<left>720</left>
+				<top>100</top>
+				<width>260</width>
+				<height>300</height>
+				<itemgap>12</itemgap>
+				<onleft>3</onleft>
+				<control type="button" id="5">
+					<width>260</width>
+					<height>64</height>
+					<font>kscape13</font>
+					<align>center</align>
+					<textcolor>FFE6E6EA</textcolor>
+					<focusedcolor>FF141418</focusedcolor>
+					<texturefocus colordiffuse="FFF5A01A">white.png</texturefocus>
+					<texturenofocus colordiffuse="FF26262C">white.png</texturenofocus>
+				</control>
+				<control type="button" id="8">
+					<width>260</width>
+					<height>64</height>
+					<font>kscape13</font>
+					<align>center</align>
+					<textcolor>FFE6E6EA</textcolor>
+					<focusedcolor>FF141418</focusedcolor>
+					<texturefocus colordiffuse="FFF5A01A">white.png</texturefocus>
+					<texturenofocus colordiffuse="FF26262C">white.png</texturenofocus>
+				</control>
+				<control type="button" id="7">
+					<width>260</width>
+					<height>64</height>
+					<font>kscape13</font>
+					<align>center</align>
+					<label>222</label>
+					<textcolor>FFE6E6EA</textcolor>
+					<focusedcolor>FF141418</focusedcolor>
+					<texturefocus colordiffuse="FFF5A01A">white.png</texturefocus>
+					<texturenofocus colordiffuse="FF26262C">white.png</texturenofocus>
+				</control>
+			</control>
+		</control>
+	</controls>
+</window>

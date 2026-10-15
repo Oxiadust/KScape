@@ -3,3 +3,4 @@ __pycache__/
 *.zip
 # Reference recording of a proprietary UI: kept local, not published.
 video/
+dist/

@@ -19,6 +19,7 @@ import xbmcgui
 
 from . import geometry as G
 from .library import fetch_movies, play
+from .skins import choose_skin
 from .ranking import rank_related
 from .wallmodel import Wall, camera_target, cell_origin, clip_outside, ease_out_cubic
 
@@ -31,6 +32,7 @@ MOVES = {
 }
 SELECT = (xbmcgui.ACTION_SELECT_ITEM, xbmcgui.ACTION_PLAYER_PLAY)
 BACK = (xbmcgui.ACTION_NAV_BACK, xbmcgui.ACTION_PREVIOUS_MENU)
+MENU = (xbmcgui.ACTION_CONTEXT_MENU, xbmcgui.ACTION_SHOW_INFO)
 
 HOME = xbmcgui.Window(10000)
 ADDON = xbmcaddon.Addon('script.kscape.wall')
@@ -50,6 +52,9 @@ class Pool:
         self.slots = [win.getControl(base + k) for k in range(POOL)]
         self.texts = [win.getControl(base + 200 + k) for k in range(POOL)]
         self.posters = [win.getControl(base + 400 + k) for k in range(POOL)]
+        self.badges = [win.getControl(base + 600 + k) for k in range(POOL)]
+        self.badge_labels = [win.getControl(base + 800 + k) for k in range(POOL)]
+        self.badge_shown = [True] * POOL
         self.cell = [None] * POOL
         self.shown = [None] * POOL      # movieid currently bound
         self.visible = [True] * POOL    # XML default
@@ -65,6 +70,11 @@ class Pool:
         if self.shown[k] != movie.movieid:
             self.posters[k].setImage(movie.poster)
             self.texts[k].setText('' if movie.poster else f'{movie.title}[CR]({movie.year})')
+            if movie.badge:
+                self.badge_labels[k].setLabel(movie.badge)
+            if self.badge_shown[k] != bool(movie.badge):
+                self.badges[k].setVisible(bool(movie.badge))
+                self.badge_shown[k] = bool(movie.badge)
             self.shown[k] = movie.movieid
         self.set_visible(k, True)
 
@@ -80,8 +90,25 @@ class Pool:
             self.set_visible(k, False)
 
 
+class LibraryMonitor(xbmc.Monitor):
+    """Flags the wall for a reload when Kodi finishes scanning or cleaning the video library."""
+
+    def __init__(self, on_change):
+        super().__init__()
+        self.on_change = on_change
+
+    def onScanFinished(self, library):
+        if library == 'video':
+            self.on_change()
+
+    def onCleanFinished(self, library):
+        if library == 'video':
+            self.on_change()
+
+
 class WallWindow(xbmcgui.WindowXML):
     ready = False
+    pending_skin = None              # set when the user picks another skin; acted on after close
 
     # ---- lifecycle -------------------------------------------------------------------------
 
@@ -94,13 +121,17 @@ class WallWindow(xbmcgui.WindowXML):
         self.frame = self.getControl(1001)
         self.panel = self.getControl(1900)
         self.status = self.getControl(1950)
-        self.front, self.back = Pool(self, 1100), Pool(self, 2100)
+        self.front, self.back = Pool(self, 10000), Pool(self, 20000)
         for k in range(POOL):
             self.front.set_visible(k, False)
             self.back.set_visible(k, False)
         self.frame.setVisible(False)
         self.panel.setVisible(False)
-        self.reduced = xbmc.getCondVisibility('Skin.HasSetting(ReducedMotion)')
+        self.reduced = (ADDON.getSettingBool('reduced_motion')
+                        or xbmc.getCondVisibility('Skin.HasSetting(ReducedMotion)'))
+        self.auto_shuffle = ADDON.getSettingBool('auto_shuffle')
+        self.reload_pending = False
+        self.monitor = LibraryMonitor(self._library_changed)
 
         self.status.setLabel(ADDON.getLocalizedString(32001))
         movies = fetch_movies()
@@ -162,6 +193,8 @@ class WallWindow(xbmcgui.WindowXML):
                     self._undo()
                 else:
                     self._close()
+            elif aid in MENU:
+                self._menu()
 
     def _move(self, dx, dy):
         c, r = self.focus[0] + dx, self.focus[1] + dy
@@ -263,13 +296,77 @@ class WallWindow(xbmcgui.WindowXML):
                 if self.shuffle_until and now >= self.shuffle_until:
                     self._finish_shuffle()
                 idle = now - self.last_input
+                if self.reload_pending and idle >= 1.0 and not self.shuffle_until:
+                    self._reload()
+                    continue
                 if not self.panel_shown and idle >= G.PANEL_DELAY_S:
                     self._show_panel()
                 movie = self.wall.at(*self.focus)
-                if (movie and idle >= G.SHUFFLE_DELAY_S and not self.shuffle_until
+                if (movie and self.auto_shuffle and idle >= G.SHUFFLE_DELAY_S and not self.shuffle_until
                         and self.shuffled_for != movie.movieid):
                     self.shuffled_for = movie.movieid
                     self._shuffle_related(movie)
+
+    # ---- menu and library changes -------------------------------------------------------------
+
+    def _menu(self):
+        on_off = lambda flag: ADDON.getLocalizedString(32030 if flag else 32031)
+        items = [
+            ('shuffle', ADDON.getLocalizedString(32021)),
+            ('auto', ADDON.getLocalizedString(32022).format(on_off(self.auto_shuffle))),
+            ('motion', ADDON.getLocalizedString(32023).format(on_off(self.reduced))),
+            ('reload', ADDON.getLocalizedString(32024)),
+            ('skin', ADDON.getLocalizedString(32025)),
+            ('exit', ADDON.getLocalizedString(32026)),
+        ]
+        i = xbmcgui.Dialog().select(ADDON.getLocalizedString(32020), [label for _, label in items])
+        choice = items[i][0] if i >= 0 else None
+        self.last_input = time.time()
+        if choice == 'shuffle':
+            movie = self.wall.at(*self.focus)
+            if movie:
+                self._finish_shuffle()
+                if not self.panel_shown:
+                    self._show_panel()
+                self.shuffled_for = movie.movieid
+                self._shuffle_related(movie)
+        elif choice == 'auto':
+            self.auto_shuffle = not self.auto_shuffle
+            ADDON.setSettingBool('auto_shuffle', self.auto_shuffle)
+        elif choice == 'motion':
+            self.reduced = not self.reduced
+            ADDON.setSettingBool('reduced_motion', self.reduced)
+        elif choice == 'reload':
+            self._reload()
+        elif choice == 'skin':
+            skin = choose_skin()
+            if skin:
+                self.pending_skin = skin
+                self._close()
+        elif choice == 'exit':
+            self._close()
+
+    def _library_changed(self):
+        self.reload_pending = True
+
+    def _reload(self):
+        """Rebuild the wall from the library, keeping the focused movie when it still exists."""
+        self.reload_pending = False
+        self._finish_shuffle()
+        current = self.wall.at(*self.focus)
+        movies = fetch_movies()
+        if not movies:
+            return
+        self.wall = Wall.column_major(movies)
+        self.history = []
+        self.front.shown = [None] * POOL       # posters/badges may have changed
+        cell = self.wall.cell_of(current.movieid) if current else None
+        self.focus = cell or (0, 0)
+        self.shuffled_for = None
+        self._hide_panel()
+        self._set_frame()
+        self._pan(camera_target(self.wall, self.focus), animate=False)
+        xbmc.log(f'kscape.wall: reloaded {len(movies)} movies', xbmc.LOGINFO)
 
     # ---- shuffle ---------------------------------------------------------------------------
 

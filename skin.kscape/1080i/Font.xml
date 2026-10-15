@@ -23,6 +23,12 @@
 			<size>40</size>
 		</font>
 		<font>
+			<name>kscape_badge</name>
+			<filename>arial.ttf</filename>
+			<size>17</size>
+			<style>bold</style>
+		</font>
+		<font>
 			<name>kscape_panel_title</name>
 			<filename>arial.ttf</filename>
 			<size>40</size>

@@ -1,7 +1,9 @@
-# Minimal Kodi JSON-RPC client over raw TCP (port 9090). Usage: kscape-rpc.py '<method>' '<json params>'
-import json, socket, sys
+# Minimal Kodi JSON-RPC client over raw TCP. Usage: kodi_rpc.py '<method>' '<json params>'
+# Port 9091 = isolated test Kodi; set KSCAPE_RPC_PORT=9090 to talk to a real Kodi.
+import json, os, socket, sys
+PORT = int(os.environ.get('KSCAPE_RPC_PORT', '9091'))
 method = sys.argv[1]; params = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
-s = socket.create_connection(('127.0.0.1', 9090), timeout=10)
+s = socket.create_connection(('127.0.0.1', PORT), timeout=10)
 s.sendall(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params}).encode())
 buf, depth, started = b'', 0, False
 while True:

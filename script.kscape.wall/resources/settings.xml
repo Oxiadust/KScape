@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings version="1">
+	<section id="script.kscape.wall">
+		<category id="wall" label="32010" help="">
+			<group id="1">
+				<setting id="auto_shuffle" type="boolean" label="32011" help="">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="reduced_motion" type="boolean" label="32012" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+			</group>
+		</category>
+	</section>
+</settings>

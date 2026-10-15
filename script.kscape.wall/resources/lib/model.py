@@ -6,8 +6,21 @@ MAX_CAST = 8
 
 JSONRPC_PROPERTIES = [
     'title', 'sorttitle', 'year', 'genre', 'director', 'cast', 'set', 'setid', 'tag',
-    'art', 'plot', 'runtime', 'file', 'resume', 'playcount',
+    'art', 'plot', 'runtime', 'file', 'resume', 'playcount', 'streamdetails',
 ]
+
+
+def badge_for(streamdetails):
+    """Cover badge from the first video stream: 'HDR' for any HDR type, else 'UHD' for 4K."""
+    video = (streamdetails or {}).get('video') or []
+    if not video:
+        return ''
+    v = video[0]
+    if v.get('hdrtype'):
+        return 'HDR'
+    if (v.get('width') or 0) >= 3200 or (v.get('height') or 0) >= 1800:
+        return 'UHD'
+    return ''
 
 
 @dataclass(frozen=True)
@@ -25,6 +38,7 @@ class Movie:
     plot: str
     runtime: int                   # seconds
     resume_position: float
+    badge: str = ''
 
     @classmethod
     def from_jsonrpc(cls, m):
@@ -44,4 +58,5 @@ class Movie:
             plot=m.get('plot') or '',
             runtime=int(m.get('runtime') or 0),
             resume_position=float((m.get('resume') or {}).get('position') or 0),
+            badge=badge_for(m.get('streamdetails')),
         )

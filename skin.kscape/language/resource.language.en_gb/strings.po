@@ -37,3 +37,7 @@ msgstr ""
 msgctxt "#31015"
 msgid "Loading library…"
 msgstr ""
+
+msgctxt "#31016"
+msgid "Switch skin"
+msgstr ""
