@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
-	<visible>Window.IsActive(fullscreenvideo) + [Player.Seeking | Player.HasPerformedSeek(3) | Player.Paused | Player.Forwarding | Player.Rewinding | Player.ShowInfo]</visible>
+	<visible>Window.IsActive(fullscreenvideo) + !Window.IsActive(videoosd) + [Player.Seeking | Player.HasPerformedSeek(3) | Player.Paused | Player.Forwarding | Player.Rewinding | Player.ShowInfo]</visible>
 	<controls>
 		<control type="group">
 			<left>120</left>

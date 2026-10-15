@@ -20,6 +20,9 @@ own library artwork. It is not affiliated with Kaleidescape and uses none of its
   covers leaving the screen fly off and newcomers fly in from the edges.
 - **Quality badges.** Covers show **HDR** or **UHD** when Kodi has stream details for the file.
 - **Library aware.** The wall reloads itself after a library scan or clean, keeping your place.
+- **Remembers where you were**, across Kodi restarts.
+- **Playback controls** in the same style: play/pause, back/forward 30 s, audio track, subtitles
+  (both cycle in place), stop, plus a title strip and an info screen.
 
 ### Remote / keyboard
 
@@ -29,6 +32,9 @@ own library artwork. It is not affiliated with Kaleidescape and uses none of its
 | Select / Enter | Play the movie (resumes from the last position if there is one) |
 | Back / Esc | Undo the last shuffle; with nothing left to undo, leave the wall |
 | Menu / C / Info | Wall menu: shuffle now, automatic shuffle on/off, reduce motion on/off, reload library, switch skin, exit |
+
+During playback: **OK / Menu** opens the controls, **Info** shows the movie's details, **Back** closes them,
+and the usual Kodi playback keys (pause, seek, stop) keep working.
 
 ## Install
 
@@ -99,9 +105,11 @@ Back undoes shuffles from a history stack.
 ## Project layout
 
 ```
-skin.kscape/              Kodi skin: startup routing, minimal Home, dialogs, fallback poster grid
+skin.kscape/              Kodi skin: startup routing, minimal Home, dialogs, playback controls,
+                          fallback poster grid
 script.kscape.wall/       The cover wall add-on (Python + generated window XML)
-  resources/lib/          geometry, model, ranking, wallmodel (pure Python), library, skins, window
+  resources/lib/          geometry, model, ranking, wallmodel (pure Python), library, skins, state,
+                          window
   tests/                  unit tests for ranking, placement, badges
 tools/
   gen_wall_xml.py         generates the wall window XML from geometry.py (do not hand-edit the XML)
@@ -128,8 +136,10 @@ against real data. Kodi screenshots take about a second, so check motion with sl
 
 ## Known limitations
 
-- No Kodi Settings, add-on browser, or full-screen video OSD screens: kscape is only the wall.
-  Use another skin for system configuration (see *Switching back*).
+- No Kodi Settings or add-on browser screens, and no audio/subtitle settings dialogs (the playback
+  controls cycle tracks instead): kscape is only the wall. Use another skin for system
+  configuration (see *Switching back*).
+- Duplicate library entries (e.g. several editions of one film) each get their own cover.
 - Badges depend on Kodi's stream details, which it records only after reading the files.
 - Tested on macOS with Kodi 21.3 at 1080p and a 384-movie library. Not yet tested at 4K, on
   low-power devices, or with a real 5,000-movie library (ranking and placement for 5,000 movies

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Full-screen video. The picture is drawn by Kodi; this only adds a title strip while
+     Player.ShowInfo is on (Info key). Seeking and pausing use DialogSeekBar. -->
+<window>
+	<controls>
+		<control type="group">
+			<visible>Player.ShowInfo + !Window.IsActive(videoosd)</visible>
+			<animation effect="fade" start="0" end="100" time="180">Visible</animation>
+			<animation effect="fade" start="100" end="0" time="140">Hidden</animation>
+			<control type="image">
+				<width>1920</width>
+				<height>180</height>
+				<texture colordiffuse="C8060607">white.png</texture>
+			</control>
+			<control type="label">
+				<left>120</left>
+				<top>50</top>
+				<width>1300</width>
+				<height>60</height>
+				<font>kscape_panel_title</font>
+				<textcolor>FFFFFFFF</textcolor>
+				<label>$INFO[VideoPlayer.Title]$INFO[VideoPlayer.Year,  (,)]</label>
+			</control>
+			<control type="label">
+				<left>1400</left>
+				<top>50</top>
+				<width>400</width>
+				<height>60</height>
+				<align>right</align>
+				<font>kscape13</font>
+				<textcolor>FFD0D0D8</textcolor>
+				<label>$INFO[Player.Time]$INFO[Player.Duration, / ]</label>
+			</control>
+		</control>
+	</controls>
+</window>

@@ -54,4 +54,20 @@
 			</control>
 		</definition>
 	</include>
+
+	<!-- Playback control button: dark at rest, amber when focused (matches the wall frame). -->
+	<include name="OSDButton">
+		<param name="width" default="200"/>
+		<definition>
+			<width>$PARAM[width]</width>
+			<height>64</height>
+			<font>kscape13</font>
+			<align>center</align>
+			<aligny>center</aligny>
+			<textcolor>FFE6E6EA</textcolor>
+			<focusedcolor>FF141418</focusedcolor>
+			<texturefocus colordiffuse="FFF5A01A">white.png</texturefocus>
+			<texturenofocus colordiffuse="FF26262C">white.png</texturenofocus>
+		</definition>
+	</include>
 </includes>

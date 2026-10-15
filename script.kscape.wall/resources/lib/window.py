@@ -18,6 +18,7 @@ import xbmcaddon
 import xbmcgui
 
 from . import geometry as G
+from . import state
 from .library import fetch_movies, play
 from .skins import choose_skin
 from .ranking import rank_related
@@ -153,7 +154,7 @@ class WallWindow(xbmcgui.WindowXML):
         self.shuffled_for = None
         self.last_input = time.time()
 
-        last = HOME.getProperty(PROP_LAST)
+        last = HOME.getProperty(PROP_LAST) or str(state.load().get('last_movie', ''))
         start = self.wall.cell_of(int(last)) if last.isdigit() else None
         self.focus = start or (0, 0)
         self._set_frame()
@@ -165,8 +166,12 @@ class WallWindow(xbmcgui.WindowXML):
         self.closing = True
         movie = self.wall.at(*self.focus) if getattr(self, 'wall', None) else None
         if movie:
-            HOME.setProperty(PROP_LAST, str(movie.movieid))
+            self._remember(movie)
         self.close()
+
+    def _remember(self, movie):
+        HOME.setProperty(PROP_LAST, str(movie.movieid))
+        state.save(last_movie=movie.movieid)
 
     # ---- input -----------------------------------------------------------------------------
 
@@ -186,7 +191,7 @@ class WallWindow(xbmcgui.WindowXML):
             elif aid in SELECT:
                 movie = self.wall.at(*self.focus)
                 if movie:
-                    HOME.setProperty(PROP_LAST, str(movie.movieid))
+                    self._remember(movie)
                     play(movie)
             elif aid in BACK:
                 if self.history:

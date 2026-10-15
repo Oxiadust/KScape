@@ -41,3 +41,45 @@ msgstr ""
 msgctxt "#31016"
 msgid "Switch skin"
 msgstr ""
+
+msgctxt "#31020"
+msgid "Play"
+msgstr ""
+
+msgctxt "#31021"
+msgid "Pause"
+msgstr ""
+
+msgctxt "#31022"
+msgid "Back 30 s"
+msgstr ""
+
+msgctxt "#31023"
+msgid "Forward 30 s"
+msgstr ""
+
+msgctxt "#31024"
+msgid "Audio"
+msgstr ""
+
+msgctxt "#31025"
+msgid "Subtitles"
+msgstr ""
+
+msgctxt "#31026"
+msgid "Off"
+msgstr ""
+
+msgctxt "#31027"
+msgid "Stop"
+msgstr ""
+
+#. Subtitles on, language unknown
+msgctxt "#31028"
+msgid "On"
+msgstr ""
+
+#. Followed by the clock time the movie finishes
+msgctxt "#31029"
+msgid "Ends at"
+msgstr ""

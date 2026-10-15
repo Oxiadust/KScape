@@ -20,4 +20,23 @@
 		<value condition="Container(50).ListItem.IsParentFolder"></value>
 		<value>$INFO[Container(50).ListItem.Year,   ]$INFO[Container(50).ListItem.Duration(mins),   ·   , $LOCALIZE[31014]]$INFO[Container(50).ListItem.Genre,   ·   ]</value>
 	</variable>
+
+	<!-- Playback controls -->
+	<variable name="OSDPlayPauseLabel">
+		<value condition="Player.Paused">$LOCALIZE[31020]</value>
+		<value>$LOCALIZE[31021]</value>
+	</variable>
+
+	<variable name="OSDAudioLabel">
+		<!-- "und" is the ISO code for an untagged track: show plain "Audio" instead. -->
+		<value condition="!String.IsEmpty(VideoPlayer.AudioLanguage) + !String.IsEqual(VideoPlayer.AudioLanguage,und)">$LOCALIZE[31024]: $INFO[VideoPlayer.AudioLanguage]</value>
+		<value>$LOCALIZE[31024]</value>
+	</variable>
+
+	<variable name="OSDSubtitleLabel">
+		<!-- Kodi reports subtitles "enabled" even for files without any, so also require a track. -->
+		<value condition="VideoPlayer.HasSubtitles + VideoPlayer.SubtitlesEnabled + !String.IsEmpty(VideoPlayer.SubtitlesLanguage)">$LOCALIZE[31025]: $INFO[VideoPlayer.SubtitlesLanguage]</value>
+		<value condition="VideoPlayer.HasSubtitles + VideoPlayer.SubtitlesEnabled">$LOCALIZE[31025]: $LOCALIZE[31028]</value>
+		<value>$LOCALIZE[31025]: $LOCALIZE[31026]</value>
+	</variable>
 </includes>
