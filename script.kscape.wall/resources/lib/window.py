@@ -414,7 +414,12 @@ class WallWindow(xbmcgui.WindowXML):
             cells = [(c - i, r) for i in range(1, G.PANEL_CELLS + 1)]
         else:
             cells = [(c + i, r) for i in range(1, G.PANEL_CELLS + 1)]
-        self.panel.setPosition(*cell_origin(*min(cells)))
+        x, y = cell_origin(c, r)
+        if cells[0][0] < c:
+            px = cell_origin(c - G.PANEL_CELLS, r)[0]           # far cell's left edge
+        else:
+            px = x + G.COVER_W + G.FRAME                       # frame's right edge
+        self.panel.setPosition(px, y - G.FRAME)
         self.getControl(1901).setLabel(movie.title)
         self.getControl(1902).setText(movie.plot)
         self.panel.setVisible(True)

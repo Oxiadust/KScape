@@ -7671,27 +7671,27 @@
 			</control>
 			<control type="group" id="1900">
 				<description>Info panel beside the focused cover</description>
-				<width>606</width>
-				<height>279</height>
+				<width>620</width>
+				<height>299</height>
 				<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 				<animation effect="fade" start="100" end="0" time="120">Hidden</animation>
 				<control type="image">
-					<width>606</width>
-					<height>279</height>
+					<width>620</width>
+					<height>299</height>
 					<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
 				</control>
 				<control type="label" id="1901">
 					<left>34</left>
-					<top>26</top>
-					<width>538</width>
+					<top>36</top>
+					<width>552</width>
 					<height>56</height>
 					<font>kscape_panel_title</font>
 					<textcolor>FFFFFFFF</textcolor>
 				</control>
 				<control type="textbox" id="1902">
 					<left>34</left>
-					<top>88</top>
-					<width>538</width>
+					<top>98</top>
+					<width>552</width>
 					<height>152</height>
 					<font>kscape_panel_body</font>
 					<textcolor>FFF0F4FF</textcolor>

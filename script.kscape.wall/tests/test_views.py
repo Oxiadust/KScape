@@ -68,7 +68,6 @@ class ListModelTest(unittest.TestCase):
 
     def test_title_order_is_kept(self):
         self.assertEqual(self.ids(L.sort_rows(MOVIES, 'title')), [(1, ''), (2, ''), (3, ''), (4, '')])
-        self.assertEqual(self.ids(L.sort_rows(MOVIES, 'cast')), [(1, ''), (2, ''), (3, ''), (4, '')])
 
     def test_genre_groups_list_a_movie_once_per_genre(self):
         self.assertEqual(self.ids(L.sort_rows(MOVIES, 'genre')), [
@@ -88,14 +87,47 @@ class ListModelTest(unittest.TestCase):
         self.assertEqual(L.find_row(rows, 3, 'Drama'), 0)
         self.assertIsNone(L.find_row(rows, 99))
 
-    def test_row_values(self):
-        v = L.row_values(L.Row(C, 'Family'))
+    def test_sort_letter_skips_the(self):
+        self.assertEqual(L.sort_letter('The Lion King'), 4)
+        self.assertEqual(L.sort_letter('Life of Pi'), 0)
+        self.assertEqual(L.sort_letter('A Clockwork Orange'), 0)      # Kodi only ignores "The"
+        self.assertEqual(L.sort_letter('(500) Days of Summer'), 1)
+        self.assertIsNone(L.sort_letter('...'))
+        self.assertEqual(L.title_markup('The Lion King'),
+                         f'The [COLOR {L.AMBER}]L[/COLOR]ion King')
+
+    def test_row_values_mark_the_selected_value(self):
+        v = L.row_values(L.Row(C, 'Family'), 'genre')
         self.assertEqual(v['genre'], 'Family')
-        self.assertEqual(v['genre_full'], f'[COLOR {L.AMBER}]Family[/COLOR][CR]Animation')
-        v = L.row_values(L.Row(A, ''))
+        self.assertEqual(v['genre_full'], f'Animation[CR][COLOR {L.AMBER}]Family[/COLOR]')
+        self.assertEqual(v['genre_mark'], '1')
+        self.assertEqual(v['label'], 'Cars')
+        v = L.row_values(L.Row(A, ''), 'title')
+        self.assertEqual(v['genre_mark'], '')
+        self.assertEqual(v['label'], f'[COLOR {L.AMBER}]A[/COLOR]lien')
         self.assertEqual((v['year'], v['time'], v['rating'], v['quality']), ('1979', '1:57', 'R', 'UHD'))
-        self.assertEqual(v['cast_full'], 'Sigourney Weaver')
-        self.assertEqual(L.row_values(L.Row(D, ''))['year'], '')
+        self.assertEqual(L.row_values(L.Row(D, ''), 'title')['year'], '')
+
+    def test_first_press_sorts_and_stays_on_the_movie(self):
+        rows = L.sort_rows(MOVIES, 'title')
+        sort, rows2, i = L.step(MOVIES, rows, 'title', 'genre', 2, +1)       # Cars, Down
+        self.assertEqual((sort, rows2[i]), ('genre', L.Row(C, 'Animation')))
+        sort, rows2, i = L.step(MOVIES, rows, 'title', 'genre', 2, -1)       # Cars, Up
+        self.assertEqual(rows2[i], L.Row(C, 'Family'))
+        sort, rows2, i = L.step(MOVIES, rows, 'title', 'year', 2, +1)
+        self.assertEqual((sort, rows2[i].movie), ('year', C))
+
+    def test_steps_through_values_then_moves_on(self):
+        rows = L.sort_rows(MOVIES, 'genre')
+        i = L.find_row(rows, 3, 'Animation')
+        _, _, i = L.step(MOVIES, rows, 'genre', 'genre', i, +1)
+        self.assertEqual(rows[i], L.Row(C, 'Family'))                        # next value
+        _, _, i = L.step(MOVIES, rows, 'genre', 'genre', i, +1)
+        self.assertEqual(rows[i], L.Row(A, 'Horror'))                        # next row
+        _, _, i = L.step(MOVIES, rows, 'genre', 'genre', i, -1)
+        self.assertEqual(rows[i], L.Row(C, 'Family'))                        # previous row
+        _, _, i = L.step(MOVIES, rows, 'genre', 'genre', 0, -1)
+        self.assertEqual(i, 0)                                               # top edge
 
     def test_scroll_keeps_last_columns_on_screen(self):
         self.assertEqual(L.scroll_for('title'), 0)
@@ -104,10 +136,6 @@ class ListModelTest(unittest.TestCase):
         total = sum(c.width for c in L.COLUMNS)
         self.assertEqual(L.scroll_for('quality'), total - L.SCROLL_W)
         self.assertEqual(L.scroll_stops(), [0, 280, total - L.SCROLL_W])
-
-    def test_sort_key_for(self):
-        self.assertEqual(L.sort_key_for('genre'), 'genre')
-        self.assertIsNone(L.sort_key_for('cast'))
 
 
 if __name__ == '__main__':

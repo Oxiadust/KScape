@@ -25,10 +25,12 @@ own library artwork. It is not affiliated with Kaleidescape and uses none of its
 - **List view.** The library as a table: the focused movie sits in a tall blue band with its
   poster and up to four genres, cast members and directors; the other rows show one line per
   column. Left/Right move between the Title, Genre, Cast, Director, Year, Time, Rating and
-  Quality columns, scrolling the columns sideways. Moving up or down while Genre, Year, Time,
-  Rating, Quality or Title is focused re-sorts the list by it, keeping the movie under the band.
-  Sorting by genre lists a movie under each of its genres; the genre it is listed under is
-  shown in amber.
+  Quality columns, scrolling the columns sideways. The first Up/Down in a newly focused column
+  re-sorts the list by it, keeping the movie under the band. In title order, the letter each
+  title sorts by is amber (a leading "The" is skipped, as Kodi sorts). Genre, Cast and Director
+  list a movie under each of its values (cast: the four names shown); Up/Down first step
+  through the movie's own values, marked ▶ and amber, regrouping the list around it, then move
+  on to the next movie.
 - **Quality badges.** Covers show **HDR** or **UHD** when Kodi has stream details for the file.
 - **Library aware.** The wall reloads itself after a library scan or clean, keeping your place.
 - **Remembers where you were**, across Kodi restarts.
@@ -176,6 +178,9 @@ against real data. Kodi screenshots take about a second, so check motion with sl
   list is cut at three lines.
 - The video aspect ratio on the info screen is the encoded video's, as Kodi reports it, so a
   letterboxed 2.39 film encoded at 16:9 shows 1.78.
+- Re-sorting a 5,000-movie list by cast takes about 3.5 s the first time on the development
+  Mac (Kodi's list item API costs ~0.2 ms per row and each movie appears under four names);
+  genre is prepared in the background when the list opens, and recent sorts are kept.
 - The list view takes a snapshot of the library when it opens; library changes made while it is
   open appear the next time you open it.
 - Kaleidescape's *Play Scene* and *Movie Store* entries have no Kodi equivalent and are not offered.

@@ -10,6 +10,8 @@ The window drives the layouts through Home window properties:
   kscape.list.off      horizontal scroll of the columns right of the title (one of scroll_stops)
   kscape.list.settled  '1' once the list has rested briefly: the band then shows the poster and
                        full values; while moving it shows one line per column, as in the reference
+  kscape.list.jump     '1' while the list scrolls to a far row (a value step or re-sort): dimmed
+Item properties: <col>, <col>_full, <col>_mark (line of the ▶ marker), see listmodel.row_values.
 """
 import os
 import sys
@@ -38,6 +40,10 @@ TITLE_COLOR = 'FFFFFFFF'
 ROW_COLORS = {'cast': 'FFA9C6FF', 'director': 'FFCCD9F2'}
 ROW_COLOR = 'FFE6EAF2'
 SLIDE_MS = 360
+# Band value lines (kscape_list_value, measured in Kodi 21): first line centre and line pitch,
+# for the ▶ marker beside the value the list is sorted by.
+LINE0_CY, LINE_PITCH = 80.6, 34.6
+MARKER_W, MARKER_H = 16, 20
 
 
 def prop(name):
@@ -76,12 +82,29 @@ def columns_row():
     return '\n'.join(out)
 
 
+def markers(key, x):
+    out = []
+    for i in range(L.FULL_LINES):
+        top = int(round(LINE0_CY + i * LINE_PITCH - MARKER_H / 2))
+        out.append(f'''
+					<control type="image">
+						<left>{x + 2}</left>
+						<top>{top}</top>
+						<width>{MARKER_W}</width>
+						<height>{MARKER_H}</height>
+						<texture colordiffuse="{L.AMBER}">kscape-marker.png</texture>
+						<visible>{SETTLED} + String.IsEqual(ListItem.Property({key}_mark),{i})</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>''')
+    return ''.join(out)
+
+
 def columns_band():
     offsets = L.column_offsets()
     out = []
     for col in L.COLUMNS:
         x = offsets[col.key]
-        multi = col.key in ('genre', 'cast', 'director')
+        multi = col.key in L.MULTI
         full = f'''
 					<control type="label">
 						<left>{x + 20}</left>
@@ -95,7 +118,7 @@ def columns_band():
 						<label>$INFO[ListItem.Property({col.key}_full)]</label>
 						<visible>{SETTLED}</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
-					</control>''' if multi else ''
+					</control>''' + markers(col.key, x) if multi else ''
         short_visible = f'\n\t\t\t\t\t\t<visible>!{SETTLED}</visible>' if multi else ''
         out.append(f'''					<control type="image">
 						<left>{x}</left>
@@ -158,6 +181,7 @@ def main():
 			<onleft>901</onleft>
 			<onright>901</onright>
 			<focusposition>{FOCUS_POS}</focusposition>
+			<animation effect="fade" start="100" end="35" time="90" condition="{is_("jump", 1)}">Conditional</animation>
 			<scrolltime tween="cubic" easing="out">200</scrolltime>
 			<itemlayout width="{ROW_W}" height="{ROW_H}">
 				<control type="group">
@@ -226,7 +250,7 @@ def main():
 						<width>{pw}</width>
 						<height>{ph}</height>
 						<aspectratio>scale</aspectratio>
-						<texture background="true">$INFO[ListItem.Art(poster)]</texture>
+						<texture background="true">$INFO[ListItem.Property(poster)]</texture>
 					</control>
 				</control>
 				<control type="label">

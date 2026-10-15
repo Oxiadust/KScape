@@ -1,8 +1,8 @@
 """List view: the library as a table with a fixed blue band on the focused movie (WindowXML).
 
 Up/Down move through movies (Kodi's fixedlist scrolls them under the band). Left/Right move
-between columns. Moving up or down while a sortable column is focused re-sorts the list by it,
-keeping the movie under the band; the genre column lists a movie under each of its genres.
+between columns; the first Up/Down in a newly focused column re-sorts the list by it, and in
+Genre, Cast or Director, Up/Down then step through the movie's values first (listmodel.step).
 Select opens the info screen; Back returns to the cover wall.
 
 It is a full window, not a dialog, so playback started here takes over the screen and Kodi
@@ -24,8 +24,11 @@ HOME = xbmcgui.Window(10000)
 LIST = 9000
 SETTLE_S = 0.45                  # rest before the band shows the poster and full values
 
-VERTICAL = (xbmcgui.ACTION_MOVE_UP, xbmcgui.ACTION_MOVE_DOWN, xbmcgui.ACTION_PAGE_UP,
-            xbmcgui.ACTION_PAGE_DOWN, xbmcgui.ACTION_FIRST_PAGE, xbmcgui.ACTION_LAST_PAGE)
+STEPS = {xbmcgui.ACTION_MOVE_UP: -1, xbmcgui.ACTION_MOVE_DOWN: 1}
+PAGING = (xbmcgui.ACTION_PAGE_UP, xbmcgui.ACTION_PAGE_DOWN, xbmcgui.ACTION_FIRST_PAGE,
+          xbmcgui.ACTION_LAST_PAGE)
+KEEP_SORTS = 3                   # built item lists kept for instant re-sorting
+JUMP_S = 0.25                    # list dimmed while it scrolls to a far row (see the XML)
 BACK = (xbmcgui.ACTION_NAV_BACK, xbmcgui.ACTION_PREVIOUS_MENU)
 MENU = (xbmcgui.ACTION_CONTEXT_MENU, xbmcgui.ACTION_SHOW_INFO)
 PLAY = (xbmcgui.ACTION_PLAYER_PLAY,)
@@ -56,9 +59,14 @@ class ListWindow(xbmcgui.WindowXML):
         self.sort = 'title'
         self.moved = 0.0
         self.settled = False
+        self.jumped = 0.0
+        self.built = {}                          # sort -> ListItems for self.rows, recent last
+        self.prebuilt = None                     # (sort, ListItems) from the background thread
+        self.prebuilder = None
         _set('col', self.col)
         _set('off', 0)
         _set('settled', '')
+        _set('jump', '')
         t0 = time.perf_counter()
         self.rows = L.sort_rows(self.movies, self.sort)
         start = L.find_row(self.rows, self.start_id) if self.start_id is not None else None
@@ -68,17 +76,49 @@ class ListWindow(xbmcgui.WindowXML):
         self.setFocusId(LIST)
         self.ready = True
         threading.Thread(target=self._settle_loop, daemon=True).start()
+        self.prebuilder = threading.Thread(target=self._prebuild, args=('genre',), daemon=True)
+        self.prebuilder.start()
+
+    @staticmethod
+    def _build(rows, sort):
+        """ListItems for `rows`: the slow part of re-sorting (Kodi's API costs ~0.2 ms per item
+        and a genre sort of 5,000 movies is ~15,000 rows), so it is one call per item."""
+        items = []
+        for row in rows:
+            values = L.row_values(row, sort)
+            li = xbmcgui.ListItem(values.pop('label'), offscreen=True)
+            values['poster'] = row.movie.poster
+            li.setProperties({k: v for k, v in values.items() if v})
+            items.append(li)
+        return items
+
+    def _prebuild(self, sort):
+        """Build a likely next sort in the background while the list is browsed."""
+        self.prebuilt = (sort, self._build(L.sort_rows(self.movies, sort), sort))
+
+    def _items(self):
+        items = self.built.pop(self.sort, None)
+        if items is None and self.prebuilder and self.prebuilder.is_alive() and self.sort == 'genre':
+            self.prebuilder.join()                    # nearly done: cheaper than starting over
+        if items is None and self.prebuilt and self.prebuilt[0] == self.sort:
+            items, self.prebuilt = self.prebuilt[1], None
+        if items is None:
+            items = self._build(self.rows, self.sort)
+        self.built[self.sort] = items
+        while len(self.built) > KEEP_SORTS:
+            del self.built[next(iter(self.built))]
+        return items
 
     def _fill(self, index):
-        items = []
-        for row in self.rows:
-            li = xbmcgui.ListItem(row.movie.title, offscreen=True)
-            li.setArt({'poster': row.movie.poster})
-            li.setProperties(L.row_values(row))
-            items.append(li)
+        t0 = time.perf_counter()
+        items = self._items()
+        t1 = time.perf_counter()
         self.list.reset()
         self.list.addItems(items)
         self.list.selectItem(index)
+        self.cur = index
+        xbmc.log(f'kscape.list: {len(items)} rows sorted by {self.sort}: items '
+                 f'{1000 * (t1 - t0):.0f} ms, list {1000 * (time.perf_counter() - t1):.0f} ms', xbmc.LOGINFO)
 
     def _current(self):
         i = self.list.getSelectedPosition()
@@ -99,8 +139,11 @@ class ListWindow(xbmcgui.WindowXML):
         if not self.ready:
             return
         with self.lock:
-            if aid in VERTICAL:
-                self._moved()
+            if aid in STEPS:
+                self._step(STEPS[aid])
+            elif aid in PAGING:
+                self._collapse()
+                self.cur = self.list.getSelectedPosition()
             elif aid in (xbmcgui.ACTION_MOVE_LEFT, xbmcgui.ACTION_MOVE_RIGHT):
                 step = -1 if aid == xbmcgui.ACTION_MOVE_LEFT else 1
                 i = max(0, min(len(KEYS) - 1, KEYS.index(self.col) + step))
@@ -116,20 +159,31 @@ class ListWindow(xbmcgui.WindowXML):
                 if row:
                     play(row.movie)
 
-    def _moved(self):
-        """Kodi has already moved the list; re-sort if the focused column asks for it."""
+    def _collapse(self):
         self.moved = time.time()
         if self.settled:
             self.settled = False
             _set('settled', '')
-        wanted = L.sort_key_for(self.col)
-        row = self._current()
-        if wanted is None or wanted == self.sort or row is None:
+
+    def _step(self, direction):
+        """Up/Down. Kodi has already moved the list one row; that is kept when it is the right
+        move, otherwise the list is re-sorted or sent to the movie's next value from here."""
+        self._collapse()
+        if not self.rows:
             return
-        self.sort = wanted
-        self.rows = L.sort_rows(self.movies, wanted)
-        group = L.preferred_group(row.movie) if wanted == 'genre' else None
-        self._fill(L.find_row(self.rows, row.movie.movieid, group) or 0)
+        base = min(self.cur, len(self.rows) - 1)
+        sort, rows, target = L.step(self.movies, self.rows, self.sort, self.col, base, direction)
+        if rows is not self.rows:
+            self.sort, self.rows = sort, rows
+            self._fill(target)
+        elif target == base + direction:
+            self.cur = self.list.getSelectedPosition()       # plain move: keep Kodi's scroll
+        else:
+            if abs(target - self.list.getSelectedPosition()) > 1:
+                self.jumped = time.time()
+                _set('jump', 1)
+            self.list.selectItem(target)
+            self.cur = target
 
     def onClick(self, control_id):
         if control_id != LIST or not self.ready:
@@ -156,6 +210,9 @@ class ListWindow(xbmcgui.WindowXML):
         while not self.closing and not mon.abortRequested():
             time.sleep(0.05)
             with self.lock:
+                if self.jumped and time.time() - self.jumped >= JUMP_S:
+                    self.jumped = 0.0
+                    _set('jump', '')
                 if not self.settled and time.time() - self.moved >= SETTLE_S:
                     self.settled = True
                     _set('settled', 1)

@@ -17,8 +17,11 @@ FRAME = 10             # amber focus frame thickness
 POOL_COLS = 13
 POOL_ROWS = 6
 
-# Info panel occupies this many cells beside the focused cover.
+# Info panel occupies this many cells beside the focused cover, and sits flush against the
+# focus frame: as tall as the frame, reaching from the frame's edge to the far cell's edge.
 PANEL_CELLS = 3
+PANEL_W = PANEL_CELLS * PITCH_X - FRAME
+PANEL_H = COVER_H + 2 * FRAME
 
 # Motion (milliseconds unless noted). The focus frame glides to the next cover with a soft
 # overshoot (Kodi tween "back"; "elastic" is available but wobbles several times), and the wall

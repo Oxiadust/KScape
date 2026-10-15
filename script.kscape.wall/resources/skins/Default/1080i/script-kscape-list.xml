@@ -28,6 +28,7 @@
 			<onleft>901</onleft>
 			<onright>901</onright>
 			<focusposition>5</focusposition>
+			<animation effect="fade" start="100" end="35" time="90" condition="String.IsEqual(Window(Home).Property(kscape.list.jump),1)">Conditional</animation>
 			<scrolltime tween="cubic" easing="out">200</scrolltime>
 			<itemlayout width="2640" height="58">
 				<control type="group">
@@ -165,6 +166,42 @@
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
+						<left>2</left>
+						<top>71</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),0)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>
+					<control type="image">
+						<left>2</left>
+						<top>105</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),1)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>
+					<control type="image">
+						<left>2</left>
+						<top>140</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),2)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>
+					<control type="image">
+						<left>2</left>
+						<top>174</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),3)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>
+					<control type="image">
 						<left>280</left>
 						<width>400</width>
 						<height>236</height>
@@ -205,6 +242,42 @@
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
+						<left>282</left>
+						<top>71</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(cast_mark),0)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>
+					<control type="image">
+						<left>282</left>
+						<top>105</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(cast_mark),1)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>
+					<control type="image">
+						<left>282</left>
+						<top>140</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(cast_mark),2)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>
+					<control type="image">
+						<left>282</left>
+						<top>174</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(cast_mark),3)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>
+					<control type="image">
 						<left>680</left>
 						<width>380</width>
 						<height>236</height>
@@ -242,6 +315,42 @@
 						<scroll>false</scroll>
 						<label>$INFO[ListItem.Property(director_full)]</label>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>
+					<control type="image">
+						<left>682</left>
+						<top>71</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(director_mark),0)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>
+					<control type="image">
+						<left>682</left>
+						<top>105</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(director_mark),1)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>
+					<control type="image">
+						<left>682</left>
+						<top>140</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(director_mark),2)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+					</control>
+					<control type="image">
+						<left>682</left>
+						<top>174</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(director_mark),3)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
@@ -383,7 +492,7 @@
 						<width>138</width>
 						<height>207</height>
 						<aspectratio>scale</aspectratio>
-						<texture background="true">$INFO[ListItem.Art(poster)]</texture>
+						<texture background="true">$INFO[ListItem.Property(poster)]</texture>
 					</control>
 				</control>
 				<control type="label">
