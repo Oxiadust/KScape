@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Shared look for kscape's system windows and dialogs (Settings, System info, power menu, ...):
+<!-- Shared look for KScape's system windows and dialogs (Settings, System info, power menu, ...):
      the blue panel of the movie info screen, a lighter header strip, lighter-blue focus. -->
 <includes>
 	<!-- Full-screen backdrop for system windows. -->

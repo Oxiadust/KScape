@@ -1,7 +1,7 @@
 # Kodi Media Center language file
-# Addon Name: kscape wall
+# Addon Name: KScape wall
 # Addon id: script.kscape.wall
-# Addon Provider: kscape contributors
+# Addon Provider: KScape contributors
 msgid ""
 msgstr ""
 "Project-Id-Version: script.kscape.wall\n"
@@ -39,7 +39,7 @@ msgid "Show duplicates once: {}"
 msgstr ""
 
 msgctxt "#32020"
-msgid "kscape"
+msgid "KScape"
 msgstr ""
 
 msgctxt "#32021"

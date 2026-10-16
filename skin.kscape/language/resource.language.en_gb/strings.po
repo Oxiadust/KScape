@@ -1,7 +1,7 @@
 # Kodi Media Center language file
-# Addon Name: kscape
+# Addon Name: KScape
 # Addon id: skin.kscape
-# Addon Provider: kscape contributors
+# Addon Provider: KScape contributors
 msgid ""
 msgstr ""
 "Project-Id-Version: skin.kscape\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Language: en_GB\n"
 
 msgctxt "#31001"
-msgid "kscape"
+msgid "KScape"
 msgstr ""
 
 msgctxt "#31010"

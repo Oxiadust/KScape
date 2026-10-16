@@ -4,7 +4,7 @@ Every column sorts. The first Up/Down after focusing a column re-sorts the list 
 the movie under the band. Genre, Cast and Director hold several values per movie: sorted by
 one of them, the list shows a movie once under each of its values (the row's `group`), and
 Up/Down first step through the focused movie's own values - the list regrouping around it each
-time - before moving on to the next movie, as on Kaleidescape.
+time - before moving on to the next movie.
 """
 from collections import namedtuple
 

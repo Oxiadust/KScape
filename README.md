@@ -1,28 +1,30 @@
-# kscape
+# KScape
 
-A Kodi 21 (Omega) movie cover wall in the style of the Kaleidescape movie library: an
-edge-to-edge wall of posters you glide across with a remote, where pausing on a movie shows
-its synopsis and then shuffles related titles into place around it.
+A cinematic movie skin for Kodi 21 (Omega), built around an edge-to-edge wall of posters you
+glide across with a remote. Pause on a movie and its synopsis appears, then related titles
+shuffle into place around it. A list view, a full movie info screen and a Home screen with
+rotating artwork complete it.
 
-It is an original implementation built only from Kodi's own skinning and Python APIs and your
-own library artwork. It is not affiliated with Kaleidescape and uses none of its code or assets.
+KScape is built only from Kodi's own skinning and Python APIs and your own library artwork.
 
 ## What it does
 
 - **Home screen.** Back from the wall. Random fanart from your movie library fills the screen
   and crossfades to another movie every ~11 s (the movie's title shows bottom right), with a
-  kscape-blue navigation bar along the bottom: **Movies** (opens the wall), **System** and
+  KScape-blue navigation bar along the bottom: **Movies** (opens the wall), **System** and
   **Power**. As in Aeon Nox: SiLVO, the focused item shows a submenu strip (here above the bar):
   **Up** enters it, **Down** or **Back** return, Left/Right wrap around.
   - *System* opens Kodi Settings; its submenu is SiLVO's: System info, Power options, Skin
-    settings, File manager, Profiles, Event log (when enabled), plus kscape's Switch skin.
+    settings, File manager, Profiles, Event log (when enabled), plus KScape's Switch skin.
   - *Power* opens the power dialog (SiLVO's list: Exit, Power off, shutdown timer, Suspend,
     Hibernate, Reboot, Log off, master mode, idle shutdown, Favourites, Reload skin, Skin
     settings, Settings); its submenu is SiLVO's: Power off, Reboot, Suspend, Hibernate, Log off,
     Quit. Entries the system cannot do are hidden, as in SiLVO.
 - **Cover wall.** Opens at startup. About 9 × 3.6 covers are visible, bleeding off every edge,
   in title order running down the columns and across to the right.
-- **Camera follow.** The amber focus frame glides to the next cover with a soft overshoot
+- **Focus frame.** A thick amber frame hugs the selected cover, in front of the wall, filling
+  the gutter to its neighbours.
+- **Camera follow.** The focus frame glides to the next cover with a soft overshoot
   (0.42 s), and the wall follows with a long ease-out (0.6 s) that settles gently.
 - **Synopsis panel.** About 1.1 s after you stop on a movie, a blue panel with its title and
   synopsis opens beside it (on whichever side has room).
@@ -76,6 +78,9 @@ Requires Kodi 21 Omega. Both add-ons are needed for the animated wall; without
 
 ### From ZIP (recommended)
 
+Download `script.kscape.wall-<version>.zip` and `skin.kscape-<version>.zip` from the
+[latest release](https://github.com/Oxiadust/kscape/releases/latest), or build them yourself:
+
 ```sh
 tools/build_zips.sh          # writes dist/skin.kscape-<ver>.zip and dist/script.kscape.wall-<ver>.zip
 ```
@@ -105,9 +110,9 @@ then set `lookandfeel.skin` to `skin.kscape` in `userdata/guisettings.xml`.
 
 ## Settings
 
-kscape now has Kodi's settings screens (Settings, its category pages, System info, Profiles,
+KScape has its own versions of Kodi's settings screens (Settings, its category pages, System info, Profiles,
 File manager, Event log, add-on browser/information/settings, keyboard and the other dialogs they
-open), drawn in kscape's blue. **Skin settings** offers: Reduce motion, and hiding the Home
+open), drawn in KScape's blue. **Skin settings** offers: Reduce motion, and hiding the Home
 screen's background artwork, clock or movie title.
 
 The wall's own options are stored as add-on settings of `script.kscape.wall` and toggled from the wall menu:
@@ -179,8 +184,8 @@ against real data. Kodi screenshots take about a second, so check motion with sl
 
 ## Known limitations
 
-- Not every Kodi window has a kscape version: music, pictures, TV/PVR, games, weather, the
-  favourites browser and the playback audio/subtitle settings dialogs still need another skin
+- Not every Kodi window has a KScape version: music, pictures, TV/PVR, games, weather and the
+  playback audio/subtitle settings dialogs still need another skin
   (the playback controls cycle tracks instead). Kodi's default icons (folders, add-on
   placeholders) are not bundled, so items without their own icon show none. The slider dialog
   has not been checked in Kodi (it needs a playing video).
@@ -190,9 +195,9 @@ against real data. Kodi screenshots take about a second, so check motion with sl
   scraper misidentified as the same film (for example several different films all matched to
   one title) are merged too; fix the match in Kodi (*Refresh* on the item) or turn the option off.
 - Badges depend on Kodi's stream details, which it records only after reading the files.
-- Tested on macOS with Kodi 21.3 at 1080p and a 384-movie library. Not yet tested at 4K, on
-  low-power devices, or with a real 5,000-movie library (ranking and placement for 5,000 movies
-  take about 55 ms on the development Mac).
+- Tested on macOS with Kodi 21.3 at 1080p, with a real 757-movie library and a synthetic
+  5,000-movie library (ranking and placement for 5,000 movies take about 55 ms on the
+  development Mac). Not yet tested at 4K, on low-power devices, or on Linux/Android/Windows.
 - The info screen lays out its right-hand column from estimated line counts (Kodi cannot
   measure text for scripts): a long synopsis scrolls inside its box, and an unusually long cast
   list is cut at three lines.
@@ -203,6 +208,6 @@ against real data. Kodi screenshots take about a second, so check motion with sl
   genre is prepared in the background when the list opens, and recent sorts are kept.
 - The list view takes a snapshot of the library when it opens; library changes made while it is
   open appear the next time you open it.
-- Kaleidescape's *Play Scene* and *Movie Store* entries have no Kodi equivalent and are not offered.
+- The info screen offers no *Play Scene* entry: Kodi has no chapter list outside playback.
 - A key press during a camera glide may show a one-frame jump; not observed, not ruled out.
 - The reference video used to match the motion is kept out of the repository.

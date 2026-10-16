@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Switch the real Kodi profile back to another skin (kscape has no Settings screens yet).
+# Switch the real Kodi profile back to another skin (e.g. if KScape cannot start).
 # Usage: tools/revert_kodi_skin.sh [skin-id]      default: skin.aeon.nox.silvo
 # Quits Kodi first if it is running; add-ons stay installed.
 SKIN=${1:-skin.aeon.nox.silvo}

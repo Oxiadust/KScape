@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Home: random movie fanart crossfading full screen, a kscape-blue navigation bar along the
+<!-- Home: random movie fanart crossfading full screen, a KScape-blue navigation bar along the
      bottom (Movies / System / Power) and, as in Aeon Nox: SiLVO, a submenu strip for the focused
      item (here above the bar: Up enters it, Down or Back return). The System and Power submenus
      and actions are SiLVO's defaults. -->
@@ -157,7 +157,7 @@
 						<visible>String.IsEqual(Container(9000).ListItem.Property(id),system) + System.GetBool(eventlog.enabled)</visible>
 					</item>
 					<item>
-						<description>kscape addition: leave for another skin (kscape has few settings of its own)</description>
+						<description>KScape addition: switch to another installed skin</description>
 						<label>$LOCALIZE[31016]</label>
 						<onclick>RunScript(script.kscape.wall,switchskin)</onclick>
 						<visible>String.IsEqual(Container(9000).ListItem.Property(id),system) + System.AddonIsEnabled(script.kscape.wall)</visible>
@@ -228,7 +228,7 @@
 			</itemlayout>
 			<focusedlayout width="320" height="96">
 				<control type="image">
-					<description>Lighter tile on the selected item (Kaleidescape tab look)</description>
+					<description>Lighter tile on the selected item (tab look)</description>
 					<width>320</width>
 					<height>96</height>
 					<texture colordiffuse="kscape_blue_focus">white.png</texture>

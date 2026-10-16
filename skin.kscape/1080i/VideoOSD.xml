@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Playback controls (OK / Menu during a movie). Audio and subtitles cycle in place, because
-     kscape has no settings dialogs to open. -->
+     KScape has no audio/subtitle settings dialogs to open. -->
 <window>
 	<defaultcontrol always="true">101</defaultcontrol>
 	<depth>DepthOSD</depth>

@@ -1,6 +1,6 @@
 """Wall geometry and motion timing, shared by the window and the XML generator.
 
-Sizes are 1080p skin pixels. Values were measured from the Kaleidescape reference video
+Sizes are 1080p skin pixels. Values were measured from the reference video
 (video/navigation.mp4): ~9 columns and ~3.6 rows visible, covers bleeding off every edge.
 """
 

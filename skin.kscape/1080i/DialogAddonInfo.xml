@@ -3,7 +3,7 @@
      8 update, 9 configure, 10 dependencies, 12 launch (select), 13 auto-update (radiobutton),
      14 versions, 50 screenshots container (filled by Kodi). Kodi sets the labels of 6 and 7 and
      disables buttons that do not apply; disabled optional buttons are hidden here.
-     Layout follows the kscape movie info screen. -->
+     Layout follows the KScape movie info screen. -->
 <window>
 	<defaultcontrol always="true">9000</defaultcontrol>
 	<depth>DepthDialog</depth>

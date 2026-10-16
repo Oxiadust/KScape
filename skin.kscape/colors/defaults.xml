@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- kscape palette: the blue of the info screen and list band, amber for the selection frame. -->
+<!-- KScape palette: the blue of the info screen and list band, amber for the selection frame. -->
 <colors>
 	<color name="white">FFFFFFFF</color>
 	<color name="kscape_bg">FF070B16</color>

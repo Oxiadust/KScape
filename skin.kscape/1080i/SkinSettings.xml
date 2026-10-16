@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Skin settings window (WINDOW_SKIN_SETTINGS). Kodi contract: none; all ids here are kscape's own.
+<!-- Skin settings window (WINDOW_SKIN_SETTINGS). Kodi contract: none; all ids here are KScape's own.
      Radio buttons toggle Skin.HasSetting(ReducedMotion | HomeNoArtwork | HomeNoClock | HomeNoCaption). -->
 <window>
 	<defaultcontrol always="true">9000</defaultcontrol>

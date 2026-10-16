@@ -1,6 +1,9 @@
 .DS_Store
 __pycache__/
 *.zip
-# Reference recording of a proprietary UI: kept local, not published.
+# Reference material (recordings, screenshots, design prompts): kept local, not published.
 video/
+examples/
+*_Master_Prompt.txt
+promp*.md
 dist/

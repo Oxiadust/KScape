@@ -1,4 +1,4 @@
-"""Leave kscape for another installed skin (kscape has no Settings screens of its own)."""
+"""Leave KScape for another installed skin."""
 import xbmcaddon
 import xbmcgui
 
