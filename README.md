@@ -211,3 +211,19 @@ against real data. Kodi screenshots take about a second, so check motion with sl
 - The info screen offers no *Play Scene* entry: Kodi has no chapter list outside playback.
 - A key press during a camera glide may show a one-frame jump; not observed, not ruled out.
 - The reference video used to match the motion is kept out of the repository.
+
+## License
+
+KScape is released under the [MIT License](LICENSE); a copy ships inside each add-on
+(`LICENSE.txt`). Kodi itself, and artwork and metadata from your library, keep their own licenses.
+
+**Exception:** two skin files closely follow the control layout of Kodi's Estuary skin (by phil65 /
+Team Kodi, code licensed GPL-2.0), so they are distributed under the
+[GNU General Public License v2](LICENSES/GPL-2.0.txt) instead of MIT:
+
+- [`skin.kscape/1080i/DialogKeyboard.xml`](skin.kscape/1080i/DialogKeyboard.xml) (on-screen keyboard)
+- [`skin.kscape/1080i/DialogNumeric.xml`](skin.kscape/1080i/DialogNumeric.xml) (number pad)
+
+Each carries a GPL-2.0 notice at the top, and the GPL text ships in the skin as
+`LICENSES/GPL-2.0.txt`. Everything else is MIT. The skin manifest declares this as
+`MIT AND GPL-2.0-only`.

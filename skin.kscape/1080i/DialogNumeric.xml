@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPDX-License-Identifier: GPL-2.0-only
+  This file follows the control layout of Kodi's Estuary skin (DialogNumeric.xml, by phil65 / Team Kodi),
+  licensed under the GNU General Public License version 2. It is therefore distributed under
+  GPL-2.0, not KScape's MIT License; see LICENSES/GPL-2.0.txt. Changes: restyled for KScape
+  (colours, fonts, layout); Estuary's includes and textures replaced.
+-->
 <!-- Numeric input (PIN, time, date, IP address, numbers).
      Kodi contract: 1 heading, 4 input text, 10-19 digit buttons 0-9, 20 previous field,
      21 done (default), 22 next field, 23 backspace. -->

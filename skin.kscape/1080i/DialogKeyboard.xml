@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPDX-License-Identifier: GPL-2.0-only
+  This file follows the control layout of Kodi's Estuary skin (DialogKeyboard.xml, by phil65 / Team Kodi),
+  licensed under the GNU General Public License version 2. It is therefore distributed under
+  GPL-2.0, not KScape's MIT License; see LICENSES/GPL-2.0.txt. Changes: restyled for KScape
+  (colours, fonts, layout); Estuary's includes and textures replaced.
+-->
 <!-- On-screen keyboard (CGUIDialogKeyboardGeneric).
      Kodi contract: 311 heading, 312 edit, 313 HZ code label / 314 HZ candidate list (Chinese input;
      Kodi shows/hides 313), key buttons 100-112, 120-132, 140-152, 160-172 (labels and visibility

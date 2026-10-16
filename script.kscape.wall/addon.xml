@@ -9,7 +9,7 @@
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en_GB">Animated movie cover wall with relationship-based shuffle</summary>
 		<description lang="en_GB">Browse the Kodi movie library as a cover wall; related covers rearrange around the selected movie.</description>
-		<license>GPL-2.0-only</license>
+		<license>MIT</license>
 		<platform>all</platform>
 	</extension>
 </addon>

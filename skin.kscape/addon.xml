@@ -9,7 +9,7 @@
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en_GB">Dense, cinematic movie-cover wall for Kodi</summary>
 		<description lang="en_GB">A cinematic Kodi skin: an edge-to-edge animated poster wall with related-title shuffling, a list view, a movie info screen, and a Home screen with rotating library artwork. Requires the KScape wall add-on (script.kscape.wall) for the animated wall.</description>
-		<license>GPL-2.0-only</license>
+		<license>MIT AND GPL-2.0-only</license>
 		<platform>all</platform>
 		<assets>
 			<icon>resources/icon.png</icon>
