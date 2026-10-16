@@ -4,7 +4,7 @@ Usage: python3 tools/gen_wall_xml.py
 Control ids (k = 0..POOL-1):
   900          focus sink (keeps Kodi delivering actions to the window)
   1000         camera group: positioned at -camera, glides via runtime slide animations
-  1001         amber focus frame (inside camera group, under the covers)
+  1001         amber focus frame: four bars around the focused cell, in front of the covers
   10000+k      pool A cover slot group; +200 fallback title textbox; +400 poster;
                +600 quality badge group; +800 badge label
   20000+k      pool B, same offsets
@@ -83,6 +83,27 @@ def slot(base):
     return '\n'.join(out)
 
 
+def focus_frame():
+    """Hollow amber frame hugging the cover (no gap), drawn after the cover slots so it glides
+    over them; the info panel follows it and sits flush against its outer edge."""
+    w, h, t = G.COVER_W + 2 * G.FRAME, G.COVER_H + 2 * G.FRAME, G.FRAME
+    bars = [(0, 0, w, t), (0, h - t, w, t), (0, t, t, h - 2 * t), (w - t, t, t, h - 2 * t)]
+    out = [f'''			<control type="group" id="1001">
+				<description>Focus frame</description>
+				<width>{w}</width>
+				<height>{h}</height>''']
+    for x, y, bw, bh in bars:
+        out.append(f'''				<control type="image">
+					<left>{x}</left>
+					<top>{y}</top>
+					<width>{bw}</width>
+					<height>{bh}</height>
+					<texture colordiffuse="{AMBER}">kscape-white.png</texture>
+				</control>''')
+    out.append('			</control>')
+    return '\n'.join(out)
+
+
 def main():
     panel_w = G.PANEL_W
     xml = f'''<?xml version="1.0" encoding="UTF-8"?>
@@ -106,14 +127,9 @@ def main():
 		</control>
 		<control type="group" id="1000">
 			<description>Camera</description>
-			<control type="image" id="1001">
-				<description>Focus frame</description>
-				<width>{G.COVER_W + 2 * G.FRAME}</width>
-				<height>{G.COVER_H + 2 * G.FRAME}</height>
-				<texture colordiffuse="{AMBER}">kscape-white.png</texture>
-			</control>
 {slot(10000)}
 {slot(20000)}
+{focus_frame()}
 			<control type="group" id="1900">
 				<description>Info panel beside the focused cover</description>
 				<width>{panel_w}</width>

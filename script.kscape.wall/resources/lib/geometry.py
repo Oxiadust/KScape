@@ -10,8 +10,8 @@ SCREEN_H = 1080
 COVER_W = 186
 COVER_H = 279          # 2:3
 PITCH_X = 210          # 24 px horizontal gutter
-PITCH_Y = 297          # 18 px vertical gutter
-FRAME = 10             # amber focus frame thickness
+PITCH_Y = 303          # 24 px vertical gutter (even gutters, so the frame is even all round)
+FRAME = 22             # amber focus frame: fills the gutter, drawn in front of the covers
 
 # Recycled cover pool: enough cells to cover the screen plus slack for a camera glide.
 POOL_COLS = 13

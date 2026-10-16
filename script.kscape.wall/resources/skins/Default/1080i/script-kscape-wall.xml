@@ -19,12 +19,6 @@
 		</control>
 		<control type="group" id="1000">
 			<description>Camera</description>
-			<control type="image" id="1001">
-				<description>Focus frame</description>
-				<width>206</width>
-				<height>299</height>
-				<texture colordiffuse="FFF5A01A">kscape-white.png</texture>
-			</control>
 			<control type="group" id="10000">
 				<width>186</width>
 				<height>279</height>
@@ -7669,29 +7663,62 @@
 					</control>
 				</control>
 			</control>
+			<control type="group" id="1001">
+				<description>Focus frame</description>
+				<width>230</width>
+				<height>323</height>
+				<control type="image">
+					<left>0</left>
+					<top>0</top>
+					<width>230</width>
+					<height>22</height>
+					<texture colordiffuse="FFF5A01A">kscape-white.png</texture>
+				</control>
+				<control type="image">
+					<left>0</left>
+					<top>301</top>
+					<width>230</width>
+					<height>22</height>
+					<texture colordiffuse="FFF5A01A">kscape-white.png</texture>
+				</control>
+				<control type="image">
+					<left>0</left>
+					<top>22</top>
+					<width>22</width>
+					<height>279</height>
+					<texture colordiffuse="FFF5A01A">kscape-white.png</texture>
+				</control>
+				<control type="image">
+					<left>208</left>
+					<top>22</top>
+					<width>22</width>
+					<height>279</height>
+					<texture colordiffuse="FFF5A01A">kscape-white.png</texture>
+				</control>
+			</control>
 			<control type="group" id="1900">
 				<description>Info panel beside the focused cover</description>
-				<width>620</width>
-				<height>299</height>
+				<width>608</width>
+				<height>323</height>
 				<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 				<animation effect="fade" start="100" end="0" time="120">Hidden</animation>
 				<control type="image">
-					<width>620</width>
-					<height>299</height>
+					<width>608</width>
+					<height>323</height>
 					<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
 				</control>
 				<control type="label" id="1901">
 					<left>34</left>
-					<top>36</top>
-					<width>552</width>
+					<top>48</top>
+					<width>540</width>
 					<height>56</height>
 					<font>kscape_panel_title</font>
 					<textcolor>FFFFFFFF</textcolor>
 				</control>
 				<control type="textbox" id="1902">
 					<left>34</left>
-					<top>98</top>
-					<width>552</width>
+					<top>110</top>
+					<width>540</width>
 					<height>152</height>
 					<font>kscape_panel_body</font>
 					<textcolor>FFF0F4FF</textcolor>
