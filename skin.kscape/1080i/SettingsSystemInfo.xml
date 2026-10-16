@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodi contract (System info): category buttons 95 summary, 94 storage, 96 network, 97 video,
+     98 hardware, 99 PVR, 100 privacy policy, 101 thank you; info labels 2-13; 30 privacy policy
+     textbox (pagecontrol 60); 102 thank-you group with 103 QR multiimage; 104 system/build group
+     with 53 build date. -->
+<window>
+	<defaultcontrol always="true">95</defaultcontrol>
+	<controls>
+		<include>SystemBackdrop</include>
+		<control type="group">
+			<left>96</left>
+			<top>48</top>
+			<include>WindowFade</include>
+			<include content="SystemPanel">
+				<param name="width" value="1728"/>
+				<param name="height" value="984"/>
+				<param name="title" value="$LOCALIZE[130]"/>
+			</include>
+			<control type="image">
+				<description>Left column</description>
+				<top>64</top>
+				<width>480</width>
+				<height>920</height>
+				<texture colordiffuse="kscape_blue_dark">white.png</texture>
+			</control>
+
+			<control type="grouplist" id="9000">
+				<description>Categories</description>
+				<top>94</top>
+				<width>480</width>
+				<height>860</height>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onright>60</onright>
+				<control type="button" id="95">
+					<description>Summary</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+					<label>$LOCALIZE[20037]</label>
+				</control>
+				<control type="button" id="94">
+					<description>Storage</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+					<label>$LOCALIZE[13277]</label>
+				</control>
+				<control type="button" id="96">
+					<description>Network</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+					<label>$LOCALIZE[13279]</label>
+				</control>
+				<control type="button" id="97">
+					<description>Video</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+					<label>$LOCALIZE[13280]</label>
+				</control>
+				<control type="button" id="98">
+					<description>Hardware</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+					<label>$LOCALIZE[13281]</label>
+				</control>
+				<control type="button" id="99">
+					<description>PVR service</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+					<label>$LOCALIZE[19191]</label>
+				</control>
+				<control type="button" id="100">
+					<description>Privacy policy</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+					<label>$LOCALIZE[12389]</label>
+				</control>
+				<control type="button" id="101">
+					<description>Thank you!</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+					<label>$LOCALIZE[12396]</label>
+				</control>
+			</control>
+
+			<control type="grouplist">
+				<description>Info lines, filled by Kodi per category</description>
+				<left>530</left>
+				<top>94</top>
+				<width>1150</width>
+				<height>564</height>
+				<orientation>vertical</orientation>
+				<control type="label" id="2">
+					<width>1150</width>
+					<height>47</height>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="3">
+					<width>1150</width>
+					<height>47</height>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="4">
+					<width>1150</width>
+					<height>47</height>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="5">
+					<width>1150</width>
+					<height>47</height>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="6">
+					<width>1150</width>
+					<height>47</height>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="7">
+					<width>1150</width>
+					<height>47</height>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="8">
+					<width>1150</width>
+					<height>47</height>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="9">
+					<width>1150</width>
+					<height>47</height>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="10">
+					<width>1150</width>
+					<height>47</height>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="11">
+					<width>1150</width>
+					<height>47</height>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="12">
+					<width>1150</width>
+					<height>47</height>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="13">
+					<width>1150</width>
+					<height>47</height>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+			</control>
+
+			<control type="textbox" id="30">
+				<description>Privacy policy text</description>
+				<left>530</left>
+				<top>94</top>
+				<width>1130</width>
+				<height>560</height>
+				<font>kscape_list_value</font>
+				<textcolor>kscape_text</textcolor>
+				<pagecontrol>60</pagecontrol>
+				<autoscroll delay="5000" repeat="7500" time="5000">!Control.HasFocus(60)</autoscroll>
+			</control>
+			<control type="scrollbar" id="60">
+				<left>1686</left>
+				<top>94</top>
+				<width>12</width>
+				<height>560</height>
+				<orientation>vertical</orientation>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+				<texturesliderbackground colordiffuse="kscape_blue_dark">white.png</texturesliderbackground>
+				<texturesliderbar colordiffuse="kscape_text_dim">white.png</texturesliderbar>
+				<texturesliderbarfocus colordiffuse="white">white.png</texturesliderbarfocus>
+				<textureslidernib/>
+				<textureslidernibfocus/>
+				<visible>Control.IsVisible(30)</visible>
+			</control>
+
+			<control type="group" id="102">
+				<description>Thank-you page with the kodi.tv/donate QR code</description>
+				<left>530</left>
+				<top>94</top>
+				<width>1150</width>
+				<height>860</height>
+				<control type="textbox">
+					<width>1150</width>
+					<height>110</height>
+					<font>kscape_panel_body</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$LOCALIZE[12397]</label>
+				</control>
+				<control type="multiimage" id="103">
+					<top>130</top>
+					<width>1150</width>
+					<height>620</height>
+					<imagepath>special://xbmc/media/qr/kodilove/</imagepath>
+					<aspectratio>keep</aspectratio>
+					<timeperimage>5000</timeperimage>
+					<fadetime>1000</fadetime>
+					<randomize>false</randomize>
+				</control>
+				<control type="label">
+					<top>770</top>
+					<width>1150</width>
+					<height>50</height>
+					<align>center</align>
+					<aligny>center</aligny>
+					<font>kscape_info_label</font>
+					<textcolor>white</textcolor>
+					<label>$LOCALIZE[12398]</label>
+				</control>
+			</control>
+
+			<control type="group" id="104">
+				<description>Memory, CPU and build info</description>
+				<left>530</left>
+				<top>676</top>
+				<width>1150</width>
+				<height>280</height>
+				<control type="image">
+					<width>1150</width>
+					<height>2</height>
+					<texture colordiffuse="kscape_blue_head">white.png</texture>
+				</control>
+				<control type="label">
+					<top>14</top>
+					<width>1150</width>
+					<height>34</height>
+					<aligny>center</aligny>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$LOCALIZE[158]: $INFO[System.Memory(free)] / $INFO[System.Memory(total)]</label>
+				</control>
+				<control type="progress">
+					<description>Memory used</description>
+					<top>52</top>
+					<width>730</width>
+					<height>12</height>
+					<texturebg colordiffuse="kscape_blue_dark">white.png</texturebg>
+					<midtexture colordiffuse="kscape_blue_focus">white.png</midtexture>
+					<info>System.Memory(used)</info>
+				</control>
+				<control type="group">
+					<visible>System.SupportsCPUUsage</visible>
+					<control type="label">
+						<top>72</top>
+						<width>1150</width>
+						<height>34</height>
+						<aligny>center</aligny>
+						<font>kscape_list_value</font>
+						<textcolor>kscape_text</textcolor>
+						<label>$LOCALIZE[13271] $INFO[System.CPUUsage]</label>
+					</control>
+					<control type="progress">
+						<description>CPU usage</description>
+						<top>110</top>
+						<width>730</width>
+						<height>12</height>
+						<texturebg colordiffuse="kscape_blue_dark">white.png</texturebg>
+						<midtexture colordiffuse="kscape_blue_focus">white.png</midtexture>
+						<info>System.CPUUsage</info>
+					</control>
+				</control>
+				<control type="group">
+					<animation effect="slide" end="0,-58" time="0" condition="!System.SupportsCPUUsage">Conditional</animation>
+					<control type="label">
+						<top>132</top>
+						<width>1150</width>
+						<height>40</height>
+						<aligny>center</aligny>
+						<font>kscape_info_label</font>
+						<textcolor>white</textcolor>
+						<label>$LOCALIZE[19114]</label>
+					</control>
+					<control type="label">
+						<top>174</top>
+						<width>1150</width>
+						<height>34</height>
+						<aligny>center</aligny>
+						<font>kscape_list_value</font>
+						<textcolor>kscape_text</textcolor>
+						<label>$LOCALIZE[144] [COLOR kscape_text_dim]$INFO[System.BuildVersionShort]$INFO[System.BuildVersionCode, (,)][/COLOR]</label>
+					</control>
+					<control type="label">
+						<top>208</top>
+						<width>1150</width>
+						<height>34</height>
+						<aligny>center</aligny>
+						<font>kscape_list_value</font>
+						<textcolor>kscape_text</textcolor>
+						<label>Git: [COLOR kscape_text_dim]$INFO[System.BuildVersionGit][/COLOR]</label>
+					</control>
+					<control type="grouplist">
+						<top>242</top>
+						<width>1150</width>
+						<height>34</height>
+						<orientation>horizontal</orientation>
+						<itemgap>10</itemgap>
+						<control type="label">
+							<width>auto</width>
+							<height>34</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>kscape_text</textcolor>
+							<label>$LOCALIZE[174]</label>
+						</control>
+						<control type="label" id="53">
+							<description>Build date, set by Kodi</description>
+							<width>auto</width>
+							<height>34</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>kscape_text_dim</textcolor>
+						</control>
+					</control>
+				</control>
+			</control>
+		</control>
+	</controls>
+</window>

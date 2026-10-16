@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Setting section window (Player/Media/PVR/Services/Games/Interface/System settings).
+     Kodi contract: 3 category grouplist (filled with clones of category button 10),
+     5 settings grouplist (filled with clones of the templates below), 60 scrollbar,
+     2 section name label (hidden; used for the title), 6 help text of the focused setting,
+     20 settings level button (SettingsLevelChange).
+     Templates Kodi clones (hidden by Kodi): 7 button, 8 radiobutton, 9 spincontrolex,
+     11 separator image, 13 sliderex, 14 group title label, 15 colorbutton.
+     No 12 edit template here (Estuary has none either): Kodi then builds edits from button 7. -->
+<window>
+	<defaultcontrol>3</defaultcontrol>
+	<controls>
+		<include>SystemBackdrop</include>
+		<control type="group">
+			<left>96</left>
+			<top>48</top>
+			<include>WindowFade</include>
+			<include content="SystemPanel">
+				<param name="width" value="1728"/>
+				<param name="height" value="984"/>
+				<param name="title" value="$LOCALIZE[5]$INFO[Control.GetLabel(2), / ]"/>
+			</include>
+			<control type="image">
+				<description>Left column</description>
+				<top>64</top>
+				<width>560</width>
+				<height>920</height>
+				<texture colordiffuse="kscape_blue_dark">white.png</texture>
+			</control>
+
+			<control type="grouplist" id="3">
+				<description>Category buttons (clones of 10)</description>
+				<top>88</top>
+				<width>560</width>
+				<height>780</height>
+				<usecontrolcoords>true</usecontrolcoords>
+				<onleft>5</onleft>
+				<onright>5</onright>
+				<onup>3</onup>
+				<ondown>20</ondown>
+			</control>
+			<control type="button" id="10">
+				<description>Default category button</description>
+				<include content="SystemButton">
+					<param name="width" value="560"/>
+					<param name="height" value="72"/>
+				</include>
+			</control>
+			<control type="radiobutton" id="20">
+				<description>Settings level (label set by Kodi)</description>
+				<top>892</top>
+				<font>kscape_small</font>
+				<textcolor>kscape_text_dim</textcolor>
+				<include content="SystemButton">
+					<param name="width" value="560"/>
+					<param name="height" value="72"/>
+				</include>
+				<onclick>SettingsLevelChange</onclick>
+				<onleft>5</onleft>
+				<onright>5</onright>
+				<onup>3</onup>
+				<ondown>3</ondown>
+				<radiowidth>1</radiowidth>
+				<radioheight>1</radioheight>
+				<textureradioonfocus/>
+				<textureradioonnofocus/>
+				<textureradioofffocus/>
+				<textureradiooffnofocus/>
+			</control>
+
+			<control type="grouplist" id="5">
+				<description>Settings (clones of the templates)</description>
+				<left>590</left>
+				<top>88</top>
+				<width>1090</width>
+				<height>724</height>
+				<pagecontrol>60</pagecontrol>
+				<onleft>3</onleft>
+				<onright>60</onright>
+				<onup>5</onup>
+				<ondown>5</ondown>
+			</control>
+			<control type="scrollbar" id="60">
+				<left>1696</left>
+				<top>88</top>
+				<width>10</width>
+				<height>724</height>
+				<orientation>vertical</orientation>
+				<showonepage>false</showonepage>
+				<texturesliderbackground colordiffuse="kscape_blue_dark">white.png</texturesliderbackground>
+				<texturesliderbar colordiffuse="kscape_text_off">white.png</texturesliderbar>
+				<texturesliderbarfocus colordiffuse="white">white.png</texturesliderbarfocus>
+				<textureslidernib/>
+				<textureslidernibfocus/>
+				<onleft>5</onleft>
+				<onright>5</onright>
+			</control>
+
+			<control type="image">
+				<description>Help text divider</description>
+				<left>590</left>
+				<top>832</top>
+				<width>1116</width>
+				<height>2</height>
+				<texture colordiffuse="kscape_blue_head">white.png</texture>
+			</control>
+			<control type="textbox" id="6">
+				<description>Help text of the focused setting (set by Kodi)</description>
+				<left>620</left>
+				<top>850</top>
+				<width>1070</width>
+				<height>116</height>
+				<font>kscape13</font>
+				<textcolor>kscape_text_dim</textcolor>
+				<autoscroll time="3000" delay="5000" repeat="5000">true</autoscroll>
+			</control>
+		</control>
+
+		<!-- Templates: Kodi hides these and clones them into grouplist 5 at its width. -->
+		<control type="button" id="7">
+			<description>Default button</description>
+			<include content="SystemButton">
+				<param name="width" value="1090"/>
+				<param name="height" value="70"/>
+			</include>
+			<selectedcolor>white</selectedcolor>
+			<invalidcolor>kscape_amber</invalidcolor>
+		</control>
+		<control type="radiobutton" id="8">
+			<description>Default radiobutton (on = amber)</description>
+			<include content="SystemButton">
+				<param name="width" value="1090"/>
+				<param name="height" value="70"/>
+			</include>
+			<radiowidth>30</radiowidth>
+			<radioheight>30</radioheight>
+			<textureradioonfocus colordiffuse="kscape_amber">white.png</textureradioonfocus>
+			<textureradioonnofocus colordiffuse="kscape_amber">white.png</textureradioonnofocus>
+			<textureradioofffocus colordiffuse="kscape_blue_dark">white.png</textureradioofffocus>
+			<textureradiooffnofocus colordiffuse="kscape_text_off">white.png</textureradiooffnofocus>
+			<textureradioondisabled colordiffuse="kscape_text_off">white.png</textureradioondisabled>
+			<textureradiooffdisabled colordiffuse="kscape_blue_dark">white.png</textureradiooffdisabled>
+		</control>
+		<control type="spincontrolex" id="9">
+			<description>Default spincontrolex (value shown right, left/right changes it)</description>
+			<include content="SystemButton">
+				<param name="width" value="1090"/>
+				<param name="height" value="70"/>
+			</include>
+			<spinwidth>8</spinwidth>
+			<spinheight>8</spinheight>
+			<reverse>yes</reverse>
+			<textureup/>
+			<texturedown/>
+			<textureupfocus/>
+			<texturedownfocus/>
+			<textureupdisabled/>
+			<texturedowndisabled/>
+		</control>
+		<control type="image" id="11">
+			<description>Separator image</description>
+			<height>2</height>
+			<texture colordiffuse="kscape_blue_head">white.png</texture>
+		</control>
+		<control type="sliderex" id="13">
+			<description>Default sliderex</description>
+			<include content="SystemButton">
+				<param name="width" value="1090"/>
+				<param name="height" value="70"/>
+			</include>
+			<sliderwidth>360</sliderwidth>
+			<sliderheight>22</sliderheight>
+			<texturesliderbar colordiffuse="kscape_blue_dark">white.png</texturesliderbar>
+			<texturesliderbardisabled colordiffuse="kscape_blue_dark">white.png</texturesliderbardisabled>
+			<textureslidernib colordiffuse="kscape_text_dim">white.png</textureslidernib>
+			<textureslidernibfocus colordiffuse="white">white.png</textureslidernibfocus>
+			<textureslidernibdisabled colordiffuse="kscape_text_off">white.png</textureslidernibdisabled>
+		</control>
+		<control type="label" id="14">
+			<description>Default group title label</description>
+			<height>64</height>
+			<textoffsetx>30</textoffsetx>
+			<aligny>center</aligny>
+			<font>kscape_info_label</font>
+			<textcolor>kscape_text_dim</textcolor>
+			<label></label>
+		</control>
+		<control type="colorbutton" id="15">
+			<description>Default colorbutton</description>
+			<include content="SystemButton">
+				<param name="width" value="1090"/>
+				<param name="height" value="70"/>
+			</include>
+			<colorwidth>60</colorwidth>
+			<colorheight>34</colorheight>
+			<texturecolormask>white.png</texturecolormask>
+			<texturecolordisabledmask colordiffuse="kscape_text_off">white.png</texturecolordisabledmask>
+		</control>
+
+		<control type="label" id="2">
+			<description>Section name (set by Kodi; shown in the title)</description>
+			<visible>false</visible>
+		</control>
+	</controls>
+</window>

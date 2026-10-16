@@ -78,5 +78,16 @@
 			<filename>arial.ttf</filename>
 			<size>44</size>
 		</font>
+		<font>
+			<name>kscape_bar</name>
+			<filename>arial.ttf</filename>
+			<size>34</size>
+			<style>bold</style>
+		</font>
+		<font>
+			<name>kscape_sub</name>
+			<filename>arial.ttf</filename>
+			<size>30</size>
+		</font>
 	</fontset>
 </fonts>

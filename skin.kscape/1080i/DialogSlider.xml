@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Slider dialog (audio offset, brightness, zoom, ... while a setting slider is open).
+     Kodi contract: 10 heading, 11 slider (default), 12 value label, 13/14 step left/right
+     buttons for mouse users. Sits near the top with no dimmer, like Estuary, so the
+     picture being adjusted stays visible. -->
+<window>
+	<defaultcontrol>11</defaultcontrol>
+	<depth>0.44</depth>
+	<controls>
+		<control type="group">
+			<left>510</left>
+			<top>48</top>
+			<include>WindowFade</include>
+			<include content="SystemPanel">
+				<param name="width" value="900"/>
+				<param name="height" value="170"/>
+				<param name="title" value=""/>
+			</include>
+			<control type="label" id="10">
+				<description>Heading (set by Kodi)</description>
+				<left>30</left>
+				<width>600</width>
+				<height>64</height>
+				<aligny>center</aligny>
+				<font>kscape_info_head</font>
+				<textcolor>white</textcolor>
+			</control>
+			<control type="label" id="12">
+				<description>Slider value (set by Kodi)</description>
+				<left>530</left>
+				<width>340</width>
+				<height>64</height>
+				<align>right</align>
+				<aligny>center</aligny>
+				<font>kscape_info_label</font>
+				<textcolor>kscape_amber</textcolor>
+			</control>
+			<control type="slider" id="11">
+				<description>Slider</description>
+				<left>100</left>
+				<top>104</top>
+				<width>700</width>
+				<height>26</height>
+				<orientation>horizontal</orientation>
+				<texturesliderbar colordiffuse="kscape_blue_dark">white.png</texturesliderbar>
+				<texturesliderbardisabled colordiffuse="kscape_blue_dark">white.png</texturesliderbardisabled>
+				<textureslidernib colordiffuse="kscape_text_dim">white.png</textureslidernib>
+				<textureslidernibfocus colordiffuse="white">white.png</textureslidernibfocus>
+				<textureslidernibdisabled colordiffuse="kscape_text_off">white.png</textureslidernibdisabled>
+				<onup>11</onup>
+				<ondown>11</ondown>
+				<onleft>11</onleft>
+				<onright>11</onright>
+			</control>
+			<control type="group">
+				<description>Step buttons for mouse users (as Estuary)</description>
+				<visible>System.GetBool(input.enablemouse)</visible>
+				<control type="button" id="13">
+					<left>30</left>
+					<top>92</top>
+					<width>50</width>
+					<height>50</height>
+					<font>kscape_info_label</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<label>&lt;</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onclick>SetFocus(11)</onclick>
+					<onclick>Left</onclick>
+					<onclick>SetFocus(13)</onclick>
+				</control>
+				<control type="button" id="14">
+					<left>820</left>
+					<top>92</top>
+					<width>50</width>
+					<height>50</height>
+					<font>kscape_info_label</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<label>&gt;</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onclick>SetFocus(11)</onclick>
+					<onclick>Right</onclick>
+					<onclick>SetFocus(14)</onclick>
+				</control>
+			</control>
+		</control>
+	</controls>
+</window>

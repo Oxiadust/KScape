@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Favourites browser (window favouritesbrowser). Kodi contract: media window, view container 50
+     listed in <views> (never give a view a <visible> condition: hidden views are never filled). -->
+<window>
+	<defaultcontrol always="true">50</defaultcontrol>
+	<views>50</views>
+	<controls>
+		<include>SystemBackdrop</include>
+		<control type="group">
+			<left>96</left>
+			<top>48</top>
+			<include>WindowFade</include>
+			<include content="SystemPanel">
+				<param name="width" value="1728"/>
+				<param name="height" value="984"/>
+				<param name="title" value="$LOCALIZE[1036]"/>
+			</include>
+			<control type="label">
+				<left>1098</left>
+				<width>600</width>
+				<height>64</height>
+				<align>right</align>
+				<aligny>center</aligny>
+				<font>kscape_small</font>
+				<textcolor>white</textcolor>
+				<label>$INFO[Container.CurrentItem]$INFO[Container.NumItems, / ]</label>
+			</control>
+			<control type="image">
+				<description>Darker left column: icon of the focused favourite</description>
+				<top>64</top>
+				<width>480</width>
+				<height>920</height>
+				<texture colordiffuse="kscape_blue_dark">white.png</texture>
+			</control>
+			<control type="image">
+				<left>60</left>
+				<top>120</top>
+				<width>360</width>
+				<height>360</height>
+				<aspectratio>keep</aspectratio>
+				<texture background="true">$INFO[ListItem.Icon]</texture>
+			</control>
+			<control type="textbox">
+				<left>40</left>
+				<top>510</top>
+				<width>400</width>
+				<height>200</height>
+				<align>center</align>
+				<font>kscape_list_value</font>
+				<textcolor>kscape_text</textcolor>
+				<label>$INFO[ListItem.Label]</label>
+			</control>
+			<control type="list" id="50">
+				<left>500</left>
+				<top>84</top>
+				<width>1208</width>
+				<height>880</height>
+				<onup>50</onup>
+				<ondown>50</ondown>
+				<onleft>50</onleft>
+				<onright>50</onright>
+				<viewtype label="535">list</viewtype>
+				<scrolltime tween="cubic" easing="out">200</scrolltime>
+				<itemlayout width="1208" height="80">
+					<control type="image">
+						<left>20</left>
+						<top>10</top>
+						<width>60</width>
+						<height>60</height>
+						<aspectratio>keep</aspectratio>
+						<texture background="true">$INFO[ListItem.Icon]</texture>
+					</control>
+					<control type="label">
+						<left>100</left>
+						<width>1080</width>
+						<height>80</height>
+						<aligny>center</aligny>
+						<font>kscape_menu</font>
+						<textcolor>kscape_text</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+				</itemlayout>
+				<focusedlayout width="1208" height="80">
+					<control type="image">
+						<width>1208</width>
+						<height>80</height>
+						<texture colordiffuse="kscape_blue_focus">white.png</texture>
+						<visible>Control.HasFocus(50)</visible>
+					</control>
+					<control type="image">
+						<left>20</left>
+						<top>10</top>
+						<width>60</width>
+						<height>60</height>
+						<aspectratio>keep</aspectratio>
+						<texture background="true">$INFO[ListItem.Icon]</texture>
+					</control>
+					<control type="label">
+						<left>100</left>
+						<width>1080</width>
+						<height>80</height>
+						<aligny>center</aligny>
+						<font>kscape_menu</font>
+						<textcolor>white</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+				</focusedlayout>
+			</control>
+		</control>
+	</controls>
+</window>

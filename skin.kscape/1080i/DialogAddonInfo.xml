@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Add-on information (CGUIDialogAddonInfo). Kodi contract: 6 install/uninstall, 7 enable/disable,
+     8 update, 9 configure, 10 dependencies, 12 launch (select), 13 auto-update (radiobutton),
+     14 versions, 50 screenshots container (filled by Kodi). Kodi sets the labels of 6 and 7 and
+     disables buttons that do not apply; disabled optional buttons are hidden here.
+     Layout follows the kscape movie info screen. -->
+<window>
+	<defaultcontrol always="true">9000</defaultcontrol>
+	<depth>DepthDialog</depth>
+	<onload condition="!ListItem.Property(addon.isinstalled) + Window.IsActive(addonbrowser)">SetFocus(6)</onload>
+	<controls>
+		<include>DialogDim</include>
+		<control type="group">
+			<left>96</left>
+			<top>48</top>
+			<include>PanelOpenClose</include>
+			<include content="SystemPanel">
+				<param name="width" value="1728"/>
+				<param name="height" value="984"/>
+				<param name="title" value="$INFO[ListItem.AddonName]"/>
+			</include>
+			<control type="label">
+				<description>Version, right of the header</description>
+				<left>900</left>
+				<width>798</width>
+				<height>64</height>
+				<align>right</align>
+				<aligny>center</aligny>
+				<font>kscape_list_value</font>
+				<textcolor>white</textcolor>
+				<label>$INFO[ListItem.AddonVersion,$LOCALIZE[24051] ,]</label>
+			</control>
+			<control type="image">
+				<description>Left column</description>
+				<top>64</top>
+				<width>480</width>
+				<height>920</height>
+				<texture colordiffuse="kscape_blue_dark">white.png</texture>
+			</control>
+
+			<control type="group">
+				<description>Icon with lifecycle warning</description>
+				<left>60</left>
+				<top>88</top>
+				<control type="image">
+					<width>360</width>
+					<height>360</height>
+					<texture colordiffuse="kscape_blue">white.png</texture>
+				</control>
+				<control type="image">
+					<width>360</width>
+					<height>360</height>
+					<aspectratio>keep</aspectratio>
+					<fadetime>150</fadetime>
+					<texture background="true">$INFO[ListItem.Art(thumb)]</texture>
+				</control>
+				<control type="group">
+					<top>312</top>
+					<visible>String.IsEqual(ListItem.AddonLifecycleType,$LOCALIZE[24170]) | String.IsEqual(ListItem.AddonLifecycleType,$LOCALIZE[24171])</visible>
+					<control type="image">
+						<width>360</width>
+						<height>48</height>
+						<texture colordiffuse="kscape_amber">white.png</texture>
+					</control>
+					<control type="label">
+						<width>360</width>
+						<height>48</height>
+						<align>center</align>
+						<aligny>center</aligny>
+						<font>kscape_info_label</font>
+						<textcolor>kscape_bg</textcolor>
+						<label>$INFO[ListItem.AddonLifecycleType]</label>
+					</control>
+				</control>
+			</control>
+
+			<control type="grouplist" id="9000">
+				<description>Actions</description>
+				<top>472</top>
+				<width>480</width>
+				<height>480</height>
+				<orientation>vertical</orientation>
+				<itemgap>0</itemgap>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>50</onleft>
+				<onright>50</onright>
+				<control type="button" id="12">
+					<include content="SystemButton">
+						<param name="width" value="480"/>
+						<param name="height" value="60"/>
+					</include>
+					<label>$LOCALIZE[518]</label>
+					<visible>Control.IsEnabled(12)</visible>
+				</control>
+				<control type="button" id="9">
+					<include content="SystemButton">
+						<param name="width" value="480"/>
+						<param name="height" value="60"/>
+					</include>
+					<label>$LOCALIZE[24020]</label>
+					<visible>Control.IsEnabled(9)</visible>
+				</control>
+				<control type="radiobutton" id="13">
+					<include content="SystemButton">
+						<param name="width" value="480"/>
+						<param name="height" value="60"/>
+					</include>
+					<label>$LOCALIZE[24063]</label>
+					<radioposx>394</radioposx>
+					<radioposy>16</radioposy>
+					<radiowidth>56</radiowidth>
+					<radioheight>28</radioheight>
+					<textureradioonfocus colordiffuse="kscape_amber">white.png</textureradioonfocus>
+					<textureradioonnofocus colordiffuse="kscape_amber">white.png</textureradioonnofocus>
+					<textureradioofffocus colordiffuse="kscape_text_off">white.png</textureradioofffocus>
+					<textureradiooffnofocus colordiffuse="kscape_text_off">white.png</textureradiooffnofocus>
+					<textureradioondisabled colordiffuse="kscape_text_off">white.png</textureradioondisabled>
+					<textureradiooffdisabled colordiffuse="kscape_text_off">white.png</textureradiooffdisabled>
+					<visible>Control.IsEnabled(13)</visible>
+				</control>
+				<control type="button" id="10">
+					<include content="SystemButton">
+						<param name="width" value="480"/>
+						<param name="height" value="60"/>
+					</include>
+					<label>$LOCALIZE[39024]</label>
+				</control>
+				<control type="button" id="7">
+					<include content="SystemButton">
+						<param name="width" value="480"/>
+						<param name="height" value="60"/>
+					</include>
+				</control>
+				<control type="button" id="8">
+					<include content="SystemButton">
+						<param name="width" value="480"/>
+						<param name="height" value="60"/>
+					</include>
+					<label>$LOCALIZE[24138]</label>
+					<visible>Control.IsEnabled(8)</visible>
+				</control>
+				<control type="button" id="14">
+					<include content="SystemButton">
+						<param name="width" value="480"/>
+						<param name="height" value="60"/>
+					</include>
+					<label>$LOCALIZE[24069]</label>
+					<visible>Control.IsEnabled(14)</visible>
+				</control>
+				<control type="button" id="6">
+					<include content="SystemButton">
+						<param name="width" value="480"/>
+						<param name="height" value="60"/>
+					</include>
+				</control>
+			</control>
+
+			<control type="list">
+				<description>Facts (not focusable)</description>
+				<left>530</left>
+				<top>88</top>
+				<width>1168</width>
+				<height>308</height>
+					<itemlayout width="1168" height="44">
+						<control type="label">
+							<width>240</width>
+							<height>44</height>
+							<aligny>center</aligny>
+							<font>kscape_info_label</font>
+							<textcolor>white</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+						<control type="label">
+							<left>260</left>
+							<width>908</width>
+							<height>44</height>
+							<aligny>center</aligny>
+							<font>kscape_panel_body</font>
+							<textcolor>kscape_text</textcolor>
+							<scroll>false</scroll>
+							<label>$INFO[ListItem.Label2]</label>
+						</control>
+					</itemlayout>
+					<focusedlayout width="1168" height="44">
+						<control type="label">
+							<width>240</width>
+							<height>44</height>
+							<aligny>center</aligny>
+							<font>kscape_info_label</font>
+							<textcolor>white</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+						<control type="label">
+							<left>260</left>
+							<width>908</width>
+							<height>44</height>
+							<aligny>center</aligny>
+							<font>kscape_panel_body</font>
+							<textcolor>kscape_text</textcolor>
+							<scroll>false</scroll>
+							<label>$INFO[ListItem.Label2]</label>
+						</control>
+					</focusedlayout>
+				<content>
+						<item>
+							<label>$LOCALIZE[21863]</label>
+							<label2>$INFO[ListItem.AddonCreator]</label2>
+							<visible>!String.IsEmpty(ListItem.AddonCreator)</visible>
+						</item>
+						<item>
+							<label>$LOCALIZE[467]</label>
+							<label2>$INFO[ListItem.AddonType]</label2>
+							<visible>!String.IsEmpty(ListItem.AddonType)</visible>
+						</item>
+						<item>
+							<label>$LOCALIZE[21870]</label>
+							<label2>$INFO[ListItem.AddonOrigin]</label2>
+							<visible>!String.IsEmpty(ListItem.AddonOrigin)</visible>
+						</item>
+						<item>
+							<label>$LOCALIZE[22031]</label>
+							<label2>$INFO[ListItem.AddonSize]</label2>
+							<visible>!String.IsEmpty(ListItem.AddonSize)</visible>
+						</item>
+						<item>
+							<label>$LOCALIZE[12013]</label>
+							<label2>$INFO[ListItem.AddonInstallDate]</label2>
+							<visible>!String.IsEmpty(ListItem.AddonInstallDate)</visible>
+						</item>
+						<item>
+							<label>$LOCALIZE[12014]</label>
+							<label2>$INFO[ListItem.AddonLastUpdated]</label2>
+							<visible>!String.IsEmpty(ListItem.AddonLastUpdated)</visible>
+						</item>
+						<item>
+							<label>$LOCALIZE[126]</label>
+							<label2>$INFO[ListItem.Property(Addon.Status)]$INFO[ListItem.Property(Addon.ValidUpdateVersion),  ($LOCALIZE[19114] ,)]</label2>
+							<visible>!String.IsEmpty(ListItem.Property(Addon.Status))</visible>
+						</item>
+				</content>
+			</control>
+
+			<control type="textbox">
+				<description>Description, with screenshots below</description>
+				<left>530</left>
+				<top>412</top>
+				<width>1168</width>
+				<height>290</height>
+				<font>kscape_panel_body</font>
+				<textcolor>kscape_text</textcolor>
+				<label>$INFO[ListItem.AddonSummary,[B],[/B][CR]]$INFO[ListItem.AddonDescription]$INFO[ListItem.AddonNews,[CR][CR][B]$LOCALIZE[24054][/B][CR],]$INFO[ListItem.AddonDisclaimer,[CR][CR][COLOR kscape_text_dim][I],[/I][/COLOR]]</label>
+				<autoscroll delay="6000" time="3000" repeat="8000">true</autoscroll>
+				<visible>Integer.IsGreater(Container(50).NumItems,0)</visible>
+			</control>
+			<control type="textbox">
+				<description>Description, no screenshots</description>
+				<left>530</left>
+				<top>412</top>
+				<width>1168</width>
+				<height>540</height>
+				<font>kscape_panel_body</font>
+				<textcolor>kscape_text</textcolor>
+				<label>$INFO[ListItem.AddonSummary,[B],[/B][CR]]$INFO[ListItem.AddonDescription]$INFO[ListItem.AddonNews,[CR][CR][B]$LOCALIZE[24054][/B][CR],]$INFO[ListItem.AddonDisclaimer,[CR][CR][COLOR kscape_text_dim][I],[/I][/COLOR]]</label>
+				<autoscroll delay="6000" time="3000" repeat="8000">true</autoscroll>
+				<visible>!Integer.IsGreater(Container(50).NumItems,0)</visible>
+			</control>
+
+			<control type="panel" id="50">
+				<description>Screenshots (Kodi fills this)</description>
+				<left>530</left>
+				<top>722</top>
+				<width>1168</width>
+				<height>230</height>
+				<orientation>horizontal</orientation>
+				<onleft>9000</onleft>
+				<onright>50</onright>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<scrolltime tween="cubic" easing="out">200</scrolltime>
+					<itemlayout width="389" height="230">
+						<control type="image">
+							<left>6</left>
+							<top>6</top>
+							<width>371</width>
+							<height>210</height>
+							<texture colordiffuse="kscape_blue_dark">white.png</texture>
+						</control>
+						<control type="image">
+							<left>6</left>
+							<top>6</top>
+							<width>371</width>
+							<height>210</height>
+							<aspectratio>scale</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</itemlayout>
+					<focusedlayout width="389" height="230">
+						<control type="image">
+							<width>389</width>
+							<height>230</height>
+							<texture colordiffuse="kscape_blue_focus">white.png</texture>
+							<visible>Control.HasFocus(50)</visible>
+						</control>
+						<control type="image">
+							<left>6</left>
+							<top>6</top>
+							<width>371</width>
+							<height>210</height>
+							<texture colordiffuse="kscape_blue_dark">white.png</texture>
+						</control>
+						<control type="image">
+							<left>6</left>
+							<top>6</top>
+							<width>371</width>
+							<height>210</height>
+							<aspectratio>scale</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+					</focusedlayout>
+			</control>
+		</control>
+	</controls>
+</window>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Skin settings window (WINDOW_SKIN_SETTINGS). Kodi contract: none; all ids here are kscape's own.
+     Radio buttons toggle Skin.HasSetting(ReducedMotion | HomeNoArtwork | HomeNoClock | HomeNoCaption). -->
+<window>
+	<defaultcontrol always="true">9000</defaultcontrol>
+	<controls>
+		<include>SystemBackdrop</include>
+		<control type="group">
+			<left>360</left>
+			<top>290</top>
+			<include>WindowFade</include>
+			<include content="SystemPanel">
+				<param name="width" value="1200"/>
+				<param name="height" value="500"/>
+				<param name="title" value="$LOCALIZE[20077]"/>
+			</include>
+			<control type="grouplist" id="9000">
+				<top>88</top>
+				<width>1200</width>
+				<height>388</height>
+				<orientation>vertical</orientation>
+				<itemgap>0</itemgap>
+				<usecontrolcoords>true</usecontrolcoords>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+				<control type="radiobutton" id="101">
+					<include content="SystemButton">
+						<param name="width" value="1200"/>
+						<param name="height" value="72"/>
+					</include>
+					<label>$LOCALIZE[31041]</label>
+					<radioposx>1106</radioposx>
+					<radioposy>21</radioposy>
+					<radiowidth>64</radiowidth>
+					<radioheight>30</radioheight>
+					<textureradioonfocus colordiffuse="kscape_amber">white.png</textureradioonfocus>
+					<textureradioonnofocus colordiffuse="kscape_amber">white.png</textureradioonnofocus>
+					<textureradioofffocus colordiffuse="kscape_text_off">white.png</textureradioofffocus>
+					<textureradiooffnofocus colordiffuse="kscape_text_off">white.png</textureradiooffnofocus>
+					<selected>Skin.HasSetting(ReducedMotion)</selected>
+					<onclick>Skin.ToggleSetting(ReducedMotion)</onclick>
+				</control>
+				<control type="label">
+					<description>Spacer above the section heading</description>
+					<width>1200</width>
+					<height>28</height>
+					<label></label>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<width>1140</width>
+					<height>56</height>
+					<aligny>center</aligny>
+					<font>kscape_list_head</font>
+					<textcolor>kscape_text_dim</textcolor>
+					<label>$LOCALIZE[31042]</label>
+				</control>
+				<control type="radiobutton" id="102">
+					<include content="SystemButton">
+						<param name="width" value="1200"/>
+						<param name="height" value="72"/>
+					</include>
+					<label>$LOCALIZE[31043]</label>
+					<radioposx>1106</radioposx>
+					<radioposy>21</radioposy>
+					<radiowidth>64</radiowidth>
+					<radioheight>30</radioheight>
+					<textureradioonfocus colordiffuse="kscape_amber">white.png</textureradioonfocus>
+					<textureradioonnofocus colordiffuse="kscape_amber">white.png</textureradioonnofocus>
+					<textureradioofffocus colordiffuse="kscape_text_off">white.png</textureradioofffocus>
+					<textureradiooffnofocus colordiffuse="kscape_text_off">white.png</textureradiooffnofocus>
+					<selected>Skin.HasSetting(HomeNoArtwork)</selected>
+					<onclick>Skin.ToggleSetting(HomeNoArtwork)</onclick>
+				</control>
+				<control type="radiobutton" id="103">
+					<include content="SystemButton">
+						<param name="width" value="1200"/>
+						<param name="height" value="72"/>
+					</include>
+					<label>$LOCALIZE[31044]</label>
+					<radioposx>1106</radioposx>
+					<radioposy>21</radioposy>
+					<radiowidth>64</radiowidth>
+					<radioheight>30</radioheight>
+					<textureradioonfocus colordiffuse="kscape_amber">white.png</textureradioonfocus>
+					<textureradioonnofocus colordiffuse="kscape_amber">white.png</textureradioonnofocus>
+					<textureradioofffocus colordiffuse="kscape_text_off">white.png</textureradioofffocus>
+					<textureradiooffnofocus colordiffuse="kscape_text_off">white.png</textureradiooffnofocus>
+					<selected>Skin.HasSetting(HomeNoClock)</selected>
+					<onclick>Skin.ToggleSetting(HomeNoClock)</onclick>
+				</control>
+				<control type="radiobutton" id="104">
+					<include content="SystemButton">
+						<param name="width" value="1200"/>
+						<param name="height" value="72"/>
+					</include>
+					<label>$LOCALIZE[31045]</label>
+					<radioposx>1106</radioposx>
+					<radioposy>21</radioposy>
+					<radiowidth>64</radiowidth>
+					<radioheight>30</radioheight>
+					<textureradioonfocus colordiffuse="kscape_amber">white.png</textureradioonfocus>
+					<textureradioonnofocus colordiffuse="kscape_amber">white.png</textureradioonnofocus>
+					<textureradioofffocus colordiffuse="kscape_text_off">white.png</textureradioofffocus>
+					<textureradiooffnofocus colordiffuse="kscape_text_off">white.png</textureradiooffnofocus>
+					<selected>Skin.HasSetting(HomeNoCaption)</selected>
+					<onclick>Skin.ToggleSetting(HomeNoCaption)</onclick>
+				</control>
+			</control>
+		</control>
+	</controls>
+</window>

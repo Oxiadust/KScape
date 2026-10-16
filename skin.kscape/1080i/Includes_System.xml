@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Shared look for kscape's system windows and dialogs (Settings, System info, power menu, ...):
+     the blue panel of the movie info screen, a lighter header strip, lighter-blue focus. -->
+<includes>
+	<!-- Full-screen backdrop for system windows. -->
+	<include name="SystemBackdrop">
+		<control type="image">
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="kscape_bg">white.png</texture>
+		</control>
+		<control type="image">
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="30245BD3">fade.png</texture>
+		</control>
+	</include>
+
+	<!-- Dims whatever is behind a dialog. -->
+	<include name="DialogDim">
+		<control type="image">
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="kscape_dim">white.png</texture>
+			<animation effect="fade" start="0" end="100" time="200">WindowOpen</animation>
+			<animation effect="fade" start="100" end="0" time="160">WindowClose</animation>
+		</control>
+	</include>
+
+	<!-- Panels slide up from the bottom edge like the movie info screen; plain fade with reduced motion. -->
+	<include name="PanelOpenClose">
+		<animation effect="slide" start="0,1080" end="0,0" time="380" tween="cubic" easing="out" condition="!Skin.HasSetting(ReducedMotion)">WindowOpen</animation>
+		<animation effect="fade" start="0" end="100" time="180">WindowOpen</animation>
+		<animation effect="slide" start="0,0" end="0,1080" time="280" tween="cubic" easing="in" condition="!Skin.HasSetting(ReducedMotion)">WindowClose</animation>
+		<animation effect="fade" start="100" end="0" time="200">WindowClose</animation>
+	</include>
+
+	<!-- Gentle fade for full windows. -->
+	<include name="WindowFade">
+		<animation effect="fade" start="0" end="100" time="220">WindowOpen</animation>
+		<animation effect="fade" start="100" end="0" time="160">WindowClose</animation>
+	</include>
+
+	<!-- Blue panel with a header strip; place inside a group positioned at the panel's top-left. -->
+	<include name="SystemPanel">
+		<param name="width" default="1200"/>
+		<param name="height" default="800"/>
+		<param name="title"></param>
+		<definition>
+			<control type="image">
+				<width>$PARAM[width]</width>
+				<height>$PARAM[height]</height>
+				<texture colordiffuse="kscape_blue">white.png</texture>
+			</control>
+			<control type="image">
+				<width>$PARAM[width]</width>
+				<height>64</height>
+				<texture colordiffuse="kscape_blue_head">white.png</texture>
+			</control>
+			<control type="label">
+				<left>30</left>
+				<width>$PARAM[width]</width>
+				<height>64</height>
+				<aligny>center</aligny>
+				<font>kscape_info_head</font>
+				<textcolor>white</textcolor>
+				<label>$PARAM[title]</label>
+			</control>
+		</definition>
+	</include>
+
+	<!-- Text button on a blue panel: lighter blue band when focused. -->
+	<include name="SystemButton">
+		<param name="width" default="480"/>
+		<param name="height" default="60"/>
+		<definition>
+			<width>$PARAM[width]</width>
+			<height>$PARAM[height]</height>
+			<font>kscape_menu</font>
+			<textoffsetx>30</textoffsetx>
+			<aligny>center</aligny>
+			<textcolor>kscape_text</textcolor>
+			<focusedcolor>white</focusedcolor>
+			<disabledcolor>kscape_text_off</disabledcolor>
+			<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+			<texturenofocus/>
+		</definition>
+	</include>
+
+	<!-- Row layouts for lists on a blue panel (Label left, Label2 right). -->
+	<include name="SystemListRow">
+		<param name="id"/>
+		<param name="width" default="1100"/>
+		<param name="height" default="60"/>
+		<definition>
+			<itemlayout width="$PARAM[width]" height="$PARAM[height]">
+				<control type="label">
+					<left>30</left>
+					<width>$PARAM[width]</width>
+					<height>$PARAM[height]</height>
+					<aligny>center</aligny>
+					<font>kscape_menu</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+				<control type="label">
+					<right>30</right>
+					<width>$PARAM[width]</width>
+					<height>$PARAM[height]</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>kscape_small</font>
+					<textcolor>kscape_text_dim</textcolor>
+					<label>$INFO[ListItem.Label2]</label>
+				</control>
+			</itemlayout>
+			<focusedlayout width="$PARAM[width]" height="$PARAM[height]">
+				<control type="image">
+					<width>$PARAM[width]</width>
+					<height>$PARAM[height]</height>
+					<texture colordiffuse="kscape_blue_focus">white.png</texture>
+					<visible>Control.HasFocus($PARAM[id])</visible>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<width>$PARAM[width]</width>
+					<height>$PARAM[height]</height>
+					<aligny>center</aligny>
+					<font>kscape_menu</font>
+					<textcolor>white</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+				<control type="label">
+					<right>30</right>
+					<width>$PARAM[width]</width>
+					<height>$PARAM[height]</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>kscape_small</font>
+					<textcolor>white</textcolor>
+					<label>$INFO[ListItem.Label2]</label>
+				</control>
+			</focusedlayout>
+		</definition>
+	</include>
+</includes>

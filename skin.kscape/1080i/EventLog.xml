@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodi contract (Event log): 50 event list (the only view, <views>50</views>), 4 sort-direction
+     togglebutton, 21 level button and 22 "show higher levels" radiobutton (labels set by Kodi),
+     20 clear button. 60 scrollbar, 501 logging-settings button and 9000 button column are skin-side. -->
+<window>
+	<defaultcontrol always="true">50</defaultcontrol>
+	<views>50</views>
+	<controls>
+		<include>SystemBackdrop</include>
+		<control type="group">
+			<left>96</left>
+			<top>48</top>
+			<include>WindowFade</include>
+			<include content="SystemPanel">
+				<param name="width" value="1728"/>
+				<param name="height" value="984"/>
+				<param name="title" value="$LOCALIZE[10050]"/>
+			</include>
+			<control type="image">
+				<description>Left column</description>
+				<top>64</top>
+				<width>480</width>
+				<height>920</height>
+				<texture colordiffuse="kscape_blue_dark">white.png</texture>
+			</control>
+
+			<control type="grouplist" id="9000">
+				<top>94</top>
+				<width>480</width>
+				<height>860</height>
+				<orientation>vertical</orientation>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>50</onleft>
+				<onright>50</onright>
+				<control type="togglebutton" id="4">
+					<description>Sort direction</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+					<alttexturefocus colordiffuse="kscape_blue_focus">white.png</alttexturefocus>
+					<alttexturenofocus/>
+					<label>$LOCALIZE[580]: $LOCALIZE[584]</label>
+					<altlabel>$LOCALIZE[580]: $LOCALIZE[585]</altlabel>
+				</control>
+				<control type="button" id="21">
+					<description>Minimum level (label set by Kodi)</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+				</control>
+				<control type="radiobutton" id="22">
+					<description>Show higher levels too (label set by Kodi)</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+					<radioposx>414</radioposx>
+					<radiowidth>36</radiowidth>
+					<radioheight>36</radioheight>
+					<textureradioonfocus colordiffuse="white">white.png</textureradioonfocus>
+					<textureradioonnofocus colordiffuse="kscape_text">white.png</textureradioonnofocus>
+					<textureradioofffocus colordiffuse="40FFFFFF">white.png</textureradioofffocus>
+					<textureradiooffnofocus colordiffuse="40FFFFFF">white.png</textureradiooffnofocus>
+					<textureradioondisabled colordiffuse="kscape_text_off">white.png</textureradioondisabled>
+					<textureradiooffdisabled colordiffuse="20FFFFFF">white.png</textureradiooffdisabled>
+				</control>
+				<control type="button" id="20">
+					<description>Clear</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+					<label>$LOCALIZE[192]</label>
+				</control>
+				<control type="button" id="501">
+					<description>Logging settings</description>
+					<include content="SystemButton"><param name="width" value="480"/><param name="height" value="80"/></include>
+					<label>$LOCALIZE[5]</label>
+					<onclick>ActivateWindow(systemsettings,logging)</onclick>
+				</control>
+			</control>
+
+			<control type="list" id="50">
+				<description>Events</description>
+				<left>530</left>
+				<top>94</top>
+				<width>1150</width>
+				<height>840</height>
+				<onleft>9000</onleft>
+				<onright>60</onright>
+				<onup>50</onup>
+				<ondown>50</ondown>
+				<viewtype label="535">list</viewtype>
+				<pagecontrol>60</pagecontrol>
+				<scrolltime tween="cubic" easing="out">300</scrolltime>
+				<itemlayout width="1150" height="140">
+					<control type="image">
+						<left>20</left>
+						<top>20</top>
+						<width>100</width>
+						<height>100</height>
+						<aspectratio>keep</aspectratio>
+						<texture fallback="DefaultAddon.png">$INFO[ListItem.Icon]</texture>
+					</control>
+					<control type="label">
+						<left>144</left>
+						<top>14</top>
+						<width>686</width>
+						<height>40</height>
+						<aligny>center</aligny>
+						<font>kscape_info_label</font>
+						<textcolor>kscape_text</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+					<control type="label">
+						<left>840</left>
+						<top>14</top>
+						<width>286</width>
+						<height>40</height>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>kscape_small</font>
+						<textcolor>kscape_text_dim</textcolor>
+						<label>$INFO[ListItem.Label2]</label>
+					</control>
+					<control type="textbox">
+						<left>144</left>
+						<top>58</top>
+						<width>982</width>
+						<height>72</height>
+						<font>kscape_list_value</font>
+						<textcolor>kscape_text_dim</textcolor>
+						<label>$INFO[ListItem.Property(Event.Description)]</label>
+					</control>
+				</itemlayout>
+				<focusedlayout width="1150" height="140">
+					<control type="image">
+						<width>1150</width>
+						<height>140</height>
+						<texture colordiffuse="kscape_blue_focus">white.png</texture>
+						<visible>Control.HasFocus(50)</visible>
+					</control>
+					<control type="image">
+						<left>20</left>
+						<top>20</top>
+						<width>100</width>
+						<height>100</height>
+						<aspectratio>keep</aspectratio>
+						<texture fallback="DefaultAddon.png">$INFO[ListItem.Icon]</texture>
+					</control>
+					<control type="label">
+						<left>144</left>
+						<top>14</top>
+						<width>686</width>
+						<height>40</height>
+						<aligny>center</aligny>
+						<font>kscape_info_label</font>
+						<textcolor>white</textcolor>
+						<scroll>true</scroll>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+					<control type="label">
+						<left>840</left>
+						<top>14</top>
+						<width>286</width>
+						<height>40</height>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>kscape_small</font>
+						<textcolor>white</textcolor>
+						<label>$INFO[ListItem.Label2]</label>
+					</control>
+					<control type="textbox">
+						<left>144</left>
+						<top>58</top>
+						<width>982</width>
+						<height>72</height>
+						<font>kscape_list_value</font>
+						<textcolor>white</textcolor>
+						<label>$INFO[ListItem.Property(Event.Description)]</label>
+					</control>
+				</focusedlayout>
+			</control>
+			<control type="scrollbar" id="60">
+				<left>1690</left>
+				<top>94</top>
+				<width>12</width>
+				<height>840</height>
+				<orientation>vertical</orientation>
+				<onleft>50</onleft>
+				<onright>9000</onright>
+				<texturesliderbackground colordiffuse="kscape_blue_dark">white.png</texturesliderbackground>
+				<texturesliderbar colordiffuse="kscape_text_dim">white.png</texturesliderbar>
+				<texturesliderbarfocus colordiffuse="white">white.png</texturesliderbarfocus>
+				<textureslidernib/>
+				<textureslidernibfocus/>
+				<visible>Control.IsVisible(50)</visible>
+			</control>
+		</control>
+	</controls>
+</window>

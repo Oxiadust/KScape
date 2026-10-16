@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- kscape palette: the blue of the info screen and list band, amber for the selection frame. -->
 <colors>
 	<color name="white">FFFFFFFF</color>
+	<color name="kscape_bg">FF070B16</color>
+	<color name="kscape_blue">FF1F5BD3</color>
+	<color name="kscape_blue_dark">FF184CB9</color>
+	<color name="kscape_blue_head">FF3876E4</color>
+	<color name="kscape_blue_focus">FF5A9DF2</color>
+	<color name="kscape_blue_bar">EE1F5BD3</color>
+	<color name="kscape_strip">D8101C3A</color>
+	<color name="kscape_amber">FFF5A01A</color>
+	<color name="kscape_text">FFF0F4FF</color>
+	<color name="kscape_text_dim">FFA9C2F2</color>
+	<color name="kscape_text_off">FF7F93BF</color>
+	<color name="kscape_dim">C0000000</color>
 </colors>

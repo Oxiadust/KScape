@@ -83,3 +83,32 @@ msgstr ""
 msgctxt "#31029"
 msgid "Ends at"
 msgstr ""
+
+msgctxt "#31040"
+msgid "Event log"
+msgstr ""
+
+#. Skin settings: radio button, skin setting ReducedMotion
+msgctxt "#31041"
+msgid "Reduce motion"
+msgstr ""
+
+#. Skin settings: section heading
+msgctxt "#31042"
+msgid "Home screen"
+msgstr ""
+
+#. Skin settings: radio button, skin setting HomeNoArtwork
+msgctxt "#31043"
+msgid "Hide the background artwork"
+msgstr ""
+
+#. Skin settings: radio button, skin setting HomeNoClock
+msgctxt "#31044"
+msgid "Hide the clock"
+msgstr ""
+
+#. Skin settings: radio button, skin setting HomeNoCaption
+msgctxt "#31045"
+msgid "Hide the movie title over the background"
+msgstr ""

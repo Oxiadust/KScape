@@ -9,6 +9,17 @@ own library artwork. It is not affiliated with Kaleidescape and uses none of its
 
 ## What it does
 
+- **Home screen.** Back from the wall. Random fanart from your movie library fills the screen
+  and crossfades to another movie every ~11 s (the movie's title shows bottom right), with a
+  kscape-blue navigation bar along the bottom: **Movies** (opens the wall), **System** and
+  **Power**. As in Aeon Nox: SiLVO, the focused item shows a submenu strip (here above the bar):
+  **Up** enters it, **Down** or **Back** return, Left/Right wrap around.
+  - *System* opens Kodi Settings; its submenu is SiLVO's: System info, Power options, Skin
+    settings, File manager, Profiles, Event log (when enabled), plus kscape's Switch skin.
+  - *Power* opens the power dialog (SiLVO's list: Exit, Power off, shutdown timer, Suspend,
+    Hibernate, Reboot, Log off, master mode, idle shutdown, Favourites, Reload skin, Skin
+    settings, Settings); its submenu is SiLVO's: Power off, Reboot, Suspend, Hibernate, Log off,
+    Quit. Entries the system cannot do are hidden, as in SiLVO.
 - **Cover wall.** Opens at startup. About 9 × 3.6 covers are visible, bleeding off every edge,
   in title order running down the columns and across to the right.
 - **Camera follow.** The amber focus frame glides to the next cover with a soft overshoot
@@ -86,16 +97,20 @@ then set `lookandfeel.skin` to `skin.kscape` in `userdata/guisettings.xml`.
 
 ## Switching back to another skin
 
-kscape has no Kodi Settings screens of its own. To leave it:
-
-- **Wall menu → Switch to another skin…**, or **Home → Switch skin** (Back from the wall).
+- **Wall menu → Switch to another skin…**, or **Home → System → Switch skin**, or Kodi's own
+  **Settings → Interface → Skin**.
   Kodi loads the chosen skin and asks whether to keep it; if you do not answer, it reverts.
 - Or, from this repository: `tools/revert_kodi_skin.sh [skin-id]` (default `skin.aeon.nox.silvo`).
   It quits Kodi if needed and edits `guisettings.xml`.
 
 ## Settings
 
-Stored as add-on settings of `script.kscape.wall` and toggled from the wall menu:
+kscape now has Kodi's settings screens (Settings, its category pages, System info, Profiles,
+File manager, Event log, add-on browser/information/settings, keyboard and the other dialogs they
+open), drawn in kscape's blue. **Skin settings** offers: Reduce motion, and hiding the Home
+screen's background artwork, clock or movie title.
+
+The wall's own options are stored as add-on settings of `script.kscape.wall` and toggled from the wall menu:
 
 - **Shuffle related covers automatically** (on). Off: use *Shuffle related covers now*.
 - **Show each movie once** (on). Off: every library entry gets its own cover.
@@ -129,8 +144,9 @@ Back undoes shuffles from a history stack.
 ## Project layout
 
 ```
-skin.kscape/              Kodi skin: startup routing, minimal Home, dialogs, playback controls,
-                          fallback poster grid
+skin.kscape/              Kodi skin: startup routing, Home (artwork + navigation), Kodi's
+                          settings/system windows and dialogs (Includes_System.xml holds their
+                          shared look), playback controls, fallback poster grid
 script.kscape.wall/       The cover wall add-on (Python + window XML)
   resources/lib/          geometry, model, ranking, wallmodel, info, listmodel (pure Python);
                           library, cache, skins, state, window (wall), details (info screen),
@@ -163,9 +179,13 @@ against real data. Kodi screenshots take about a second, so check motion with sl
 
 ## Known limitations
 
-- No Kodi Settings or add-on browser screens, and no audio/subtitle settings dialogs (the playback
-  controls cycle tracks instead): kscape is only the wall. Use another skin for system
-  configuration (see *Switching back*).
+- Not every Kodi window has a kscape version: music, pictures, TV/PVR, games, weather, the
+  favourites browser and the playback audio/subtitle settings dialogs still need another skin
+  (the playback controls cycle tracks instead). Kodi's default icons (folders, add-on
+  placeholders) are not bundled, so items without their own icon show none. The slider dialog
+  has not been checked in Kodi (it needs a playing video).
+- The Home submenu sits above the bar rather than below it as in SiLVO, so Up (not Down) enters
+  it. SiLVO's skinshortcuts-only "Master user" profile condition is not copied.
 - Duplicates are matched on title and year, the only thing Kodi's metadata offers. Entries the
   scraper misidentified as the same film (for example several different films all matched to
   one title) are merged too; fix the match in Kodi (*Refresh* on the item) or turn the option off.
