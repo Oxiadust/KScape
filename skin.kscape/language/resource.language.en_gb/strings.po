@@ -112,3 +112,38 @@ msgstr ""
 msgctxt "#31045"
 msgid "Hide the movie title over the background"
 msgstr ""
+
+#. Home: view card
+msgctxt "#31050"
+msgid "List"
+msgstr ""
+
+#. Home: view card
+msgctxt "#31051"
+msgid "Covers"
+msgstr ""
+
+#. Home: view card
+msgctxt "#31052"
+msgid "Favourites"
+msgstr ""
+
+#. Home: view card (music)
+msgctxt "#31053"
+msgid "Now Playing"
+msgstr ""
+
+#. Home: Now Playing card with no music
+msgctxt "#31054"
+msgid "Nothing playing"
+msgstr ""
+
+#. Home: top-left player strip
+msgctxt "#31055"
+msgid "NOW PLAYING"
+msgstr ""
+
+#. Home: top-left player strip
+msgctxt "#31056"
+msgid "PAUSED"
+msgstr ""

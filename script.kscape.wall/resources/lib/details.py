@@ -10,12 +10,13 @@ estimated line counts (info.estimate_lines); the synopsis scrolls if it is longe
 import xbmcaddon
 import xbmcgui
 
-from . import info
+from . import info, menu
 from .library import fetch_details
 
 ADDON = xbmcaddon.Addon('script.kscape.wall')
 BACK = (xbmcgui.ACTION_NAV_BACK, xbmcgui.ACTION_PREVIOUS_MENU)
 PLAY = (xbmcgui.ACTION_PLAYER_PLAY,)
+CONTEXT = (xbmcgui.ACTION_CONTEXT_MENU,)
 
 MENU = 100
 SUMMARY = 210
@@ -43,11 +44,13 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         super().__init__(*args)
         self.movie = kwargs['movie']
         self.details = kwargs.get('details') or {}
+        self.favs = kwargs.get('favs')
         self.choice = None
 
     def onInit(self):
         m, d = self.movie, self.details
         self.setProperty('title', d.get('title') or m.title)
+        self._mark_favourite()
         self.setProperty('poster', m.poster)
         self.setProperty('badge', m.badge)
         self._layout()
@@ -146,14 +149,27 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         elif aid in PLAY:
             self.choice = 'resume' if self.movie.resume_position > 0 else 'play'
             self.close()
+        elif aid in CONTEXT:
+            choice = menu.show(self.movie, self.favs, [])
+            if choice == 'favourite':
+                self.favs.toggle(self.movie)
+                self._mark_favourite()
+            elif choice == 'search':
+                self.choice = 'search'
+                self.close()
+
+    def _mark_favourite(self):
+        fav = self.favs is not None and self.favs.contains(self.movie)
+        self.setProperty('favourite', '1' if fav else '')
 
 
-def show_details(movie):
+def show_details(movie, favs=None):
     """Open the info screen for `movie`. Returns (choice, details): choice is 'play', 'resume',
-    'trailer' or None for Return/Back; details is the GetMovieDetails dict (or None)."""
+    'trailer', 'search' (from the C menu) or None for Return/Back; details is the
+    GetMovieDetails dict (or None)."""
     details = fetch_details(movie.movieid)
     dialog = DetailsDialog('script-kscape-info.xml', ADDON.getAddonInfo('path'), 'Default', '1080i',
-                           movie=movie, details=details)
+                           movie=movie, details=details, favs=favs)
     dialog.doModal()
     choice = dialog.choice
     del dialog

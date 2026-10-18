@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Now Playing (resources/lib/nowplaying.py). Hand-written. Everything about the playing track
+     comes from Kodi's player info labels and the buttons run Kodi's PlayerControl actions; Python
+     only fills the queue (700) from Kodi's music playlist and marks the playing row. -->
+<window>
+	<defaultcontrol always="true">602</defaultcontrol>
+	<controls>
+		<control type="image">
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="FF070B16">kscape-white.png</texture>
+		</control>
+		<control type="image">
+			<description>Artist fanart, when Kodi has it, kept dark behind the panel</description>
+			<width>1920</width>
+			<height>1080</height>
+			<aspectratio>scale</aspectratio>
+			<fadetime>600</fadetime>
+			<colordiffuse>40FFFFFF</colordiffuse>
+			<texture background="true">$INFO[Player.Art(fanart)]</texture>
+			<visible>Player.HasAudio</visible>
+		</control>
+		<control type="group">
+			<description>Slides up like the info screen</description>
+			<animation effect="slide" start="0,120" end="0,0" time="420" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1)">WindowOpen</animation>
+			<animation effect="fade" start="0" end="100" time="260">WindowOpen</animation>
+			<animation effect="fade" start="100" end="0" time="200">WindowClose</animation>
+
+			<control type="image">
+				<description>Left panel</description>
+				<left>96</left>
+				<top>48</top>
+				<width>672</width>
+				<height>984</height>
+				<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>96</left>
+				<top>48</top>
+				<width>672</width>
+				<height>64</height>
+				<texture colordiffuse="FF3876E4">kscape-white.png</texture>
+			</control>
+			<control type="label">
+				<left>126</left>
+				<top>48</top>
+				<width>612</width>
+				<height>64</height>
+				<aligny>center</aligny>
+				<font>kscape_info_head</font>
+				<textcolor>FFFFFFFF</textcolor>
+				<label>$ADDON[script.kscape.wall 32130]</label>
+			</control>
+
+			<control type="group">
+				<description>Cover, with a fallback card</description>
+				<left>132</left>
+				<top>140</top>
+				<control type="image">
+					<width>600</width>
+					<height>600</height>
+					<texture colordiffuse="FF1A1A1F">kscape-white.png</texture>
+				</control>
+				<control type="textbox">
+					<left>40</left>
+					<top>40</top>
+					<width>520</width>
+					<height>520</height>
+					<align>center</align>
+					<aligny>center</aligny>
+					<font>kscape_panel_title</font>
+					<textcolor>FFC8C8D0</textcolor>
+					<label>$INFO[MusicPlayer.Album]</label>
+					<visible>Player.HasAudio + String.IsEmpty(Player.Art(thumb))</visible>
+				</control>
+				<control type="image">
+					<width>600</width>
+					<height>600</height>
+					<aspectratio>scale</aspectratio>
+					<fadetime>300</fadetime>
+					<texture background="true">$INFO[Player.Art(thumb)]</texture>
+					<visible>Player.HasAudio</visible>
+				</control>
+			</control>
+
+			<control type="group">
+				<description>Progress</description>
+				<left>132</left>
+				<top>768</top>
+				<visible>Player.HasAudio</visible>
+				<control type="progress">
+					<width>600</width>
+					<height>10</height>
+					<texturebg colordiffuse="FF184CB9">kscape-white.png</texturebg>
+					<midtexture colordiffuse="FFF5A01A">kscape-white.png</midtexture>
+					<info>Player.Progress</info>
+				</control>
+				<control type="label">
+					<top>18</top>
+					<width>300</width>
+					<height>36</height>
+					<font>kscape_small</font>
+					<textcolor>FFF0F4FF</textcolor>
+					<label>$INFO[Player.Time]</label>
+				</control>
+				<control type="label">
+					<left>300</left>
+					<top>18</top>
+					<width>300</width>
+					<height>36</height>
+					<align>right</align>
+					<font>kscape_small</font>
+					<textcolor>FFF0F4FF</textcolor>
+					<label>$INFO[Player.Duration]</label>
+				</control>
+			</control>
+
+			<control type="grouplist" id="600">
+				<description>Previous / Play-Pause / Stop / Next</description>
+				<left>132</left>
+				<top>856</top>
+				<width>600</width>
+				<height>96</height>
+				<orientation>horizontal</orientation>
+				<itemgap>12</itemgap>
+				<onup>600</onup>
+				<ondown>600</ondown>
+				<onright>700</onright>
+				<onleft>600</onleft>
+				<control type="button" id="601">
+					<width>141</width>
+					<height>96</height>
+					<label>$ADDON[script.kscape.wall 32136]</label>
+					<font>kscape_small</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>FFD6E2FF</textcolor>
+					<focusedcolor>FFFFFFFF</focusedcolor>
+					<texturenofocus colordiffuse="FF184CB9">kscape-white.png</texturenofocus>
+					<texturefocus colordiffuse="FFF5A01A">kscape-white.png</texturefocus>
+					<onclick>PlayerControl(Previous)</onclick>
+				</control>
+				<control type="togglebutton" id="602">
+					<description>Pause while playing; Play while paused or stopped</description>
+					<width>141</width>
+					<height>96</height>
+					<label>$ADDON[script.kscape.wall 32141]</label>
+					<altlabel>$ADDON[script.kscape.wall 32140]</altlabel>
+					<usealttexture>Player.Paused | !Player.HasAudio</usealttexture>
+					<font>kscape_small</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>FFD6E2FF</textcolor>
+					<focusedcolor>FFFFFFFF</focusedcolor>
+					<texturenofocus colordiffuse="FF184CB9">kscape-white.png</texturenofocus>
+					<texturefocus colordiffuse="FFF5A01A">kscape-white.png</texturefocus>
+					<alttexturenofocus colordiffuse="FF184CB9">kscape-white.png</alttexturenofocus>
+					<alttexturefocus colordiffuse="FFF5A01A">kscape-white.png</alttexturefocus>
+					<onclick>PlayerControl(Play)</onclick>
+				</control>
+				<control type="button" id="603">
+					<width>141</width>
+					<height>96</height>
+					<label>$ADDON[script.kscape.wall 32138]</label>
+					<font>kscape_small</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>FFD6E2FF</textcolor>
+					<focusedcolor>FFFFFFFF</focusedcolor>
+					<texturenofocus colordiffuse="FF184CB9">kscape-white.png</texturenofocus>
+					<texturefocus colordiffuse="FFF5A01A">kscape-white.png</texturefocus>
+					<onclick>PlayerControl(Stop)</onclick>
+				</control>
+				<control type="button" id="604">
+					<width>141</width>
+					<height>96</height>
+					<label>$ADDON[script.kscape.wall 32139]</label>
+					<font>kscape_small</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>FFD6E2FF</textcolor>
+					<focusedcolor>FFFFFFFF</focusedcolor>
+					<texturenofocus colordiffuse="FF184CB9">kscape-white.png</texturenofocus>
+					<texturefocus colordiffuse="FFF5A01A">kscape-white.png</texturefocus>
+					<onclick>PlayerControl(Next)</onclick>
+				</control>
+			</control>
+
+			<control type="group">
+				<description>Track facts</description>
+				<left>832</left>
+				<top>100</top>
+				<visible>Player.HasAudio</visible>
+				<control type="label">
+					<width>990</width>
+					<height>40</height>
+					<font>kscape_list_head</font>
+					<textcolor>FFF5A01A</textcolor>
+					<label>$ADDON[script.kscape.wall 32133]</label>
+					<visible>!Player.Paused</visible>
+				</control>
+				<control type="label">
+					<width>990</width>
+					<height>40</height>
+					<font>kscape_list_head</font>
+					<textcolor>FFF5A01A</textcolor>
+					<label>$ADDON[script.kscape.wall 32134]</label>
+					<visible>Player.Paused</visible>
+				</control>
+				<control type="textbox">
+					<top>44</top>
+					<width>990</width>
+					<height>110</height>
+					<font>kscape_list_title</font>
+					<textcolor>FFFFFFFF</textcolor>
+					<label>$INFO[MusicPlayer.Title]</label>
+				</control>
+				<control type="label">
+					<top>162</top>
+					<width>990</width>
+					<height>52</height>
+					<font>kscape_panel_title</font>
+					<textcolor>FFF0F4FF</textcolor>
+					<label>$INFO[MusicPlayer.Artist]</label>
+				</control>
+				<control type="label">
+					<top>220</top>
+					<width>990</width>
+					<height>44</height>
+					<font>kscape_panel_body</font>
+					<textcolor>FFA9C2F2</textcolor>
+					<label>$INFO[MusicPlayer.Album]$INFO[MusicPlayer.Year,  ·  ]</label>
+				</control>
+			</control>
+			<control type="group">
+				<description>Nothing playing</description>
+				<left>832</left>
+				<top>140</top>
+				<visible>!Player.HasAudio</visible>
+				<control type="label">
+					<width>990</width>
+					<height>60</height>
+					<font>kscape_title</font>
+					<textcolor>FFE6E6EA</textcolor>
+					<label>$ADDON[script.kscape.wall 32131]</label>
+				</control>
+				<control type="textbox">
+					<top>70</top>
+					<width>990</width>
+					<height>80</height>
+					<font>kscape_panel_body</font>
+					<textcolor>FFA9C2F2</textcolor>
+					<label>$ADDON[script.kscape.wall 32132]</label>
+				</control>
+			</control>
+
+			<control type="label">
+				<left>832</left>
+				<top>408</top>
+				<width>990</width>
+				<height>44</height>
+				<font>kscape_info_label</font>
+				<textcolor>FFFFFFFF</textcolor>
+				<label>$ADDON[script.kscape.wall 32135]</label>
+				<visible>Integer.IsGreater(Container(700).NumItems,0)</visible>
+			</control>
+			<control type="list" id="700">
+				<description>Queue: Kodi's music playlist</description>
+				<left>820</left>
+				<top>460</top>
+				<width>1004</width>
+				<height>560</height>
+				<onleft>600</onleft>
+				<onright>901</onright>
+				<onup>901</onup>
+				<ondown>901</ondown>
+				<scrolltime tween="cubic" easing="out">200</scrolltime>
+				<itemlayout width="1004" height="80">
+					<control type="image">
+						<left>12</left>
+						<top>4</top>
+						<width>980</width>
+						<height>72</height>
+						<texture colordiffuse="FF13284F">kscape-white.png</texture>
+					</control>
+					<control type="image">
+						<left>12</left>
+						<top>4</top>
+						<width>980</width>
+						<height>72</height>
+						<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
+						<visible>String.IsEqual(ListItem.Property(playing),1)</visible>
+					</control>
+					<control type="image">
+						<left>16</left>
+						<top>8</top>
+						<width>64</width>
+						<height>64</height>
+						<texture colordiffuse="FF1A1A1F">kscape-white.png</texture>
+					</control>
+					<control type="image">
+						<left>16</left>
+						<top>8</top>
+						<width>64</width>
+						<height>64</height>
+						<aspectratio>scale</aspectratio>
+						<texture background="true">$INFO[ListItem.Art(thumb)]</texture>
+					</control>
+					<control type="image">
+						<left>96</left>
+						<top>30</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(ListItem.Property(playing),1)</visible>
+					</control>
+					<control type="label">
+						<left>124</left>
+						<width>720</width>
+						<height>80</height>
+						<aligny>center</aligny>
+						<font>kscape_menu</font>
+						<textcolor>FFE6EAF2</textcolor>
+						<label>$INFO[ListItem.Label]$INFO[ListItem.Label2,[COLOR FF9AB4E6]   ,[/COLOR]]</label>
+					</control>
+					<control type="label">
+						<left>850</left>
+						<width>126</width>
+						<height>80</height>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>kscape_small</font>
+						<textcolor>FFA9C2F2</textcolor>
+						<label>$INFO[ListItem.Property(duration)]</label>
+					</control>
+				</itemlayout>
+				<focusedlayout width="1004" height="80">
+					<control type="image">
+						<left>12</left>
+						<top>4</top>
+						<width>980</width>
+						<height>72</height>
+						<texture colordiffuse="FF13284F">kscape-white.png</texture>
+					</control>
+					<control type="image">
+						<left>12</left>
+						<top>4</top>
+						<width>980</width>
+						<height>72</height>
+						<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
+						<visible>String.IsEqual(ListItem.Property(playing),1)</visible>
+					</control>
+					<control type="image">
+						<left>12</left>
+						<top>4</top>
+						<width>980</width>
+						<height>72</height>
+						<texture colordiffuse="FF5A9DF2">kscape-white.png</texture>
+						<visible>Control.HasFocus(700)</visible>
+					</control>
+					<control type="image">
+						<description>Amber frame round the focused cover, as on the wall</description>
+						<left>8</left>
+						<top>0</top>
+						<width>80</width>
+						<height>80</height>
+						<texture colordiffuse="FFF5A01A">kscape-white.png</texture>
+						<visible>Control.HasFocus(700)</visible>
+					</control>
+					<control type="image">
+						<left>16</left>
+						<top>8</top>
+						<width>64</width>
+						<height>64</height>
+						<texture colordiffuse="FF1A1A1F">kscape-white.png</texture>
+					</control>
+					<control type="image">
+						<left>16</left>
+						<top>8</top>
+						<width>64</width>
+						<height>64</height>
+						<aspectratio>scale</aspectratio>
+						<texture background="true">$INFO[ListItem.Art(thumb)]</texture>
+					</control>
+					<control type="image">
+						<left>96</left>
+						<top>30</top>
+						<width>16</width>
+						<height>20</height>
+						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<visible>String.IsEqual(ListItem.Property(playing),1)</visible>
+					</control>
+					<control type="label">
+						<left>124</left>
+						<width>720</width>
+						<height>80</height>
+						<aligny>center</aligny>
+						<font>kscape_menu</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<label>$INFO[ListItem.Label]$INFO[ListItem.Label2,[COLOR FFD6E2FF]   ,[/COLOR]]</label>
+					</control>
+					<control type="label">
+						<left>850</left>
+						<width>126</width>
+						<height>80</height>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>kscape_small</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<label>$INFO[ListItem.Property(duration)]</label>
+					</control>
+				</focusedlayout>
+			</control>
+			<control type="button" id="901">
+				<description>Edge target: never visible, so the queue stops at its ends</description>
+				<left>-200</left>
+				<top>-200</top>
+				<width>1</width>
+				<height>1</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<visible>false</visible>
+			</control>
+		</control>
+	</controls>
+</window>

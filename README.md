@@ -1,9 +1,10 @@
 # KScape
 
-A cinematic movie skin for Kodi 21 (Omega), built around an edge-to-edge wall of posters you
-glide across with a remote. Pause on a movie and its synopsis appears, then related titles
-shuffle into place around it. A list view, a full movie info screen and a Home screen with
-rotating artwork complete it.
+A cinematic skin for Kodi 21 (Omega), built around an edge-to-edge wall of covers you glide
+across with a remote. Pause on a movie, album or TV show and its synopsis appears, then related
+titles shuffle into place around it. Movies, Music and TV Shows each have a cover wall, a list
+view and a Favourites view; music adds Now Playing. Kodi's own favourites and a search scoped to
+each library are one press of C away.
 
 KScape is built only from Kodi's own skinning and Python APIs and your own library artwork.
 
@@ -11,9 +12,18 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
 
 - **Home screen.** Back from the wall. Random fanart from your movie library fills the screen
   and crossfades to another movie every ~11 s (the movie's title shows bottom right), with a
-  KScape-blue navigation bar along the bottom: **Movies** (opens the wall), **System** and
-  **Power**. As in Aeon Nox: SiLVO, the focused item shows a submenu strip (here above the bar):
-  **Up** enters it, **Down** or **Back** return, Left/Right wrap around.
+  KScape-blue navigation bar along the bottom: **Movies**, **Music**, **TV Shows**, **System**
+  and **Power**. Left/Right wrap around.
+  - *Movies*, *Music* and *TV Shows* open their wall (or list, whichever you used last). Above
+    the focused tab, a column of cards shows the views it offers - **List**, **Covers**,
+    **Favourites**, and **Now Playing** for music - each the real view at 1/6 scale, drawn live
+    from your own library.
+    **Up** enters the cards (the selected one gets the wall's amber frame), **Select** opens that
+    view, **Down** past the last card or **Back** returns to the bar.
+  - While something plays, the top left shows its cover or poster, title, artist and album (or
+    show and episode), play state and progress.
+  - As in Aeon Nox: SiLVO, *System* and *Power* show a submenu strip above the bar: **Up** enters
+    it, **Down** or **Back** return.
   - *System* opens Kodi Settings; its submenu is SiLVO's: System info, Power options, Skin
     settings, File manager, Profiles, Event log (when enabled), plus KScape's Switch skin.
   - *Power* opens the power dialog (SiLVO's list: Exit, Power off, shutdown timer, Suspend,
@@ -30,7 +40,8 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   synopsis opens beside it (on whichever side has room).
 - **Related-cover shuffle.** About 3.2 s after you stop, every cover flies to a new cell so the
   most related movies end up closest to the one you picked. That movie and its panel stay put;
-  covers leaving the screen fly off and newcomers fly in from the edges.
+  covers leaving the screen fly off and newcomers fly in from the edges. No cover flies across the
+  selected one: paths that would are steered round its frame.
 - **Movie info.** Select on a cover slides up a large panel over the wall: poster, the
   rating and facts line (runtime, video quality, aspect ratio, country, year), synopsis, genres,
   cast, director and collection, with **Return / Resume Movie / Play Movie / Play Trailer**.
@@ -49,6 +60,30 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
 - **Remembers where you were**, across Kodi restarts.
 - **One cover per movie.** Duplicate copies (same title and year) show as one cover by default;
   the copy with a resume point, then the best quality, is the one kept and played.
+- **Music.** The same wall with square album covers (missing artwork shows the album and artist
+  on a dark card); the panel shows album and artist, and related albums (same artist, shared
+  artists, genres, styles, era) shuffle around the one you pick. The list view's columns are
+  **Artist** (amber sort letter, leading "The" skipped), **Album**, **Genre** and **Year**.
+  Select opens the album: cover, facts, review, **Play Album** and its tracks (Select on a track
+  plays the album from there, in Kodi's own music player).
+- **Now Playing.** Cover, title, artist, album and year, progress, play state, **Previous /
+  Play-Pause / Stop / Next** (Kodi's own player controls), and the queue (Select jumps to a
+  track). Opens by itself when you start an album.
+- **TV Shows.** A poster wall and a list view (Title, Genre, Cast, Network, Year, Seasons,
+  Episodes, Rating). Select opens the show: poster, facts, plot and its seasons; Select on a
+  season lists its episodes (unwatched ones marked amber; Back returns to the seasons); Select on
+  an episode plays it, asking whether to resume if Kodi has a resume point. Shows with a single
+  season open straight on its episodes. **Play** on a show starts the first unwatched episode.
+- **Favourites.** Kodi's own favourites (`favourites.xml`), no separate list: KScape writes the
+  same entries Kodi's context menu does, so favourites added in either place show in both.
+  Favourite covers and list rows carry an amber heart. The **Favourites** view is the cover wall
+  of just your favourites of that kind, updated as soon as one is added or removed (here or in
+  Kodi's own favourites window); with none it explains how to add one.
+- **Search.** From the C menu. Kodi's on-screen keyboard (KScape-styled) asks what to look for;
+  results open as a list view of that library only - movies match titles, then cast and
+  directors; albums match album and artist (then genre); shows match titles, then cast - with a
+  heading saying what was searched and how many matched, or a message when nothing did. C on
+  the results searches again.
 - **Playback controls** in the same style: play/pause, back/forward 30 s, audio track, subtitles
   (both cycle in place), stop, plus a title strip and an info screen.
 
@@ -60,13 +95,19 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
 | Select / Enter | Open the movie info screen |
 | Play | Play the movie (resumes from the last position if there is one) |
 | Back / Esc | Undo the last shuffle; with nothing left to undo, leave the wall |
-| Menu / C / Info | Wall menu: list view, shuffle now, automatic shuffle on/off, reduce motion on/off, show duplicates once on/off, reload library, switch skin, exit |
+| Menu / C / Info | Menu: **Add to / Remove from Favourites** (labelled for the selected item), **Search…**, then list view, shuffle now, automatic shuffle on/off, reduce motion on/off, show duplicates once on/off (movies), reload library, switch skin, exit |
 
-In the **list view**: Up/Down move through movies, Left/Right between columns, Select opens the
-info screen, Play plays, Back returns to the cover wall on the same movie, and Menu offers
-cover wall / switch skin / exit. The view you were in is remembered across restarts.
+In the **list view**: Up/Down move through items, Left/Right between columns, Select opens the
+info, album or show screen, Play plays, Back returns to the cover wall on the same item, and
+Menu offers favourites / search / cover wall / switch skin / exit. The view you were in is
+remembered across restarts, per library.
 
-On the **info screen**: Up/Down choose an action, Select runs it, Back returns.
+On the **info, album and show screens**: Up/Down choose, Left/Right move between the menu and
+the track, season or episode list, Select runs it, Back returns (from episodes, to the seasons),
+and C offers favourites and search.
+
+On **Now Playing**: Left/Right/Up/Down move between the buttons and the queue, Back returns, C
+offers favourites (for the playing album) and search.
 
 During playback: **OK / Menu** opens the controls, **Info** shows the movie's details, **Back** closes them,
 and the usual Kodi playback keys (pause, seek, stop) keep working.
@@ -152,14 +193,21 @@ Back undoes shuffles from a history stack.
 skin.kscape/              Kodi skin: startup routing, Home (artwork + navigation), Kodi's
                           settings/system windows and dialogs (Includes_System.xml holds their
                           shared look), playback controls, fallback poster grid
-script.kscape.wall/       The cover wall add-on (Python + window XML)
-  resources/lib/          geometry, model, ranking, wallmodel, info, listmodel (pure Python);
-                          library, cache, skins, state, window (wall), details (info screen),
-                          listwindow (list view)
-  tests/                  unit tests for ranking, placement, badges, info text, list sorting
+script.kscape.wall/       The wall add-on: movies, music and TV (Python + window XML)
+  resources/lib/          geometry, model, media (albums, shows), ranking, wallmodel, info,
+                          listmodel, search (pure Python); kinds (what differs per library),
+                          favourites (Kodi's favourites), menu (the C menu), library, cache,
+                          skins, state, window (wall), details (movie info), browse (album and
+                          show screens), listwindow (list view), nowplaying
+  tests/                  unit tests for ranking, placement, badges, info text, list sorting,
+                          albums, shows, favourites, search
 tools/
-  gen_wall_xml.py         generates the wall window XML from geometry.py (do not hand-edit the XML)
-  gen_list_xml.py         generates the list view XML from listmodel.py (likewise)
+  gen_wall_xml.py         generates the wall window XMLs (poster, square) from geometry.py (do
+                          not hand-edit the XML)
+  gen_list_xml.py         generates the movie, music and TV list XMLs from listmodel.py (likewise)
+  gen_home_xml.py         generates the Home view cards (skin Includes_Home.xml) from the views'
+                          geometry (likewise)
+  make_test_media.py      a small tagged music and TV library for the test Kodi
   build_zips.sh           installable ZIPs into dist/
   kodi_smoke_test.sh      launches an isolated test Kodi (temporary HOME, JSON-RPC port 9091)
   kodi_nav_test.py        drives the test Kodi over JSON-RPC
@@ -173,7 +221,9 @@ tools/
 (cd script.kscape.wall && python3 -m unittest discover -s tests)   # unit tests
 python3 tools/gen_wall_xml.py                                       # after changing geometry.py
 python3 tools/gen_list_xml.py                                       # after changing listmodel.py
-tools/kodi_smoke_test.sh                                            # isolated Kodi with both add-ons
+python3 tools/gen_home_xml.py                                       # after either of those
+python3 tools/make_test_media.py                                    # test music + TV library
+MEDIA=1 tools/kodi_smoke_test.sh                                    # isolated Kodi, scans it too
 python3 -I tools/kodi_nav_test.py                                   # scripted navigation checks
 ```
 
@@ -184,19 +234,29 @@ against real data. Kodi screenshots take about a second, so check motion with sl
 
 ## Known limitations
 
-- Not every Kodi window has a KScape version: music, pictures, TV/PVR, games, weather and the
-  playback audio/subtitle settings dialogs still need another skin
+- Not every Kodi window has a KScape version: Kodi's own music file browser (only a cover grid,
+  used by album favourites opened from Kodi's favourites window), the music visualisation,
+  pictures, live TV/PVR, games, weather and the playback audio/subtitle settings dialogs still
+  need another skin
   (the playback controls cycle tracks instead). Kodi's default icons (folders, add-on
   placeholders) are not bundled, so items without their own icon show none. The slider dialog
   has not been checked in Kodi (it needs a playing video).
 - The Home submenu sits above the bar rather than below it as in SiLVO, so Up (not Down) enters
   it. SiLVO's skinshortcuts-only "Master user" profile condition is not copied.
+- Favourites cover movies, albums and TV shows (the items the walls show), not single songs or
+  episodes. A movie is a favourite by its file, as Kodi stores it, so a favourite added for one
+  copy of a merged duplicate counts for the cover.
+- Search looks through what the walls load: album titles, artists and genres, but not song
+  titles; movie and show titles and people, but not plots.
+- The Home cards draw the library live, so the Favourites card shows the amber heart over the
+  library rather than your actual favourites (Kodi cannot filter its favourites by kind in a
+  skin).
 - Duplicates are matched on title and year, the only thing Kodi's metadata offers. Entries the
   scraper misidentified as the same film (for example several different films all matched to
   one title) are merged too; fix the match in Kodi (*Refresh* on the item) or turn the option off.
 - Badges depend on Kodi's stream details, which it records only after reading the files.
-- Tested on macOS with Kodi 21.3 at 1080p, with a real 757-movie library and a synthetic
-  5,000-movie library (ranking and placement for 5,000 movies take about 55 ms on the
+- Tested on macOS with Kodi 21.3 at 1080p, with a real 757-movie library, a synthetic
+  5,000-movie library, and the generated 30-album / 5-show test library (ranking and placement for 5,000 movies take about 55 ms on the
   development Mac). Not yet tested at 4K, on low-power devices, or on Linux/Android/Windows.
 - The info screen lays out its right-hand column from estimated line counts (Kodi cannot
   measure text for scripts): a long synopsis scrolls inside its box, and an unusually long cast

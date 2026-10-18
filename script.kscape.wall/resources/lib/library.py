@@ -1,9 +1,10 @@
-"""Kodi video library access over in-process JSON-RPC."""
+"""Kodi video and music library access over in-process JSON-RPC."""
 import json
 
 import xbmc
 
 from .info import DETAILS_PROPERTIES
+from .media import ALBUM_PROPERTIES, SHOW_PROPERTIES, Album, Show
 from .model import JSONRPC_PROPERTIES, LIGHT_PROPERTIES, MAX_CAST, Movie
 
 SORT = {'method': 'sorttitle', 'order': 'ascending', 'ignorearticle': True}
@@ -68,3 +69,86 @@ def play(movie, resume=None):
 
 def play_trailer(url):
     xbmc.executebuiltin(f'PlayMedia("{url}")')
+
+
+# ---- music library -------------------------------------------------------------------------
+
+ALBUM_SORT = {'method': 'artist', 'order': 'ascending', 'ignorearticle': True}
+MUSIC_PLAYLIST = 0
+SONG_PROPERTIES = ['title', 'track', 'disc', 'duration', 'artist', 'file', 'albumid']
+
+
+def album_total():
+    result = rpc('AudioLibrary.GetAlbums', {'limits': {'start': 0, 'end': 1}})
+    return int((result.get('limits') or {}).get('total') or 0)
+
+
+def fetch_albums():
+    """All albums by artist (leading "The" ignored), then year and title (see Album.sorttitle)."""
+    result = rpc('AudioLibrary.GetAlbums', {'properties': ALBUM_PROPERTIES, 'sort': ALBUM_SORT})
+    return sorted((Album.from_jsonrpc(a) for a in result.get('albums', [])), key=lambda a: a.sorttitle)
+
+
+def fetch_album(albumid):
+    details = rpc('AudioLibrary.GetAlbumDetails', {'albumid': albumid, 'properties': ALBUM_PROPERTIES})
+    a = details.get('albumdetails')
+    return Album.from_jsonrpc(a) if a else None
+
+
+def fetch_songs(albumid):
+    """The album's tracks in disc and track order, as Kodi returns them."""
+    result = rpc('AudioLibrary.GetSongs', {'filter': {'albumid': albumid}, 'properties': SONG_PROPERTIES,
+                                           'sort': {'method': 'track', 'order': 'ascending'}})
+    return sorted(result.get('songs', []), key=lambda s: (s.get('disc') or 0, s.get('track') or 0))
+
+
+def play_album(albumid, position=0):
+    """Queue the whole album in Kodi's music playlist and start at track `position`."""
+    rpc('Playlist.Clear', {'playlistid': MUSIC_PLAYLIST})
+    rpc('Playlist.Add', {'playlistid': MUSIC_PLAYLIST, 'item': {'albumid': albumid}})
+    rpc('Player.Open', {'item': {'playlistid': MUSIC_PLAYLIST, 'position': position}})
+
+
+# ---- TV library ----------------------------------------------------------------------------
+
+SHOW_SORT = {'method': 'sorttitle', 'order': 'ascending', 'ignorearticle': True}
+SEASON_PROPERTIES = ['season', 'episode', 'watchedepisodes', 'art', 'title']
+EPISODE_PROPERTIES = ['title', 'season', 'episode', 'runtime', 'plot', 'art', 'playcount', 'resume',
+                      'firstaired', 'file']
+
+
+def show_total():
+    result = rpc('VideoLibrary.GetTVShows', {'limits': {'start': 0, 'end': 1}})
+    return int((result.get('limits') or {}).get('total') or 0)
+
+
+def fetch_shows():
+    result = rpc('VideoLibrary.GetTVShows', {'properties': SHOW_PROPERTIES, 'sort': SHOW_SORT})
+    return [Show.from_jsonrpc(t) for t in result.get('tvshows', [])]
+
+
+def fetch_show(tvshowid):
+    details = rpc('VideoLibrary.GetTVShowDetails', {'tvshowid': tvshowid, 'properties': SHOW_PROPERTIES})
+    t = details.get('tvshowdetails')
+    return Show.from_jsonrpc(t) if t else None
+
+
+def fetch_seasons(tvshowid):
+    result = rpc('VideoLibrary.GetSeasons', {'tvshowid': tvshowid, 'properties': SEASON_PROPERTIES,
+                                             'sort': {'method': 'season', 'order': 'ascending'}})
+    return result.get('seasons', [])
+
+
+def fetch_episodes(tvshowid, season):
+    result = rpc('VideoLibrary.GetEpisodes', {'tvshowid': tvshowid, 'season': season,
+                                              'properties': EPISODE_PROPERTIES,
+                                              'sort': {'method': 'episode', 'order': 'ascending'}})
+    return result.get('episodes', [])
+
+
+def play_episode(episodeid, resume=None):
+    """Like play(): resumes from Kodi's bookmark unless told otherwise."""
+    if resume is None:
+        details = rpc('VideoLibrary.GetEpisodeDetails', {'episodeid': episodeid, 'properties': ['resume']})
+        resume = ((details.get('episodedetails') or {}).get('resume') or {}).get('position', 0) > 0
+    rpc('Player.Open', {'item': {'episodeid': episodeid}, 'options': {'resume': bool(resume)}})

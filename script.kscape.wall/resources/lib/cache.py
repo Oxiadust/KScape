@@ -1,4 +1,4 @@
-"""Disk cache of the movie list, so opening the wall does not re-query a large library.
+"""Disk cache of a library list, so opening the wall does not re-query a large library.
 
 Listing 5,000 movies with every property takes ~40 s in Kodi, so the wall shows the cached list
 straight away and only re-queries when the library changes (scan, clean, or an edit Kodi
@@ -11,19 +11,26 @@ import time
 
 import xbmcvfs
 
-PATH = xbmcvfs.translatePath('special://profile/addon_data/script.kscape.wall/movies-cache.json')
-VERSION = 2
+FOLDER = xbmcvfs.translatePath('special://profile/addon_data/script.kscape.wall/')
+
+
+def _path(name):
+    """One cache per media kind: movies-cache.json, music-cache.json, tv-cache.json."""
+    return os.path.join(FOLDER, f'{name}-cache.json')
+
+
+VERSION = 3
 MAX_AGE_S = 24 * 3600
 
 
-def load(expected_total):
+def load(expected_total, name='movies'):
     """{'movies': [dict], 'complete': bool, 'stale': bool} or None if unusable.
 
     `complete` is False when cast had not been fetched yet; `stale` when the cache is older than
     MAX_AGE_S and should be refreshed in the background.
     """
     try:
-        with open(PATH) as f:
+        with open(_path(name)) as f:
             data = json.load(f)
     except (OSError, ValueError):
         return None
@@ -36,21 +43,21 @@ def load(expected_total):
     }
 
 
-def save(total, movies, complete):
+def save(total, movies, complete, name='movies'):
     data = {'version': VERSION, 'total': total, 'complete': complete, 'written': time.time(),
             'movies': movies}
     try:
-        os.makedirs(os.path.dirname(PATH), exist_ok=True)
-        tmp = PATH + '.tmp'
+        os.makedirs(FOLDER, exist_ok=True)
+        tmp = _path(name) + '.tmp'
         with open(tmp, 'w') as f:
             json.dump(data, f)
-        os.replace(tmp, PATH)
+        os.replace(tmp, _path(name))
     except OSError:
         pass                          # the cache is an optimisation; a failed write costs nothing
 
 
-def discard():
+def discard(name='movies'):
     try:
-        os.remove(PATH)
+        os.remove(_path(name))
     except OSError:
         pass

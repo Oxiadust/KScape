@@ -43,6 +43,11 @@ class Movie:
     resume_position: float
     badge: str = ''
     mpaa: str = ''                 # as scraped, e.g. 'Rated PG-13'
+    file: str = ''                 # what Kodi's favourites store for a library movie
+
+    @property
+    def key(self):
+        return self.movieid
 
     @classmethod
     def from_jsonrpc(cls, m):
@@ -64,6 +69,7 @@ class Movie:
             resume_position=float((m.get('resume') or {}).get('position') or 0),
             badge=badge_for(m.get('streamdetails')),
             mpaa=m.get('mpaa') or '',
+            file=m.get('file') or '',
         )
 
     def to_cache(self):

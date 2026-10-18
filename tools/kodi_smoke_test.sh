@@ -14,6 +14,13 @@ rm -rf "$K/addons/skin.kscape" "$K/addons/skin.kscapeprobe" "$K/addons/script.ks
 cp -R "$(dirname "$SRC")/script.kscape.wall" "$K/addons/" && find "$K/addons/script.kscape.wall" -name __pycache__ -prune -exec rm -rf {} +
 # Manually copied add-ons are registered disabled by Kodi 17+; enable ours in the throwaway profile only.
 sqlite3 "$DB" "delete from installed where addonID='skin.kscapeprobe'; update installed set enabled=1 where addonID in ('skin.kscape','script.kscape.wall');"
+# MEDIA=1: add the generated test music/TV library (tools/make_test_media.py) and scan it after launch.
+if [[ -n $MEDIA ]]; then
+    S="$K/userdata/sources.xml"
+    grep -q kscape-media/music "$S" || sed -i '' 's#<music>#<music><source><name>KScape test music</name><path>/tmp/kscape-media/music/</path><allowsharing>true</allowsharing></source>#' "$S"
+    grep -q kscape-media/tv "$S" || sed -i '' 's#<video>#<video><source><name>KScape test TV</name><path>/tmp/kscape-media/tv/</path><allowsharing>true</allowsharing></source>#' "$S"
+    sqlite3 "$K/userdata/Database/MyVideos131.db" "insert into path (strPath, strContent, strScraper, scanRecursive, useFolderNames, strSettings, noUpdate, exclude, allAudio) select '/tmp/kscape-media/tv/', 'tvshows', 'metadata.local', 0, 0, '', 0, 0, 0 where not exists (select 1 from path where strPath='/tmp/kscape-media/tv/');"
+fi
 G="$K/userdata/guisettings.xml"
 sed -i '' 's#<setting id="lookandfeel.skin"[^<]*<#<setting id="lookandfeel.skin">skin.kscape<#' "$G"
 # Local-only JSON-RPC plus screenshot path, for automated checks.
@@ -34,3 +41,9 @@ echo $! > $PIDF
 sleep ${WAIT:-35}
 LOG="$H/Library/Logs/kodi.log"
 grep -E "load skin from|Failed to load skin|LoadFontsFromFile|Loading skin file: Home| error " "$LOG" | grep -viE 'MediaKey|CDisplaySettings|CSettings' | cut -c1-220
+if [[ -n $MEDIA ]]; then
+    RPC="$(dirname "$SRC")/tools/kodi_rpc.py"
+    python3 "$RPC" AudioLibrary.Scan '{"directory":"/tmp/kscape-media/music/"}'
+    sleep 8
+    python3 "$RPC" VideoLibrary.Scan '{"directory":"/tmp/kscape-media/tv/"}'
+fi

@@ -186,3 +186,233 @@ msgstr ""
 msgctxt "#32071"
 msgid "List view"
 msgstr ""
+
+#. Wall status: no albums in the music library
+msgctxt "#32003"
+msgid "Your music library is empty"
+msgstr ""
+
+#. Wall status: no TV shows in the library
+msgctxt "#32004"
+msgid "Your TV library is empty"
+msgstr ""
+
+#. Favourites view, nothing in Kodi's favourites for this kind
+msgctxt "#32005"
+msgid "No favourites yet"
+msgstr ""
+
+#. Favourites view, second line
+msgctxt "#32006"
+msgid "Press C on a title and choose Add to Favourites."
+msgstr ""
+
+#. List column (music): artist
+msgctxt "#32080"
+msgid "Artist"
+msgstr ""
+
+#. List column (music): album
+msgctxt "#32081"
+msgid "Album"
+msgstr ""
+
+#. List column (TV): network or studio
+msgctxt "#32082"
+msgid "Network"
+msgstr ""
+
+#. List column (TV): number of seasons
+msgctxt "#32083"
+msgid "Seasons"
+msgstr ""
+
+#. List column (TV): number of episodes
+msgctxt "#32084"
+msgid "Episodes"
+msgstr ""
+
+#. C menu
+msgctxt "#32090"
+msgid "Add to Favourites"
+msgstr ""
+
+#. C menu
+msgctxt "#32091"
+msgid "Remove from Favourites"
+msgstr ""
+
+#. C menu
+msgctxt "#32092"
+msgid "Search…"
+msgstr ""
+
+#. Search keyboard heading
+msgctxt "#32093"
+msgid "Search movies"
+msgstr ""
+
+#. Search keyboard heading
+msgctxt "#32094"
+msgid "Search music"
+msgstr ""
+
+#. Search keyboard heading
+msgctxt "#32095"
+msgid "Search TV shows"
+msgstr ""
+
+#. Search results heading; {} is the query
+msgctxt "#32096"
+msgid "Search “{}”: 1 result"
+msgstr ""
+
+#. Search results heading; query, count
+msgctxt "#32097"
+msgid "Search “{}”: {} results"
+msgstr ""
+
+#. Search results, nothing found
+msgctxt "#32098"
+msgid "No movies match “{}”"
+msgstr ""
+
+#. Search results, nothing found
+msgctxt "#32099"
+msgid "No albums match “{}”"
+msgstr ""
+
+#. Search results, nothing found
+msgctxt "#32100"
+msgid "No TV shows match “{}”"
+msgstr ""
+
+#. Album screen menu
+msgctxt "#32110"
+msgid "Play Album"
+msgstr ""
+
+#. Album screen list heading
+msgctxt "#32111"
+msgid "Tracks"
+msgstr ""
+
+#. TV show screen list heading
+msgctxt "#32112"
+msgid "Seasons"
+msgstr ""
+
+#. TV show screen list heading
+msgctxt "#32113"
+msgid "Episodes"
+msgstr ""
+
+#. Season name; {} is the number
+msgctxt "#32114"
+msgid "Season {}"
+msgstr ""
+
+#. Season 0
+msgctxt "#32115"
+msgid "Specials"
+msgstr ""
+
+#. Episode count
+msgctxt "#32116"
+msgid "{} episodes"
+msgstr ""
+
+#. Track count
+msgctxt "#32117"
+msgid "{} tracks"
+msgstr ""
+
+#. Track count, one
+msgctxt "#32118"
+msgid "{} track"
+msgstr ""
+
+#. Episode count, one
+msgctxt "#32119"
+msgid "1 episode"
+msgstr ""
+
+#. Watched episode count
+msgctxt "#32120"
+msgid "({} watched)"
+msgstr ""
+
+#. TV show screen menu; the episode code is shown beside it
+msgctxt "#32121"
+msgid "Play Episode"
+msgstr ""
+
+#. TV show screen menu
+msgctxt "#32122"
+msgid "Resume Episode"
+msgstr ""
+
+#. Episode with a resume point; {} is the time
+msgctxt "#32123"
+msgid "Resume from {}"
+msgstr ""
+
+#. Episode with a resume point
+msgctxt "#32124"
+msgid "Play from beginning"
+msgstr ""
+
+#. Now Playing header
+msgctxt "#32130"
+msgid "Now Playing"
+msgstr ""
+
+#. Now Playing, no music
+msgctxt "#32131"
+msgid "Nothing is playing"
+msgstr ""
+
+#. Now Playing, no music, hint
+msgctxt "#32132"
+msgid "Choose an album in Music to start listening."
+msgstr ""
+
+#. Now Playing state
+msgctxt "#32133"
+msgid "PLAYING"
+msgstr ""
+
+#. Now Playing state
+msgctxt "#32134"
+msgid "PAUSED"
+msgstr ""
+
+#. Now Playing queue heading
+msgctxt "#32135"
+msgid "Up next"
+msgstr ""
+
+#. Now Playing button
+msgctxt "#32136"
+msgid "Previous"
+msgstr ""
+
+#. Now Playing button
+msgctxt "#32138"
+msgid "Stop"
+msgstr ""
+
+#. Now Playing button
+msgctxt "#32139"
+msgid "Next"
+msgstr ""
+
+#. Now Playing button
+msgctxt "#32140"
+msgid "Play"
+msgstr ""
+
+#. Now Playing button
+msgctxt "#32141"
+msgid "Pause"
+msgstr ""

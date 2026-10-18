@@ -89,5 +89,23 @@
 			<filename>arial.ttf</filename>
 			<size>30</size>
 		</font>
+		<!-- Home view cards: the real views drawn at 1/6 scale (tools/gen_home_xml.py). -->
+		<font>
+			<name>kscape_micro</name>
+			<filename>arial.ttf</filename>
+			<size>6</size>
+		</font>
+		<font>
+			<name>kscape_micro_bold</name>
+			<filename>arial.ttf</filename>
+			<size>7</size>
+			<style>bold</style>
+		</font>
+		<font>
+			<name>kscape_tiny_bold</name>
+			<filename>arial.ttf</filename>
+			<size>8</size>
+			<style>bold</style>
+		</font>
 	</fontset>
 </fonts>

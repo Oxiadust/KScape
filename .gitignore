@@ -2,8 +2,5 @@
 __pycache__/
 *.zip
 # Reference material (recordings, screenshots, design prompts): kept local, not published.
-video/
-examples/
-*_Master_Prompt.txt
-promp*.md
+prompts/
 dist/

@@ -9,8 +9,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from resources.lib import geometry as G  # noqa: E402
 from resources.lib.model import Movie, badge_for, merge_duplicates  # noqa: E402
 from resources.lib.ranking import rank_related, score  # noqa: E402
-from resources.lib.wallmodel import (Wall, camera_target, clip_outside, ease_out_back,  # noqa: E402
-                                     ease_out_cubic, grid_rows)
+from resources.lib.wallmodel import (Wall, _segment_hits_rect, camera_target, clip_outside,  # noqa: E402
+                                     detour, ease_out_back, ease_out_cubic, grid_rows)
 
 
 def movie(i, title, year=2000, genres=(), directors=(), cast=(), setid=0, tags=()):
@@ -146,6 +146,16 @@ class WallTest(unittest.TestCase):
         x, y = clip_outside((960, 540), (9000, 540), rect, 100)
         self.assertAlmostEqual(x, 2020)
         self.assertAlmostEqual(y, 540)
+
+    def test_detour_steers_round_the_selected_cover(self):
+        keep_out, size = (400, 400, 600, 700), (100, 150)
+        grown = (300, 250, 600, 700)
+        self.assertEqual(detour((0, 0), (1000, 0), keep_out, size, 20), [])           # clear already
+        for start, end in (((0, 500), (1000, 500)), ((450, 0), (450, 1000)), ((0, 300), (700, 800))):
+            route = [start] + detour(start, end, keep_out, size, 20) + [end]
+            self.assertGreater(len(route), 2)
+            for a, b in zip(route, route[1:]):
+                self.assertFalse(_segment_hits_rect(a, b, grown), (start, end, route))
 
     def test_ease(self):
         self.assertEqual(ease_out_cubic(0), 0)
