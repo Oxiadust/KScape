@@ -20,7 +20,7 @@ import xbmcaddon
 import xbmcgui
 
 from . import listmodel as L
-from . import menu
+from . import collectionui, menu, modal
 from .search import search
 
 ADDON = xbmcaddon.Addon('script.kscape.wall')
@@ -55,6 +55,9 @@ class ListWindow(xbmcgui.WindowXML):
         self.favs = kwargs.get('favs')
         self.query = kwargs.get('query')         # set when listing search results
         self.library = kwargs.get('library') or self.movies    # what Search searches
+        self.store = kwargs.get('store')         # this library's collections (None: no C menu entry)
+        self.collection = kwargs.get('collection')   # listing this collection's movies
+        self.copies = kwargs.get('copies') or (lambda m: [m])   # duplicate copies a row stands for
         self.result = 'wall'                     # 'wall', 'exit' or 'skin' once closed
         self.focus_id = self.start_id            # key of the item under the band when closed
 
@@ -154,6 +157,10 @@ class ListWindow(xbmcgui.WindowXML):
         i = self.list.getSelectedPosition()
         return self.rows[i] if 0 <= i < len(self.rows) else None
 
+    def abandon(self):
+        """Closed because Home asked for another view (modal.py)."""
+        self._close('exit')
+
     def _close(self, result):
         row = self._current()
         if row:
@@ -238,15 +245,44 @@ class ListWindow(xbmcgui.WindowXML):
         else:
             entries = [('wall', tr(32066))]                   # Return
         row = self._current()
+        if row and self.store is not None:
+            entries.insert(0, ('collect', tr(collectionui.S_COLLECT)))
+            if self.collection is not None and self.store.get(self.collection):
+                entries.insert(1, ('uncollect', tr(32165).format(collectionui.name_of(self.collection, self.store))))
         choice = menu.show(row.movie if row else None, self.favs, entries)
         if choice == 'favourite':
             self.favs.toggle(row.movie)
             self._sync_favourites()
+        elif choice == 'collect':
+            collectionui.choose(row.movie, self._files(row.movie), self.store)
+            self._drop_uncollected()
+        elif choice == 'uncollect':
+            self.store.remove(self.collection, self._files(row.movie))
+            self._drop_uncollected()
         elif choice == 'search':
             return 'search'
         elif choice:
             self._close(choice)
         return None
+
+    def _files(self, movie):
+        return collectionui.keys_of(self.copies(movie))
+
+    def _drop_uncollected(self):
+        """Listing a collection: take out rows whose movie has left it, keeping the band near."""
+        if self.collection is None or self.store.get(self.collection) is None:
+            return
+        files = set(self.store.get(self.collection)['members'])
+        inside = lambda m: any(f in files for f in self._files(m))
+        kept = [m for m in self.movies if inside(m)]
+        if len(kept) == len(self.movies):
+            return
+        i = self.list.getSelectedPosition()
+        after = [r.movie.key for r in self.rows[i:] if inside(r.movie)]
+        before = [r.movie.key for r in self.rows[:i] if inside(r.movie)]
+        self.movies = kept
+        self.built, self.prebuilt = {}, None
+        self._load(after[0] if after else (before[-1] if before else None))
 
     # ---- favourites and search ---------------------------------------------------------------
 
@@ -270,7 +306,7 @@ class ListWindow(xbmcgui.WindowXML):
             return
         results = search(self.library, query)
         if self.query is None:
-            show_list(self.kind, results, None, self.favs, query=query, library=self.library)
+            show_list(self.kind, results, None, self.favs, query=query, library=self.library, store=self.store)
             self._sync_favourites()
             return
         with self.lock:                                       # a new search replaces these results
@@ -296,13 +332,16 @@ class ListWindow(xbmcgui.WindowXML):
                 self._sync_favourites()
 
 
-def show_list(kind, movies, focus, favs=None, query=None, library=None):
+def show_list(kind, movies, focus, favs=None, query=None, library=None, store=None, collection=None,
+              copies=None):
     """Run the list view for `kind` (or search results, with `query`; `library` is what a new
-    search searches). Returns (result, key of the item under the band)."""
+    search searches; `store` the movie collections, `collection` the one listed, if any).
+    Returns (result, key of the item under the band)."""
     menu.wait_for_dialogs()
     window = ListWindow(kind.list_spec.xml, ADDON.getAddonInfo('path'), 'Default', '1080i',
-                        kind=kind, movies=movies, focus=focus, favs=favs, query=query, library=library)
-    window.doModal()
+                        kind=kind, movies=movies, focus=focus, favs=favs, query=query, library=library,
+                        store=store, collection=collection, copies=copies)
+    modal.run(window)
     result, focus_id = window.result, window.focus_id
     del window
     return result, focus_id

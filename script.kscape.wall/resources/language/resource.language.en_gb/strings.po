@@ -416,3 +416,207 @@ msgstr ""
 msgctxt "#32141"
 msgid "Pause"
 msgstr ""
+
+msgctxt "#32150"
+msgid "Collections"
+msgstr ""
+
+msgctxt "#32151"
+msgid "New"
+msgstr ""
+
+msgctxt "#32152"
+msgid "Paused"
+msgstr ""
+
+msgctxt "#32153"
+msgid "Played"
+msgstr ""
+
+msgctxt "#32154"
+msgid "{} movies"
+msgstr ""
+
+msgctxt "#32155"
+msgid "1 movie"
+msgstr ""
+
+msgctxt "#32156"
+msgid "Kept up to date by Kodi"
+msgstr ""
+
+msgctxt "#32157"
+msgid "Your collection"
+msgstr ""
+
+msgctxt "#32158"
+msgid "New collection…"
+msgstr ""
+
+msgctxt "#32159"
+msgid "Rename collection…"
+msgstr ""
+
+msgctxt "#32160"
+msgid "Delete collection…"
+msgstr ""
+
+msgctxt "#32161"
+msgid "Added on {}"
+msgstr ""
+
+msgctxt "#32162"
+msgid "Paused on {} at {}"
+msgstr ""
+
+msgctxt "#32163"
+msgid "Played on {}"
+msgstr ""
+
+msgctxt "#32164"
+msgid "Add to collection…"
+msgstr ""
+
+msgctxt "#32165"
+msgid "Remove from “{}”"
+msgstr ""
+
+msgctxt "#32166"
+msgid "Move"
+msgstr ""
+
+msgctxt "#32167"
+msgid "Open as cover wall"
+msgstr ""
+
+msgctxt "#32168"
+msgid "Open as list"
+msgstr ""
+
+msgctxt "#32169"
+msgid "Collection name"
+msgstr ""
+
+msgctxt "#32170"
+msgid "Delete “{}”?"
+msgstr ""
+
+msgctxt "#32171"
+msgid "The collection is removed; its movies stay in your library."
+msgstr ""
+
+msgctxt "#32172"
+msgid "Collections for “{}”"
+msgstr ""
+
+msgctxt "#32173"
+msgid "New: added in the last {} days…"
+msgstr ""
+
+msgctxt "#32174"
+msgid "{} days"
+msgstr ""
+
+msgctxt "#32175"
+msgid "This collection is empty"
+msgstr ""
+
+msgctxt "#32176"
+msgid "Press C on a title and choose Add to collection…."
+msgstr ""
+
+msgctxt "#32177"
+msgid "Nothing added in the last {} days"
+msgstr ""
+
+msgctxt "#32178"
+msgid "Nothing paused"
+msgstr ""
+
+msgctxt "#32179"
+msgid "Nothing played yet"
+msgstr ""
+
+msgctxt "#32180"
+msgid "Up / Down to move it, Select to put it down"
+msgstr ""
+
+msgctxt "#32181"
+msgid "New collection: recently added period"
+msgstr ""
+
+msgctxt "#32182"
+msgid "Collections"
+msgstr ""
+
+msgctxt "#32183"
+msgid "{} albums"
+msgstr ""
+
+msgctxt "#32184"
+msgid "1 album"
+msgstr ""
+
+msgctxt "#32185"
+msgid "{} TV shows"
+msgstr ""
+
+msgctxt "#32186"
+msgid "1 TV show"
+msgstr ""
+
+msgctxt "#32187"
+msgid "Favourites"
+msgstr ""
+
+msgctxt "#32190"
+msgid "Blue"
+msgstr ""
+
+msgctxt "#32191"
+msgid "Crimson"
+msgstr ""
+
+msgctxt "#32192"
+msgid "Emerald"
+msgstr ""
+
+msgctxt "#32193"
+msgid "Violet"
+msgstr ""
+
+msgctxt "#32194"
+msgid "Teal"
+msgstr ""
+
+msgctxt "#32195"
+msgid "Graphite"
+msgstr ""
+
+msgctxt "#32196"
+msgid "Amber"
+msgstr ""
+
+msgctxt "#32197"
+msgid "White"
+msgstr ""
+
+msgctxt "#32198"
+msgid "Cyan"
+msgstr ""
+
+msgctxt "#32199"
+msgid "Lime"
+msgstr ""
+
+msgctxt "#32200"
+msgid "Rose"
+msgstr ""
+
+msgctxt "#32201"
+msgid "Theme colour"
+msgstr ""
+
+msgctxt "#32202"
+msgid "Highlight colour"
+msgstr ""

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Escape on Home (Home's <previouswindow>): back to what is playing. A video returns to full
+     screen where it is, music opens KScape's Now Playing; with nothing playing it just closes,
+     as Escape on Home did before. Opens and closes in the same frame: nothing is drawn. -->
+<window type="dialog" id="1190">
+	<onload>Dialog.Close(1190,true)</onload>
+	<onload condition="Player.HasVideo">ActivateWindow(FullscreenVideo)</onload>
+	<onload condition="!Player.HasVideo + Player.HasAudio + System.AddonIsEnabled(script.kscape.wall)">RunScript(script.kscape.wall,music,nowplaying)</onload>
+	<controls/>
+</window>

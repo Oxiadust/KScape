@@ -11,7 +11,8 @@ re-appear elsewhere, flies the departing ones off-screen and flies the new ones 
 
 One window serves every media kind (kinds.py): movie and TV posters, or square album covers,
 each with its own XML generated for that layout. In favourites mode it shows only the items
-in Kodi's favourites, and follows changes to them.
+in Kodi's favourites, and follows changes to them; in collection mode only the movies of one
+collection (collectionmodel.py), in the collection's order.
 """
 import json
 import random
@@ -24,7 +25,7 @@ import xbmcgui
 import xbmcvfs
 
 from . import geometry as G
-from . import cache, menu, state
+from . import cache, collectionui, menu, modal, state
 from .favourites import Favourites
 from .info import estimate_lines
 from .library import rpc
@@ -70,6 +71,26 @@ def remembered(kind):
     if kind.name == 'movies':
         return 'kscape.lastmovie', 'last_movie'
     return f'kscape.last.{kind.name}', f'last_{kind.name}'
+
+
+def load_library(kind):
+    """Every library item of `kind`, from the disk cache when it is still valid (see cache.py).
+    Returns (items, cast_complete, cached, total): cached is the cache.load() result or None,
+    total the library count the cache is keyed on (it can differ from len(items))."""
+    t0 = time.perf_counter()
+    total = kind.total()
+    cached = cache.load(total, kind.name) if total else None
+    if cached:
+        items = [kind.from_cache(d) for d in cached['movies']]
+        complete = cached['complete'] or not kind.has_extra
+    else:
+        items = kind.fetch_all() if total else []
+        complete = not kind.has_extra
+        if items:
+            cache.save(total, [m.to_cache() for m in items], complete, kind.name)
+    xbmc.log(f'kscape: {len(items)} {kind.name} from {"cache" if cached else "library"} in '
+             f'{1000 * (time.perf_counter() - t0):.0f} ms', xbmc.LOGINFO)
+    return items, complete, cached, total
 
 
 def view_key(kind):
@@ -131,7 +152,8 @@ class Pool:
 
 class LibraryMonitor(xbmc.Monitor):
     """Reports library changes: whole-library ones (scan, clean, removal) and single item edits
-    (refreshed metadata, or the play count and resume point Kodi saves after watching)."""
+    (refreshed metadata, or the play count and resume point Kodi saves after watching). A song
+    or episode that changes reports its album or show."""
 
     def __init__(self, kind, on_change, on_item):
         super().__init__()
@@ -156,7 +178,16 @@ class LibraryMonitor(xbmc.Monitor):
         except ValueError:
             return
         item = info.get('item', info)
-        if item.get('type') != self.kind.item_type or not item.get('id'):
+        if not item.get('id'):
+            return
+        if item.get('type') in self.kind.child_types:
+            if method.endswith('OnUpdate'):
+                from .library import parent_of
+                parent = parent_of(item['type'], int(item['id']))
+                if parent:
+                    self.on_item(int(parent))
+            return
+        if item.get('type') != self.kind.item_type:
             return
         if method.endswith('OnUpdate'):
             self.on_item(int(item['id']))
@@ -172,6 +203,8 @@ class WallWindow(xbmcgui.WindowXML):
         super().__init__(*args)
         self.kind = kwargs['kind']
         self.favourites_only = kwargs.get('favourites', False)
+        self.collection = kwargs.get('collection')   # collection id: show only its movies
+        self.filtered = self.favourites_only or self.collection is not None
         self.start_view = kwargs.get('view')         # 'list' or 'wall' if chosen from Home
 
     # ---- lifecycle -------------------------------------------------------------------------
@@ -181,6 +214,7 @@ class WallWindow(xbmcgui.WindowXML):
             return                       # back from playback: state is intact
         self.lock = threading.RLock()
         self.closing = False
+        self.window_id = xbmcgui.getCurrentWindowId()
         self.lay = self.kind.layout
         self.pool_size = self.lay.pool_cols * self.lay.pool_rows
         self.camera = self.getControl(1000)
@@ -211,6 +245,8 @@ class WallWindow(xbmcgui.WindowXML):
         self.favs = Favourites(rpc, FAVOURITES_FILE)
         self.favs_seen = self.favs.version
         self.favs_checked = time.time()
+        self.store = collectionui.store(self.kind)
+        self.new_days = collectionui.new_days()
 
         self.wall = Wall.column_major([], layout=self.lay)
         self.all_movies = []             # every library entry; the wall may filter or merge them
@@ -227,19 +263,7 @@ class WallWindow(xbmcgui.WindowXML):
         self.last_input = time.time()
 
         self.status.setLabel(ADDON.getLocalizedString(32001))
-        t0 = time.perf_counter()
-        total = self.kind.total()
-        cached = cache.load(total, self.kind.name) if total else None
-        if cached:
-            items = [self.kind.from_cache(d) for d in cached['movies']]
-            self.cast_complete = cached['complete'] or not self.kind.has_extra
-        else:
-            items = self.kind.fetch_all() if total else []
-            self.cast_complete = not self.kind.has_extra
-            if items and self.cast_complete:
-                cache.save(total, [m.to_cache() for m in items], True, self.kind.name)
-        xbmc.log(f'kscape.wall: {len(items)} {self.kind.name} from {"cache" if cached else "library"} in '
-                 f'{1000 * (time.perf_counter() - t0):.0f} ms', xbmc.LOGINFO)
+        items, self.cast_complete, cached, total = load_library(self.kind)
 
         self.all_movies = items
         visible = self._visible(items)
@@ -256,10 +280,12 @@ class WallWindow(xbmcgui.WindowXML):
         threading.Thread(target=self._dwell_loop, daemon=True).start()
         if cached and cached['stale']:
             self._start_reload()
+        elif cached and self.collection is not None:
+            threading.Thread(target=self._refresh_status, daemon=True).start()
         elif items and not self.cast_complete:
             threading.Thread(target=self._load_cast, args=(total, self.library_gen), daemon=True).start()
-        view = self.start_view or (None if self.favourites_only else state.load().get(view_key(self.kind)))
-        if self.start_view and not self.favourites_only:
+        view = self.start_view or (None if self.filtered else state.load().get(view_key(self.kind)))
+        if self.start_view and not self.filtered:
             state.save(**{view_key(self.kind): self.start_view})
         if view == 'list' and items:
             self._open_list()             # chosen from Home, or in use when Kodi last closed
@@ -268,6 +294,8 @@ class WallWindow(xbmcgui.WindowXML):
         """Loading done: an empty library or empty favourites says so; otherwise no status."""
         if self.wall.movies():
             self.status.setLabel('')
+        elif self.collection is not None and self.all_movies:
+            self.status.setLabel(collection_empty(self.collection, self.new_days))
         elif self.favourites_only and self.all_movies:
             self.status.setLabel(f'{ADDON.getLocalizedString(32005)}[CR][COLOR FF9AA3B5]'
                                  f'{ADDON.getLocalizedString(32006)}[/COLOR]')
@@ -280,6 +308,10 @@ class WallWindow(xbmcgui.WindowXML):
         if item:
             self._remember(item)
         self.close()
+
+    def abandon(self):
+        """Closed because Home asked for another view (modal.py)."""
+        self._close()
 
     def _remember(self, item):
         prop, key = remembered(self.kind)
@@ -322,6 +354,8 @@ class WallWindow(xbmcgui.WindowXML):
             self._open_list()
         elif overlay == 'search':
             self._search()
+        elif overlay == 'favourites':
+            self._open_favourites()
 
     # ---- overlays: info screen, list view, search -------------------------------------------
 
@@ -351,12 +385,14 @@ class WallWindow(xbmcgui.WindowXML):
         with self.lock:
             current = self.wall.at(*self.focus)
             items = self._visible(self.all_movies)          # library order, whatever the wall's
-        if not self.favourites_only:
+        if not self.filtered:
             state.save(**{view_key(self.kind): 'list'})
         library = self.kind.visible(self.all_movies, self.merge)
         result, key = self._covered(lambda: show_list(self.kind, items, current.key if current else None,
-                                                      self.favs, library=library))
+                                                      self.favs, library=library, store=self.store,
+                                                      collection=self.collection, copies=self._copies))
         self._after_favourites()
+        self._after_collections()
         with self.lock:
             cell = self.wall.cell_of(key) if key is not None else None
             if cell and cell != self.focus:
@@ -365,7 +401,7 @@ class WallWindow(xbmcgui.WindowXML):
                 self._set_frame()
                 self._pan(camera_target(self.wall, self.focus), animate=False)
             if result == 'wall':
-                if not self.favourites_only:
+                if not self.filtered:
                     state.save(**{view_key(self.kind): 'wall'})
             elif result == 'skin':
                 skin = choose_skin()
@@ -374,6 +410,15 @@ class WallWindow(xbmcgui.WindowXML):
                     self._close()
             elif result == 'exit':
                 self._close()
+
+    def _open_favourites(self):
+        """The cover wall of just this library's favourites, over this one; Back returns here."""
+        skin = self._covered(lambda: open_wall(self.kind, view='wall', favourites=True))
+        self._after_favourites()
+        self._after_collections()
+        if skin:
+            self.pending_skin = skin
+            self._close()
 
     @property
     def _order(self):
@@ -388,8 +433,10 @@ class WallWindow(xbmcgui.WindowXML):
         with self.lock:
             library = self.kind.visible(self.all_movies, self.merge)
         results = search(library, query)
-        self._covered(lambda: show_list(self.kind, results, None, self.favs, query=query, library=library))
+        self._covered(lambda: show_list(self.kind, results, None, self.favs, query=query, library=library,
+                                        store=self.store, copies=self._copies))
         self._after_favourites()
+        self._after_collections()
 
     def _move(self, dx, dy):
         c, r = self.focus[0] + dx, self.focus[1] + dy
@@ -422,6 +469,22 @@ class WallWindow(xbmcgui.WindowXML):
         else:
             self.favs.toggle(item)
         self._favourites_changed()
+
+    def _after_collections(self):
+        """A collection may have changed in an overlay (list view, search results)."""
+        if self.store.poll() and self.collection is not None:
+            with self.lock:
+                self._apply_library(self.all_movies)
+
+    def _collect(self, item):
+        """Add to collection…: the user's collections, ticked where `item` (any copy) is."""
+        keys = collectionui.keys_of(self._copies(item))
+        if collectionui.choose(item, keys, self.store) and self.collection is not None:
+            self._apply_library(self.all_movies)
+
+    def _uncollect(self, item):
+        self.store.remove(self.collection, collectionui.keys_of(self._copies(item)))
+        self._apply_library(self.all_movies)
 
     def _after_favourites(self):
         """Favourites may have changed in an overlay (info screen, list, search results)."""
@@ -577,8 +640,11 @@ class WallWindow(xbmcgui.WindowXML):
             time.sleep(0.05)
             with self.lock:
                 now = time.time()
-                if self.paused or xbmc.getCondVisibility('Player.HasVideo'):
-                    self.last_input = now     # wall is covered: stay idle
+                if self.paused or xbmcgui.getCurrentWindowId() != self.window_id:
+                    # Covered (full-screen video, Home, another window): stay idle. A video
+                    # playing behind the wall no longer counts, so browsing during playback
+                    # keeps the synopsis panel and the shuffle.
+                    self.last_input = now
                     continue
                 if now - self.favs_checked >= FAVOURITES_POLL_S:
                     self.favs_checked = now
@@ -616,6 +682,12 @@ class WallWindow(xbmcgui.WindowXML):
             ]
             if self.kind.merges:
                 entries.append(('merge', tr(32029).format(on_off(self.merge))))
+        if item:
+            entries.insert(0, ('collect', tr(collectionui.S_COLLECT)))
+            if self.collection is not None and self.store.get(self.collection):
+                entries.insert(1, ('uncollect', tr(32165).format(collectionui.name_of(self.collection, self.store))))
+        if not self.favourites_only:
+            entries.append(('favourites', tr(32187)))
         entries += [
             ('reload', tr(32024)),
             ('skin', tr(32025)),
@@ -626,7 +698,11 @@ class WallWindow(xbmcgui.WindowXML):
         self.last_input = time.time()
         if choice == 'favourite':
             self._toggle_favourite(item)
-        elif choice in ('search', 'list'):
+        elif choice == 'collect':
+            self._collect(item)
+        elif choice == 'uncollect':
+            self._uncollect(item)
+        elif choice in ('search', 'list', 'favourites'):
             return choice
         elif choice == 'shuffle':
             self._finish_shuffle()
@@ -659,6 +735,9 @@ class WallWindow(xbmcgui.WindowXML):
     def _visible(self, items):
         """What the wall shows: in favourites mode only favourites (any copy of a merged movie
         counts), then duplicate copies merged when that setting is on."""
+        if self.collection is not None:
+            shown = self.kind.visible(items, self.merge)
+            return [m for m, _ in collectionui.members(self.collection, self.store, items, shown, self.new_days)]
         if self.favourites_only:
             items = [m for m in items if self.favs.contains(m)]
         return self.kind.visible(items, self.merge)
@@ -708,6 +787,18 @@ class WallWindow(xbmcgui.WindowXML):
         if items:
             cache.save(total, [m.to_cache() for m in items], True, self.kind.name)
 
+    def _refresh_status(self):
+        """Collection mode: the cache may predate the latest plays; bring play state and dates
+        up to date (they decide New, Paused and Played)."""
+        from dataclasses import replace
+        from .library import fetch_status
+        status = fetch_status(self.kind.name)
+        with self.lock:
+            if self.closing:
+                return
+            self.pending_library = [replace(m, **status[m.key]) if m.key in status else m
+                                    for m in self.all_movies]    # applied once the wall is idle
+
     def _item_changed(self, key):
         """One item changed (e.g. watched): patch it in place without re-laying out the wall."""
         threading.Thread(target=self._refresh_item, args=(key,), daemon=True).start()
@@ -723,10 +814,17 @@ class WallWindow(xbmcgui.WindowXML):
                 return
             if self.kind.has_extra and not self.cast_complete:
                 item = self.kind.with_extra(item, {key: current.cast})
+            was_in = self.collection is not None and self._in_view(current)
             self.all_movies = [item if m.key == key else m for m in self.all_movies]
-            self._patch({key: item})
+            if self.collection is not None and was_in != self._in_view(item):
+                self._apply_library(self.all_movies)  # e.g. watched: moves from Paused to Played
+            else:
+                self._patch({key: item})
             snapshot, complete = list(self.all_movies), self.cast_complete
         cache.save(len(snapshot), [m.to_cache() for m in snapshot], complete, self.kind.name)
+
+    def _in_view(self, item):
+        return any(m.key == item.key for m in self._visible(self.all_movies))
 
     def _patch(self, by_key):
         """Swap updated items into the wall and Back history, keeping every cell in place."""
@@ -918,11 +1016,23 @@ class WallWindow(xbmcgui.WindowXML):
             self.shuffle_until = 0.0
 
 
-def open_wall(kind, view=None, favourites=False):
+def collection_empty(cid, days):
+    """Status text of an empty collection: what would put movies in it."""
+    tr = ADDON.getLocalizedString
+    if cid == 'new':
+        return tr(32177).format(days)
+    if cid == 'paused':
+        return tr(32178)
+    if cid == 'played':
+        return tr(32179)
+    return f'{tr(32175)}[CR][COLOR FF9AA3B5]{tr(32176)}[/COLOR]'
+
+
+def open_wall(kind, view=None, favourites=False, collection=None):
     """Run the wall for `kind`. Returns the skin the user chose to switch to, if any."""
     window = WallWindow(kind.wall_xml, ADDON.getAddonInfo('path'), 'Default', '1080i',
-                        kind=kind, view=view, favourites=favourites)
-    window.doModal()
+                        kind=kind, view=view, favourites=favourites, collection=collection)
+    modal.run(window)
     skin = window.pending_skin
     del window
     return skin

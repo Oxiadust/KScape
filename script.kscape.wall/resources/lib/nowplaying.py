@@ -13,7 +13,7 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-from . import menu
+from . import menu, modal
 from .favourites import Favourites
 from .library import MUSIC_PLAYLIST, fetch_album, fetch_albums, rpc
 from .search import search
@@ -97,6 +97,10 @@ class NowPlayingWindow(xbmcgui.WindowXML):
             elif i >= 0:
                 rpc('Player.Open', {'item': {'playlistid': MUSIC_PLAYLIST, 'position': i}})
 
+    def abandon(self):
+        self.closing = True
+        self.close()
+
     def onAction(self, action):
         aid = action.getId()
         if aid in BACK:
@@ -128,7 +132,9 @@ class NowPlayingWindow(xbmcgui.WindowXML):
             if query:
                 from .listwindow import show_list
                 library = fetch_albums()
-                show_list(kind, search(library, query), None, self.favs, query=query, library=library)
+                from .collectionui import store
+                show_list(kind, search(library, query), None, self.favs, query=query, library=library,
+                          store=store(kind))
         elif choice == 'close':
             self.closing = True
             self.close()
@@ -147,7 +153,7 @@ def show_now_playing():
     menu.wait_for_dialogs()
     try:
         window = NowPlayingWindow('script-kscape-nowplaying.xml', ADDON.getAddonInfo('path'), 'Default', '1080i')
-        window.doModal()
+        modal.run(window)
         window.closing = True
         del window
     finally:

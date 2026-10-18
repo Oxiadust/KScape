@@ -13,6 +13,7 @@ Control ids (k = 0..POOL-1, POOL = the layout's pool_cols x pool_rows):
   1900         info panel group; 1901 title (a label; a two-line textbox for albums);
                1902 synopsis (posters) or artist (albums), placed below the title by Python
   1950         status label (loading / empty library), outside the camera group
+  (no id)      now-playing chip top right while something plays (tools/np_chip.py)
 
 No <visible> tags on Python-driven controls: a visibility condition overrides setVisible().
 """
@@ -21,11 +22,13 @@ import sys
 
 ROOT = os.path.join(os.path.dirname(__file__), '..', 'script.kscape.wall')
 sys.path.insert(0, ROOT)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from resources.lib import geometry as G  # noqa: E402
+import np_chip  # noqa: E402
 
 CARD = 'FF1A1A1F'
-AMBER = 'FFF5A01A'
-PANEL_BLUE = 'FF1F5BD3'
+AMBER = 'kscape_amber'
+PANEL_BLUE = 'kscape_blue'
 PANEL_TEXT_H = 152            # four 37.6 px lines of kscape_panel_body; no clipped partial line
 BADGE_W, BADGE_H = 58, 28     # reference: small amber-outlined "HDR"/"UHD" tag, bottom right
 HEART_BOX, HEART = 40, 26     # favourite marker, top right of the cover
@@ -141,7 +144,7 @@ def panel_text(L, panel_w):
 					<width>{panel_w - 68}</width>
 					<height>76</height>
 					<font>kscape_panel_body</font>
-					<textcolor>FFF0F4FF</textcolor>
+					<textcolor>kscape_text</textcolor>
 				</control>'''
     return f'''				<control type="label" id="1901">
 					<left>34</left>
@@ -157,7 +160,7 @@ def panel_text(L, panel_w):
 					<width>{panel_w - 68}</width>
 					<height>{PANEL_TEXT_H}</height>
 					<font>kscape_panel_body</font>
-					<textcolor>FFF0F4FF</textcolor>
+					<textcolor>kscape_text</textcolor>
 				</control>'''
 
 
@@ -213,7 +216,7 @@ def build(L):
 			<textcolor>FFE6E6EA</textcolor>
 			<wrapmultiline>true</wrapmultiline>
 		</control>
-	</controls>
+{np_chip.chip()}	</controls>
 </window>
 '''
 

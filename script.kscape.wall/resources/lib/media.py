@@ -7,9 +7,10 @@ from dataclasses import asdict, dataclass
 from typing import FrozenSet, Tuple
 
 ALBUM_PROPERTIES = ['title', 'displayartist', 'sortartist', 'artist', 'genre', 'style', 'year',
-                    'art', 'description', 'albumlabel']
+                    'art', 'description', 'albumlabel', 'dateadded', 'lastplayed', 'playcount']
 SHOW_PROPERTIES = ['title', 'sorttitle', 'year', 'genre', 'studio', 'cast', 'art', 'plot',
-                   'season', 'episode', 'watchedepisodes', 'mpaa', 'file', 'premiered']
+                   'season', 'episode', 'watchedepisodes', 'mpaa', 'file', 'premiered', 'dateadded',
+                   'lastplayed', 'playcount']
 MAX_SHOW_CAST = 8
 
 SORT_TOKENS = ('the ', 'the.', 'the_')       # Kodi's default: titles sort as if "The" were absent
@@ -43,6 +44,9 @@ class Album:
     plot: str = ''                 # album review, when scraped
     label: str = ''                # record label
     badge: str = ''
+    dateadded: str = ''            # as Kodi reports them (collections)
+    lastplayed: str = ''           # Kodi works these two out from the album's songs
+    playcount: int = 0
 
     @property
     def key(self):
@@ -69,6 +73,9 @@ class Album:
             poster=art.get('thumb') or art.get('poster') or '',
             plot=a.get('description') or '',
             label=a.get('albumlabel') or '',
+            dateadded=a.get('dateadded') or '',
+            lastplayed=a.get('lastplayed') or '',
+            playcount=int(a.get('playcount') or 0),
         )
 
     def to_cache(self):
@@ -103,6 +110,10 @@ class Show:
     mpaa: str = ''
     file: str = ''                 # the show's folder
     badge: str = ''
+    dateadded: str = ''            # Kodi: when its latest episode was added
+    lastplayed: str = ''           # when an episode was last played
+    playcount: int = 0             # Kodi: 1 once every episode is watched
+    inprogress: bool = False       # an episode has a resume point (VideoLibrary.GetInProgressTVShows)
 
     @property
     def key(self):
@@ -129,6 +140,10 @@ class Show:
             watched=int(t.get('watchedepisodes') or 0),
             mpaa=t.get('mpaa') or '',
             file=t.get('file') or '',
+            dateadded=t.get('dateadded') or '',
+            lastplayed=t.get('lastplayed') or '',
+            playcount=int(t.get('playcount') or 0),
+            inprogress=bool(t.get('inprogress')),
         )
 
     def to_cache(self):

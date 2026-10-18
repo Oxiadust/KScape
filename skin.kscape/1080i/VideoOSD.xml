@@ -40,7 +40,7 @@
 				<height>8</height>
 				<info>Player.Progress</info>
 				<texturebg colordiffuse="40FFFFFF">white.png</texturebg>
-				<midtexture colordiffuse="FFF5A01A">white.png</midtexture>
+				<midtexture colordiffuse="kscape_amber">white.png</midtexture>
 			</control>
 			<control type="label">
 				<left>120</left>

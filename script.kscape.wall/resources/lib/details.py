@@ -10,7 +10,7 @@ estimated line counts (info.estimate_lines); the synopsis scrolls if it is longe
 import xbmcaddon
 import xbmcgui
 
-from . import info, menu
+from . import info, menu, modal
 from .library import fetch_details
 
 ADDON = xbmcaddon.Addon('script.kscape.wall')
@@ -170,7 +170,7 @@ def show_details(movie, favs=None):
     details = fetch_details(movie.movieid)
     dialog = DetailsDialog('script-kscape-info.xml', ADDON.getAddonInfo('path'), 'Default', '1080i',
                            movie=movie, details=details, favs=favs)
-    dialog.doModal()
+    modal.run(dialog)
     choice = dialog.choice
     del dialog
     return choice, details

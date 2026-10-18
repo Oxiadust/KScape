@@ -13,7 +13,7 @@ from Favourites (for the album or show) and Search.
 import xbmcaddon
 import xbmcgui
 
-from . import info, menu
+from . import info, menu, modal
 from . import library as lib
 
 ADDON = xbmcaddon.Addon('script.kscape.wall')
@@ -333,7 +333,7 @@ class ShowDialog(BrowseDialog):
 def _run(cls, item, favs):
     dialog = cls('script-kscape-browse.xml', ADDON.getAddonInfo('path'), 'Default', '1080i',
                  item=item, favs=favs)
-    dialog.doModal()
+    modal.run(dialog)
     choice = dialog.choice
     del dialog
     return choice

@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Skin settings window (WINDOW_SKIN_SETTINGS). Kodi contract: none; all ids here are KScape's own.
-     Radio buttons toggle Skin.HasSetting(ReducedMotion | HomeNoArtwork | HomeNoClock | HomeNoCaption). -->
+     Radio buttons toggle Skin.HasSetting(ReducedMotion | HomeNoArtwork | HomeNoClock | HomeNoCaption).
+     Colours: the theme's main and highlight colour, picked by script.kscape.wall (colours.py), which
+     sets Kodi's skin colours setting (colors/*.xml, made by tools/gen_colors.py). -->
 <window>
-	<defaultcontrol always="true">9000</defaultcontrol>
+	<defaultcontrol always="true">101</defaultcontrol>
 	<controls>
 		<include>SystemBackdrop</include>
 		<control type="group">
 			<left>360</left>
-			<top>290</top>
+			<top>150</top>
 			<include>WindowFade</include>
 			<include content="SystemPanel">
 				<param name="width" value="1200"/>
-				<param name="height" value="500"/>
+				<param name="height" value="780"/>
 				<param name="title" value="$LOCALIZE[20077]"/>
 			</include>
-			<control type="grouplist" id="9000">
+			<control type="group" id="9000">
+				<description>Rows at fixed positions with explicit Up/Down (wrapping). A grouplist would
+				not move focus across the section headings.</description>
 				<top>88</top>
-				<width>1200</width>
-				<height>388</height>
-				<orientation>vertical</orientation>
-				<itemgap>0</itemgap>
-				<usecontrolcoords>true</usecontrolcoords>
-				<onup>9000</onup>
-				<ondown>9000</ondown>
-				<onleft>9000</onleft>
-				<onright>9000</onright>
 				<control type="radiobutton" id="101">
+					<top>0</top>
+					<onup>104</onup>
+					<ondown>121</ondown>
 					<include content="SystemButton">
 						<param name="width" value="1200"/>
 						<param name="height" value="72"/>
@@ -43,12 +41,57 @@
 					<onclick>Skin.ToggleSetting(ReducedMotion)</onclick>
 				</control>
 				<control type="label">
+					<top>72</top>
 					<description>Spacer above the section heading</description>
 					<width>1200</width>
 					<height>28</height>
 					<label></label>
 				</control>
 				<control type="label">
+					<top>100</top>
+					<left>30</left>
+					<width>1140</width>
+					<height>56</height>
+					<aligny>center</aligny>
+					<font>kscape_list_head</font>
+					<textcolor>kscape_text_dim</textcolor>
+					<label>$LOCALIZE[31046]</label>
+				</control>
+				<control type="button" id="121">
+					<top>156</top>
+					<onup>101</onup>
+					<ondown>122</ondown>
+					<include content="SystemButton">
+						<param name="width" value="1200"/>
+						<param name="height" value="72"/>
+					</include>
+					<label>$LOCALIZE[31047]</label>
+					<label2>$VAR[KScapeColourMainLabel]</label2>
+					<textoffsetx>30</textoffsetx>
+					<onclick>RunScript(script.kscape.wall,colours,main)</onclick>
+				</control>
+				<control type="button" id="122">
+					<top>228</top>
+					<onup>121</onup>
+					<ondown>102</ondown>
+					<include content="SystemButton">
+						<param name="width" value="1200"/>
+						<param name="height" value="72"/>
+					</include>
+					<label>$LOCALIZE[31048]</label>
+					<label2>$VAR[KScapeColourHighlightLabel]</label2>
+					<textoffsetx>30</textoffsetx>
+					<onclick>RunScript(script.kscape.wall,colours,highlight)</onclick>
+				</control>
+				<control type="label">
+					<top>300</top>
+					<description>Spacer above the section heading</description>
+					<width>1200</width>
+					<height>28</height>
+					<label></label>
+				</control>
+				<control type="label">
+					<top>328</top>
 					<left>30</left>
 					<width>1140</width>
 					<height>56</height>
@@ -58,6 +101,9 @@
 					<label>$LOCALIZE[31042]</label>
 				</control>
 				<control type="radiobutton" id="102">
+					<top>384</top>
+					<onup>122</onup>
+					<ondown>103</ondown>
 					<include content="SystemButton">
 						<param name="width" value="1200"/>
 						<param name="height" value="72"/>
@@ -75,6 +121,9 @@
 					<onclick>Skin.ToggleSetting(HomeNoArtwork)</onclick>
 				</control>
 				<control type="radiobutton" id="103">
+					<top>456</top>
+					<onup>102</onup>
+					<ondown>104</ondown>
 					<include content="SystemButton">
 						<param name="width" value="1200"/>
 						<param name="height" value="72"/>
@@ -92,6 +141,9 @@
 					<onclick>Skin.ToggleSetting(HomeNoClock)</onclick>
 				</control>
 				<control type="radiobutton" id="104">
+					<top>528</top>
+					<onup>103</onup>
+					<ondown>101</ondown>
 					<include content="SystemButton">
 						<param name="width" value="1200"/>
 						<param name="height" value="72"/>

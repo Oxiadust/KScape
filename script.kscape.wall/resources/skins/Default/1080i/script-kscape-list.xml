@@ -6,7 +6,7 @@
 		<control type="image">
 			<width>1920</width>
 			<height>1080</height>
-			<texture colordiffuse="FF070B16">kscape-white.png</texture>
+			<texture colordiffuse="kscape_bg">kscape-white.png</texture>
 		</control>
 		<control type="button" id="901">
 			<description>Edge target: never visible, so the list stops at its ends</description>
@@ -41,7 +41,7 @@
 						<height>58</height>
 						<aligny>center</aligny>
 						<font>kscape_list_row</font>
-						<textcolor>FFE6EAF2</textcolor>
+						<textcolor>kscape_tint_row</textcolor>
 						<label>$INFO[ListItem.Property(genre)]</label>
 					</control>
 					<control type="label">
@@ -50,7 +50,7 @@
 						<height>58</height>
 						<aligny>center</aligny>
 						<font>kscape_list_row</font>
-						<textcolor>FFA9C6FF</textcolor>
+						<textcolor>kscape_tint_cast</textcolor>
 						<label>$INFO[ListItem.Property(cast)]</label>
 					</control>
 					<control type="label">
@@ -59,7 +59,7 @@
 						<height>58</height>
 						<aligny>center</aligny>
 						<font>kscape_list_row</font>
-						<textcolor>FFCCD9F2</textcolor>
+						<textcolor>kscape_tint_director</textcolor>
 						<label>$INFO[ListItem.Property(director)]</label>
 					</control>
 					<control type="label">
@@ -68,7 +68,7 @@
 						<height>58</height>
 						<aligny>center</aligny>
 						<font>kscape_list_row</font>
-						<textcolor>FFE6EAF2</textcolor>
+						<textcolor>kscape_tint_row</textcolor>
 						<label>$INFO[ListItem.Property(year)]</label>
 					</control>
 					<control type="label">
@@ -77,7 +77,7 @@
 						<height>58</height>
 						<aligny>center</aligny>
 						<font>kscape_list_row</font>
-						<textcolor>FFE6EAF2</textcolor>
+						<textcolor>kscape_tint_row</textcolor>
 						<label>$INFO[ListItem.Property(time)]</label>
 					</control>
 					<control type="label">
@@ -86,7 +86,7 @@
 						<height>58</height>
 						<aligny>center</aligny>
 						<font>kscape_list_row</font>
-						<textcolor>FFE6EAF2</textcolor>
+						<textcolor>kscape_tint_row</textcolor>
 						<label>$INFO[ListItem.Property(rating)]</label>
 					</control>
 					<control type="label">
@@ -95,14 +95,14 @@
 						<height>58</height>
 						<aligny>center</aligny>
 						<font>kscape_list_row</font>
-						<textcolor>FFE6EAF2</textcolor>
+						<textcolor>kscape_tint_row</textcolor>
 						<label>$INFO[ListItem.Property(quality)]</label>
 					</control>
 				</control>
 				<control type="image">
 					<width>860</width>
 					<height>58</height>
-					<texture colordiffuse="FF070B16">kscape-white.png</texture>
+					<texture colordiffuse="kscape_bg">kscape-white.png</texture>
 				</control>
 				<control type="label">
 					<left>244</left>
@@ -118,7 +118,7 @@
 					<top>18</top>
 					<width>22</width>
 					<height>22</height>
-					<texture colordiffuse="FFF5A01A">kscape-heart.png</texture>
+					<texture colordiffuse="kscape_amber">kscape-heart.png</texture>
 					<visible>String.IsEqual(ListItem.Property(fav),1)</visible>
 				</control>
 			</itemlayout>
@@ -127,7 +127,7 @@
 					<left>40</left>
 					<width>2600</width>
 					<height>236</height>
-					<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
+					<texture colordiffuse="kscape_blue">kscape-white.png</texture>
 				</control>
 				<control type="group">
 					<left>860</left>
@@ -137,7 +137,7 @@
 						<left>0</left>
 						<width>280</width>
 						<height>236</height>
-						<texture colordiffuse="FF5A9DF2">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.col),genre)</visible>
 					</control>
 					<control type="label">
@@ -174,38 +174,38 @@
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
-						<left>2</left>
-						<top>71</top>
-						<width>16</width>
-						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<left>4</left>
+						<top>64</top>
+						<width>12</width>
+						<height>15</height>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),0)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
-						<left>2</left>
-						<top>105</top>
-						<width>16</width>
-						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<left>4</left>
+						<top>96</top>
+						<width>12</width>
+						<height>15</height>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),1)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
-						<left>2</left>
-						<top>140</top>
-						<width>16</width>
-						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<left>4</left>
+						<top>127</top>
+						<width>12</width>
+						<height>15</height>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),2)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
-						<left>2</left>
-						<top>174</top>
-						<width>16</width>
-						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<left>4</left>
+						<top>159</top>
+						<width>12</width>
+						<height>15</height>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),3)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
@@ -213,7 +213,7 @@
 						<left>280</left>
 						<width>400</width>
 						<height>236</height>
-						<texture colordiffuse="FF5A9DF2">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.col),cast)</visible>
 					</control>
 					<control type="label">
@@ -250,38 +250,38 @@
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
-						<left>282</left>
-						<top>71</top>
-						<width>16</width>
-						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<left>284</left>
+						<top>64</top>
+						<width>12</width>
+						<height>15</height>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(cast_mark),0)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
-						<left>282</left>
-						<top>105</top>
-						<width>16</width>
-						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<left>284</left>
+						<top>96</top>
+						<width>12</width>
+						<height>15</height>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(cast_mark),1)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
-						<left>282</left>
-						<top>140</top>
-						<width>16</width>
-						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<left>284</left>
+						<top>127</top>
+						<width>12</width>
+						<height>15</height>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(cast_mark),2)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
-						<left>282</left>
-						<top>174</top>
-						<width>16</width>
-						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<left>284</left>
+						<top>159</top>
+						<width>12</width>
+						<height>15</height>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(cast_mark),3)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
@@ -289,7 +289,7 @@
 						<left>680</left>
 						<width>380</width>
 						<height>236</height>
-						<texture colordiffuse="FF5A9DF2">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.col),director)</visible>
 					</control>
 					<control type="label">
@@ -326,38 +326,38 @@
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
-						<left>682</left>
-						<top>71</top>
-						<width>16</width>
-						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<left>684</left>
+						<top>64</top>
+						<width>12</width>
+						<height>15</height>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(director_mark),0)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
-						<left>682</left>
-						<top>105</top>
-						<width>16</width>
-						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<left>684</left>
+						<top>96</top>
+						<width>12</width>
+						<height>15</height>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(director_mark),1)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
-						<left>682</left>
-						<top>140</top>
-						<width>16</width>
-						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<left>684</left>
+						<top>127</top>
+						<width>12</width>
+						<height>15</height>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(director_mark),2)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
 					<control type="image">
-						<left>682</left>
-						<top>174</top>
-						<width>16</width>
-						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<left>684</left>
+						<top>159</top>
+						<width>12</width>
+						<height>15</height>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(director_mark),3)</visible>
 						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
 					</control>
@@ -365,7 +365,7 @@
 						<left>1060</left>
 						<width>150</width>
 						<height>236</height>
-						<texture colordiffuse="FF5A9DF2">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.col),year)</visible>
 					</control>
 					<control type="label">
@@ -391,7 +391,7 @@
 						<left>1210</left>
 						<width>150</width>
 						<height>236</height>
-						<texture colordiffuse="FF5A9DF2">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.col),time)</visible>
 					</control>
 					<control type="label">
@@ -417,7 +417,7 @@
 						<left>1360</left>
 						<width>170</width>
 						<height>236</height>
-						<texture colordiffuse="FF5A9DF2">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.col),rating)</visible>
 					</control>
 					<control type="label">
@@ -443,7 +443,7 @@
 						<left>1530</left>
 						<width>210</width>
 						<height>236</height>
-						<texture colordiffuse="FF5A9DF2">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
 						<visible>String.IsEqual(Window(Home).Property(kscape.list.col),quality)</visible>
 					</control>
 					<control type="label">
@@ -469,19 +469,19 @@
 				<control type="image">
 					<width>40</width>
 					<height>236</height>
-					<texture colordiffuse="FF070B16">kscape-white.png</texture>
+					<texture colordiffuse="kscape_bg">kscape-white.png</texture>
 				</control>
 				<control type="image">
 					<left>40</left>
 					<width>820</width>
 					<height>236</height>
-					<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
+					<texture colordiffuse="kscape_blue">kscape-white.png</texture>
 				</control>
 				<control type="image">
 					<left>40</left>
 					<width>820</width>
 					<height>236</height>
-					<texture colordiffuse="FF5A9DF2">kscape-white.png</texture>
+					<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
 					<visible>String.IsEqual(Window(Home).Property(kscape.list.col),title)</visible>
 				</control>
 				<control type="group">
@@ -527,7 +527,7 @@
 					<top>60</top>
 					<width>22</width>
 					<height>22</height>
-					<texture colordiffuse="FFF5A01A">kscape-heart.png</texture>
+					<texture colordiffuse="kscape_amber">kscape-heart.png</texture>
 					<visible>String.IsEqual(ListItem.Property(fav),1)</visible>
 				</control>
 			</focusedlayout>
@@ -536,13 +536,13 @@
 			<description>Fade the rows into the background at the top and bottom</description>
 			<width>1920</width>
 			<height>150</height>
-			<texture colordiffuse="FF070B16">kscape-fade.png</texture>
+			<texture colordiffuse="kscape_bg">kscape-fade.png</texture>
 		</control>
 		<control type="image">
 			<top>890</top>
 			<width>1920</width>
 			<height>190</height>
-			<texture colordiffuse="FF070B16" flipy="true">kscape-fade.png</texture>
+			<texture colordiffuse="kscape_bg" flipy="true">kscape-fade.png</texture>
 		</control>
 		<control type="group">
 			<description>Search results: what was searched, and the count</description>
@@ -550,7 +550,7 @@
 			<control type="image">
 				<width>1920</width>
 				<height>96</height>
-				<texture colordiffuse="FF070B16">kscape-white.png</texture>
+				<texture colordiffuse="kscape_bg">kscape-white.png</texture>
 			</control>
 			<control type="label">
 				<left>244</left>
@@ -559,7 +559,7 @@
 				<height>56</height>
 				<aligny>center</aligny>
 				<font>kscape_panel_title</font>
-				<textcolor>FFF5A01A</textcolor>
+				<textcolor>kscape_amber</textcolor>
 				<label>$INFO[Window(Home).Property(kscape.list.heading)]</label>
 			</control>
 		</control>
@@ -576,6 +576,96 @@
 			<wrapmultiline>true</wrapmultiline>
 			<label>$INFO[Window(Home).Property(kscape.list.empty)]</label>
 			<visible>!String.IsEmpty(Window(Home).Property(kscape.list.empty))</visible>
+		</control>
+		<control type="group">
+			<description>Now playing chip (tools/np_chip.py)</description>
+			<left>1272</left>
+			<top>26</top>
+			<visible>Player.HasMedia</visible>
+			<animation effect="fade" start="0" end="100" time="300">Visible</animation>
+			<animation effect="fade" start="100" end="0" time="200">Hidden</animation>
+			<control type="image">
+				<width>620</width>
+				<height>108</height>
+				<texture colordiffuse="kscape_bg_chip">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<width>620</width>
+				<height>3</height>
+				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>9</left>
+				<top>9</top>
+				<width>160</width>
+				<height>90</height>
+				<texture colordiffuse="FF000000">kscape-white.png</texture>
+				<visible>Player.HasVideo</visible>
+			</control>
+			<control type="videowindow">
+				<left>9</left>
+				<top>9</top>
+				<width>160</width>
+				<height>90</height>
+				<visible>Player.HasVideo</visible>
+			</control>
+			<control type="image">
+				<left>79</left>
+				<top>9</top>
+				<width>90</width>
+				<height>90</height>
+				<aspectratio>scale</aspectratio>
+				<texture background="true">$INFO[Player.Art(thumb)]</texture>
+				<visible>Player.HasAudio</visible>
+			</control>
+			<control type="label">
+				<left>187</left>
+				<top>10</top>
+				<width>415</width>
+				<height>26</height>
+				<font>kscape_badge</font>
+				<textcolor>kscape_amber</textcolor>
+				<label>$ADDON[script.kscape.wall 32133]</label>
+				<visible>!Player.Paused</visible>
+			</control>
+			<control type="label">
+				<left>187</left>
+				<top>10</top>
+				<width>415</width>
+				<height>26</height>
+				<font>kscape_badge</font>
+				<textcolor>kscape_amber</textcolor>
+				<label>$ADDON[script.kscape.wall 32134]</label>
+				<visible>Player.Paused</visible>
+			</control>
+			<control type="label">
+				<left>187</left>
+				<top>10</top>
+				<width>415</width>
+				<height>26</height>
+				<align>right</align>
+				<font>kscape_badge</font>
+				<textcolor>FF9AA3B5</textcolor>
+				<label>$INFO[Player.Time]$INFO[Player.Duration, / ]</label>
+			</control>
+			<control type="label">
+				<left>187</left>
+				<top>38</top>
+				<width>415</width>
+				<height>36</height>
+				<font>kscape_small</font>
+				<textcolor>FFFFFFFF</textcolor>
+				<label>$INFO[Player.Title]</label>
+			</control>
+			<control type="progress">
+				<left>187</left>
+				<top>86</top>
+				<width>415</width>
+				<height>5</height>
+				<texturebg colordiffuse="kscape_track">kscape-white.png</texturebg>
+				<midtexture colordiffuse="kscape_amber">kscape-white.png</midtexture>
+				<info>Player.Progress</info>
+			</control>
 		</control>
 	</controls>
 </window>

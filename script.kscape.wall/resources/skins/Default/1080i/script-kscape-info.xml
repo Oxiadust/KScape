@@ -22,20 +22,20 @@
 			<control type="image">
 				<width>1728</width>
 				<height>984</height>
-				<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
+				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
 			</control>
 			<control type="image">
 				<description>Left column</description>
 				<top>64</top>
 				<width>480</width>
 				<height>920</height>
-				<texture colordiffuse="FF184CB9">kscape-white.png</texture>
+				<texture colordiffuse="kscape_blue_dark">kscape-white.png</texture>
 			</control>
 			<control type="image">
 				<description>Header strip</description>
 				<width>1728</width>
 				<height>64</height>
-				<texture colordiffuse="FF3876E4">kscape-white.png</texture>
+				<texture colordiffuse="kscape_blue_head">kscape-white.png</texture>
 			</control>
 			<control type="label">
 				<left>30</left>
@@ -82,7 +82,7 @@
 					<control type="image">
 						<width>80</width>
 						<height>32</height>
-						<texture colordiffuse="FFF5A01A">kscape-white.png</texture>
+						<texture colordiffuse="kscape_amber">kscape-white.png</texture>
 					</control>
 					<control type="image">
 						<left>2</left>
@@ -97,7 +97,7 @@
 						<align>center</align>
 						<aligny>center</aligny>
 						<font>kscape_badge</font>
-						<textcolor>FFF5A01A</textcolor>
+						<textcolor>kscape_amber</textcolor>
 						<label>$INFO[Window.Property(badge)]</label>
 					</control>
 				</control>
@@ -120,7 +120,7 @@
 						<height>60</height>
 						<aligny>center</aligny>
 						<font>kscape_menu</font>
-						<textcolor>FFD6E2FF</textcolor>
+						<textcolor>kscape_tint_light</textcolor>
 						<label>$INFO[ListItem.Label]</label>
 					</control>
 					<control type="label">
@@ -130,7 +130,7 @@
 						<align>right</align>
 						<aligny>center</aligny>
 						<font>kscape_small</font>
-						<textcolor>FFA9C2F2</textcolor>
+						<textcolor>kscape_text_dim</textcolor>
 						<label>$INFO[ListItem.Label2]</label>
 					</control>
 				</itemlayout>
@@ -138,7 +138,7 @@
 					<control type="image">
 						<width>480</width>
 						<height>60</height>
-						<texture colordiffuse="FF4E8DF2">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue_light">kscape-white.png</texture>
 					</control>
 					<control type="label">
 						<left>30</left>
@@ -169,7 +169,7 @@
 				<width>1150</width>
 				<height>114</height>
 				<font>kscape_panel_body</font>
-				<textcolor>FFF0F4FF</textcolor>
+				<textcolor>kscape_text</textcolor>
 			</control>
 			<control type="label" id="220">
 				<left>530</left>
@@ -184,7 +184,7 @@
 				<width>1150</width>
 				<height>228</height>
 				<font>kscape_panel_body</font>
-				<textcolor>FFF0F4FF</textcolor>
+				<textcolor>kscape_text</textcolor>
 				<autoscroll delay="6000" time="3000" repeat="8000">true</autoscroll>
 			</control>
 			<control type="label" id="230">
@@ -199,7 +199,7 @@
 				<width>910</width>
 				<height>38</height>
 				<font>kscape_panel_body</font>
-				<textcolor>FFF0F4FF</textcolor>
+				<textcolor>kscape_text</textcolor>
 			</control>
 			<control type="label" id="240">
 				<left>530</left>
@@ -213,7 +213,7 @@
 				<width>910</width>
 				<height>76</height>
 				<font>kscape_panel_body</font>
-				<textcolor>FFF0F4FF</textcolor>
+				<textcolor>kscape_text</textcolor>
 			</control>
 			<control type="label" id="250">
 				<left>530</left>
@@ -227,7 +227,7 @@
 				<width>910</width>
 				<height>38</height>
 				<font>kscape_panel_body</font>
-				<textcolor>FFF0F4FF</textcolor>
+				<textcolor>kscape_text</textcolor>
 			</control>
 			<control type="label" id="260">
 				<left>530</left>
@@ -241,7 +241,7 @@
 				<width>910</width>
 				<height>38</height>
 				<font>kscape_panel_body</font>
-				<textcolor>FFF0F4FF</textcolor>
+				<textcolor>kscape_text</textcolor>
 			</control>
 		</control>
 	</controls>

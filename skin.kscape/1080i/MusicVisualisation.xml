@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- KScape has no visualisation screen: Kodi opens this window for music on Back from Home and
+     on the Fullscreen key, so it hands over to KScape's Now Playing (over Home) instead. -->
+<window>
+	<onload>ReplaceWindow(Home)</onload>
+	<onload condition="System.AddonIsEnabled(script.kscape.wall)">RunScript(script.kscape.wall,music,nowplaying)</onload>
+	<controls/>
+</window>

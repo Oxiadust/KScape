@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includes>
+	<!-- Skin settings: the colour theme, as script.kscape.wall last recorded it (default until then). -->
+	<variable name="KScapeColourMainLabel">
+		<value condition="!String.IsEmpty(Skin.String(KScapeColourMain))">$INFO[Skin.String(KScapeColourMain)]</value>
+		<value>$ADDON[script.kscape.wall 32190]</value>
+	</variable>
+	<variable name="KScapeColourHighlightLabel">
+		<value condition="!String.IsEmpty(Skin.String(KScapeColourHighlight))">$INFO[Skin.String(KScapeColourHighlight)]</value>
+		<value>$ADDON[script.kscape.wall 32196]</value>
+	</variable>
+
 	<variable name="PosterArt">
 		<value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
 		<value>$INFO[ListItem.Art(thumb)]</value>

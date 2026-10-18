@@ -24,20 +24,20 @@
 			<control type="image">
 				<width>1728</width>
 				<height>984</height>
-				<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
+				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
 			</control>
 			<control type="image">
 				<description>Left column</description>
 				<top>64</top>
 				<width>480</width>
 				<height>920</height>
-				<texture colordiffuse="FF184CB9">kscape-white.png</texture>
+				<texture colordiffuse="kscape_blue_dark">kscape-white.png</texture>
 			</control>
 			<control type="image">
 				<description>Header strip</description>
 				<width>1728</width>
 				<height>64</height>
-				<texture colordiffuse="FF3876E4">kscape-white.png</texture>
+				<texture colordiffuse="kscape_blue_head">kscape-white.png</texture>
 			</control>
 			<control type="label">
 				<left>30</left>
@@ -54,7 +54,7 @@
 				<top>17</top>
 				<width>32</width>
 				<height>32</height>
-				<texture colordiffuse="FFF5A01A">kscape-heart.png</texture>
+				<texture colordiffuse="kscape_amber">kscape-heart.png</texture>
 				<visible>String.IsEqual(Window.Property(favourite),1)</visible>
 				<animation effect="zoom" start="60" end="100" center="auto" time="220" tween="back" easing="out">Visible</animation>
 			</control>
@@ -147,7 +147,7 @@
 						<height>60</height>
 						<aligny>center</aligny>
 						<font>kscape_menu</font>
-						<textcolor>FFD6E2FF</textcolor>
+						<textcolor>kscape_tint_light</textcolor>
 						<label>$INFO[ListItem.Label]</label>
 					</control>
 					<control type="label">
@@ -157,7 +157,7 @@
 						<align>right</align>
 						<aligny>center</aligny>
 						<font>kscape_small</font>
-						<textcolor>FFA9C2F2</textcolor>
+						<textcolor>kscape_text_dim</textcolor>
 						<label>$INFO[ListItem.Label2]</label>
 					</control>
 				</itemlayout>
@@ -165,7 +165,7 @@
 					<control type="image">
 						<width>480</width>
 						<height>60</height>
-						<texture colordiffuse="FF4E8DF2">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue_light">kscape-white.png</texture>
 						<visible>Control.HasFocus(100)</visible>
 					</control>
 					<control type="label">
@@ -197,7 +197,7 @@
 				<width>1150</width>
 				<height>76</height>
 				<font>kscape_panel_body</font>
-				<textcolor>FFF0F4FF</textcolor>
+				<textcolor>kscape_text</textcolor>
 			</control>
 			<control type="textbox" id="221">
 				<description>Album review or show plot</description>
@@ -206,7 +206,7 @@
 				<width>1150</width>
 				<height>152</height>
 				<font>kscape_panel_body</font>
-				<textcolor>FFD6E2FF</textcolor>
+				<textcolor>kscape_tint_light</textcolor>
 				<autoscroll delay="6000" time="3000" repeat="8000">true</autoscroll>
 			</control>
 			<control type="label" id="230">
@@ -237,7 +237,7 @@
 						<top>36</top>
 						<width>12</width>
 						<height>12</height>
-						<texture colordiffuse="FFF5A01A">kscape-white.png</texture>
+						<texture colordiffuse="kscape_amber">kscape-white.png</texture>
 						<visible>String.IsEqual(ListItem.Property(unwatched),1)</visible>
 					</control>
 					<control type="image">
@@ -255,8 +255,8 @@
 						<height>84</height>
 						<aligny>center</aligny>
 						<font>kscape_menu</font>
-						<textcolor>FFE6EAF2</textcolor>
-						<label>$INFO[ListItem.Label]$INFO[ListItem.Property(detail),[COLOR FFA9C2F2]   ,[/COLOR]]</label>
+						<textcolor>kscape_tint_row</textcolor>
+						<label>$INFO[ListItem.Label]$INFO[ListItem.Property(detail),[COLOR kscape_text_dim]   ,[/COLOR]]</label>
 						<visible>String.IsEmpty(ListItem.Art(thumb))</visible>
 					</control>
 					<control type="label">
@@ -265,8 +265,8 @@
 						<height>84</height>
 						<aligny>center</aligny>
 						<font>kscape_menu</font>
-						<textcolor>FFE6EAF2</textcolor>
-						<label>$INFO[ListItem.Label]$INFO[ListItem.Property(detail),[COLOR FFA9C2F2]   ,[/COLOR]]</label>
+						<textcolor>kscape_tint_row</textcolor>
+						<label>$INFO[ListItem.Label]$INFO[ListItem.Property(detail),[COLOR kscape_text_dim]   ,[/COLOR]]</label>
 						<visible>!String.IsEmpty(ListItem.Art(thumb))</visible>
 					</control>
 					<control type="label">
@@ -276,7 +276,7 @@
 						<align>right</align>
 						<aligny>center</aligny>
 						<font>kscape_small</font>
-						<textcolor>FFA9C2F2</textcolor>
+						<textcolor>kscape_text_dim</textcolor>
 						<label>$INFO[ListItem.Label2]</label>
 					</control>
 				</itemlayout>
@@ -284,13 +284,13 @@
 					<control type="image">
 						<width>1190</width>
 						<height>84</height>
-						<texture colordiffuse="FF4E8DF2">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue_light">kscape-white.png</texture>
 						<visible>Control.HasFocus(300)</visible>
 					</control>
 					<control type="image">
 						<width>1190</width>
 						<height>84</height>
-						<texture colordiffuse="FF2A66D8">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue_mid">kscape-white.png</texture>
 						<visible>!Control.HasFocus(300)</visible>
 					</control>
 					<control type="image">
@@ -298,7 +298,7 @@
 						<top>36</top>
 						<width>12</width>
 						<height>12</height>
-						<texture colordiffuse="FFF5A01A">kscape-white.png</texture>
+						<texture colordiffuse="kscape_amber">kscape-white.png</texture>
 						<visible>String.IsEqual(ListItem.Property(unwatched),1)</visible>
 					</control>
 					<control type="image">
@@ -317,7 +317,7 @@
 						<aligny>center</aligny>
 						<font>kscape_menu</font>
 						<textcolor>FFFFFFFF</textcolor>
-						<label>$INFO[ListItem.Label]$INFO[ListItem.Property(detail),[COLOR FFD6E2FF]   ,[/COLOR]]</label>
+						<label>$INFO[ListItem.Label]$INFO[ListItem.Property(detail),[COLOR kscape_tint_light]   ,[/COLOR]]</label>
 						<visible>String.IsEmpty(ListItem.Art(thumb))</visible>
 					</control>
 					<control type="label">
@@ -327,7 +327,7 @@
 						<aligny>center</aligny>
 						<font>kscape_menu</font>
 						<textcolor>FFFFFFFF</textcolor>
-						<label>$INFO[ListItem.Label]$INFO[ListItem.Property(detail),[COLOR FFD6E2FF]   ,[/COLOR]]</label>
+						<label>$INFO[ListItem.Label]$INFO[ListItem.Property(detail),[COLOR kscape_tint_light]   ,[/COLOR]]</label>
 						<visible>!String.IsEmpty(ListItem.Art(thumb))</visible>
 					</control>
 					<control type="label">

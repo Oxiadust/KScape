@@ -8,7 +8,7 @@
 		<control type="image">
 			<width>1920</width>
 			<height>1080</height>
-			<texture colordiffuse="FF070B16">kscape-white.png</texture>
+			<texture colordiffuse="kscape_bg">kscape-white.png</texture>
 		</control>
 		<control type="image">
 			<description>Artist fanart, when Kodi has it, kept dark behind the panel</description>
@@ -32,14 +32,14 @@
 				<top>48</top>
 				<width>672</width>
 				<height>984</height>
-				<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
+				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
 			</control>
 			<control type="image">
 				<left>96</left>
 				<top>48</top>
 				<width>672</width>
 				<height>64</height>
-				<texture colordiffuse="FF3876E4">kscape-white.png</texture>
+				<texture colordiffuse="kscape_blue_head">kscape-white.png</texture>
 			</control>
 			<control type="label">
 				<left>126</left>
@@ -91,8 +91,8 @@
 				<control type="progress">
 					<width>600</width>
 					<height>10</height>
-					<texturebg colordiffuse="FF184CB9">kscape-white.png</texturebg>
-					<midtexture colordiffuse="FFF5A01A">kscape-white.png</midtexture>
+					<texturebg colordiffuse="kscape_blue_dark">kscape-white.png</texturebg>
+					<midtexture colordiffuse="kscape_amber">kscape-white.png</midtexture>
 					<info>Player.Progress</info>
 				</control>
 				<control type="label">
@@ -100,7 +100,7 @@
 					<width>300</width>
 					<height>36</height>
 					<font>kscape_small</font>
-					<textcolor>FFF0F4FF</textcolor>
+					<textcolor>kscape_text</textcolor>
 					<label>$INFO[Player.Time]</label>
 				</control>
 				<control type="label">
@@ -110,7 +110,7 @@
 					<height>36</height>
 					<align>right</align>
 					<font>kscape_small</font>
-					<textcolor>FFF0F4FF</textcolor>
+					<textcolor>kscape_text</textcolor>
 					<label>$INFO[Player.Duration]</label>
 				</control>
 			</control>
@@ -134,10 +134,10 @@
 					<font>kscape_small</font>
 					<align>center</align>
 					<aligny>center</aligny>
-					<textcolor>FFD6E2FF</textcolor>
+					<textcolor>kscape_tint_light</textcolor>
 					<focusedcolor>FFFFFFFF</focusedcolor>
-					<texturenofocus colordiffuse="FF184CB9">kscape-white.png</texturenofocus>
-					<texturefocus colordiffuse="FFF5A01A">kscape-white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">kscape-white.png</texturenofocus>
+					<texturefocus colordiffuse="kscape_amber">kscape-white.png</texturefocus>
 					<onclick>PlayerControl(Previous)</onclick>
 				</control>
 				<control type="togglebutton" id="602">
@@ -150,12 +150,12 @@
 					<font>kscape_small</font>
 					<align>center</align>
 					<aligny>center</aligny>
-					<textcolor>FFD6E2FF</textcolor>
+					<textcolor>kscape_tint_light</textcolor>
 					<focusedcolor>FFFFFFFF</focusedcolor>
-					<texturenofocus colordiffuse="FF184CB9">kscape-white.png</texturenofocus>
-					<texturefocus colordiffuse="FFF5A01A">kscape-white.png</texturefocus>
-					<alttexturenofocus colordiffuse="FF184CB9">kscape-white.png</alttexturenofocus>
-					<alttexturefocus colordiffuse="FFF5A01A">kscape-white.png</alttexturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">kscape-white.png</texturenofocus>
+					<texturefocus colordiffuse="kscape_amber">kscape-white.png</texturefocus>
+					<alttexturenofocus colordiffuse="kscape_blue_dark">kscape-white.png</alttexturenofocus>
+					<alttexturefocus colordiffuse="kscape_amber">kscape-white.png</alttexturefocus>
 					<onclick>PlayerControl(Play)</onclick>
 				</control>
 				<control type="button" id="603">
@@ -165,10 +165,10 @@
 					<font>kscape_small</font>
 					<align>center</align>
 					<aligny>center</aligny>
-					<textcolor>FFD6E2FF</textcolor>
+					<textcolor>kscape_tint_light</textcolor>
 					<focusedcolor>FFFFFFFF</focusedcolor>
-					<texturenofocus colordiffuse="FF184CB9">kscape-white.png</texturenofocus>
-					<texturefocus colordiffuse="FFF5A01A">kscape-white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">kscape-white.png</texturenofocus>
+					<texturefocus colordiffuse="kscape_amber">kscape-white.png</texturefocus>
 					<onclick>PlayerControl(Stop)</onclick>
 				</control>
 				<control type="button" id="604">
@@ -178,10 +178,10 @@
 					<font>kscape_small</font>
 					<align>center</align>
 					<aligny>center</aligny>
-					<textcolor>FFD6E2FF</textcolor>
+					<textcolor>kscape_tint_light</textcolor>
 					<focusedcolor>FFFFFFFF</focusedcolor>
-					<texturenofocus colordiffuse="FF184CB9">kscape-white.png</texturenofocus>
-					<texturefocus colordiffuse="FFF5A01A">kscape-white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">kscape-white.png</texturenofocus>
+					<texturefocus colordiffuse="kscape_amber">kscape-white.png</texturefocus>
 					<onclick>PlayerControl(Next)</onclick>
 				</control>
 			</control>
@@ -195,7 +195,7 @@
 					<width>990</width>
 					<height>40</height>
 					<font>kscape_list_head</font>
-					<textcolor>FFF5A01A</textcolor>
+					<textcolor>kscape_amber</textcolor>
 					<label>$ADDON[script.kscape.wall 32133]</label>
 					<visible>!Player.Paused</visible>
 				</control>
@@ -203,7 +203,7 @@
 					<width>990</width>
 					<height>40</height>
 					<font>kscape_list_head</font>
-					<textcolor>FFF5A01A</textcolor>
+					<textcolor>kscape_amber</textcolor>
 					<label>$ADDON[script.kscape.wall 32134]</label>
 					<visible>Player.Paused</visible>
 				</control>
@@ -220,7 +220,7 @@
 					<width>990</width>
 					<height>52</height>
 					<font>kscape_panel_title</font>
-					<textcolor>FFF0F4FF</textcolor>
+					<textcolor>kscape_text</textcolor>
 					<label>$INFO[MusicPlayer.Artist]</label>
 				</control>
 				<control type="label">
@@ -228,7 +228,7 @@
 					<width>990</width>
 					<height>44</height>
 					<font>kscape_panel_body</font>
-					<textcolor>FFA9C2F2</textcolor>
+					<textcolor>kscape_text_dim</textcolor>
 					<label>$INFO[MusicPlayer.Album]$INFO[MusicPlayer.Year,  ·  ]</label>
 				</control>
 			</control>
@@ -249,7 +249,7 @@
 					<width>990</width>
 					<height>80</height>
 					<font>kscape_panel_body</font>
-					<textcolor>FFA9C2F2</textcolor>
+					<textcolor>kscape_text_dim</textcolor>
 					<label>$ADDON[script.kscape.wall 32132]</label>
 				</control>
 			</control>
@@ -281,14 +281,14 @@
 						<top>4</top>
 						<width>980</width>
 						<height>72</height>
-						<texture colordiffuse="FF13284F">kscape-white.png</texture>
+						<texture colordiffuse="kscape_track_dark">kscape-white.png</texture>
 					</control>
 					<control type="image">
 						<left>12</left>
 						<top>4</top>
 						<width>980</width>
 						<height>72</height>
-						<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue">kscape-white.png</texture>
 						<visible>String.IsEqual(ListItem.Property(playing),1)</visible>
 					</control>
 					<control type="image">
@@ -311,7 +311,7 @@
 						<top>30</top>
 						<width>16</width>
 						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(ListItem.Property(playing),1)</visible>
 					</control>
 					<control type="label">
@@ -320,8 +320,8 @@
 						<height>80</height>
 						<aligny>center</aligny>
 						<font>kscape_menu</font>
-						<textcolor>FFE6EAF2</textcolor>
-						<label>$INFO[ListItem.Label]$INFO[ListItem.Label2,[COLOR FF9AB4E6]   ,[/COLOR]]</label>
+						<textcolor>kscape_tint_row</textcolor>
+						<label>$INFO[ListItem.Label]$INFO[ListItem.Label2,[COLOR kscape_tint_soft]   ,[/COLOR]]</label>
 					</control>
 					<control type="label">
 						<left>850</left>
@@ -330,7 +330,7 @@
 						<align>right</align>
 						<aligny>center</aligny>
 						<font>kscape_small</font>
-						<textcolor>FFA9C2F2</textcolor>
+						<textcolor>kscape_text_dim</textcolor>
 						<label>$INFO[ListItem.Property(duration)]</label>
 					</control>
 				</itemlayout>
@@ -340,14 +340,14 @@
 						<top>4</top>
 						<width>980</width>
 						<height>72</height>
-						<texture colordiffuse="FF13284F">kscape-white.png</texture>
+						<texture colordiffuse="kscape_track_dark">kscape-white.png</texture>
 					</control>
 					<control type="image">
 						<left>12</left>
 						<top>4</top>
 						<width>980</width>
 						<height>72</height>
-						<texture colordiffuse="FF1F5BD3">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue">kscape-white.png</texture>
 						<visible>String.IsEqual(ListItem.Property(playing),1)</visible>
 					</control>
 					<control type="image">
@@ -355,7 +355,7 @@
 						<top>4</top>
 						<width>980</width>
 						<height>72</height>
-						<texture colordiffuse="FF5A9DF2">kscape-white.png</texture>
+						<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
 						<visible>Control.HasFocus(700)</visible>
 					</control>
 					<control type="image">
@@ -364,7 +364,7 @@
 						<top>0</top>
 						<width>80</width>
 						<height>80</height>
-						<texture colordiffuse="FFF5A01A">kscape-white.png</texture>
+						<texture colordiffuse="kscape_amber">kscape-white.png</texture>
 						<visible>Control.HasFocus(700)</visible>
 					</control>
 					<control type="image">
@@ -387,7 +387,7 @@
 						<top>30</top>
 						<width>16</width>
 						<height>20</height>
-						<texture colordiffuse="FFF5A01A">kscape-marker.png</texture>
+						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
 						<visible>String.IsEqual(ListItem.Property(playing),1)</visible>
 					</control>
 					<control type="label">
@@ -397,7 +397,7 @@
 						<aligny>center</aligny>
 						<font>kscape_menu</font>
 						<textcolor>FFFFFFFF</textcolor>
-						<label>$INFO[ListItem.Label]$INFO[ListItem.Label2,[COLOR FFD6E2FF]   ,[/COLOR]]</label>
+						<label>$INFO[ListItem.Label]$INFO[ListItem.Label2,[COLOR kscape_tint_light]   ,[/COLOR]]</label>
 					</control>
 					<control type="label">
 						<left>850</left>

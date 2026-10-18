@@ -5,6 +5,7 @@ Usage: python3 tools/gen_list_xml.py
 Control ids:
   9000   fixedlist: one row per movie, the focused row is a tall blue band at a fixed height
   901    never-visible target for the list's edge actions (stops wrap-around at the ends)
+  (no id) now-playing chip top right while something plays (tools/np_chip.py)
 
 The window drives the layouts through Home window properties:
   kscape.list.col      focused column key (lighter cell in the band)
@@ -22,7 +23,9 @@ import sys
 
 ROOT = os.path.join(os.path.dirname(__file__), '..', 'script.kscape.wall')
 sys.path.insert(0, ROOT)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from resources.lib import listmodel as L  # noqa: E402
+import np_chip  # noqa: E402
 
 W, H = 1920, 1080
 # Rows are laid out wider than the screen: Kodi skips layout controls that start outside the
@@ -39,17 +42,19 @@ SQUARE = (62, 30, 138, 138)    # album cover
 HEART = 22                     # favourite marker, left of the title text
 HEART_X = TEXT_X - 34
 
-BG = 'FF070B16'
-BAND = 'FF1F5BD3'
-CELL = 'FF5A9DF2'              # focused column
+BG = 'kscape_bg'
+BAND = 'kscape_blue'
+CELL = 'kscape_blue_focus'              # focused column
 TITLE_COLOR = 'FFFFFFFF'
-ROW_COLORS = {'cast': 'FFA9C6FF', 'director': 'FFCCD9F2'}
-ROW_COLOR = 'FFE6EAF2'
+ROW_COLORS = {'cast': 'kscape_tint_cast', 'director': 'kscape_tint_director'}
+ROW_COLOR = 'kscape_tint_row'
 SLIDE_MS = 360
-# Band value lines (kscape_list_value, measured in Kodi 21): first line centre and line pitch,
-# for the ▶ marker beside the value the list is sorted by.
-LINE0_CY, LINE_PITCH = 80.6, 34.6
-MARKER_W, MARKER_H = 16, 20
+# Band value lines (kscape_list_value, measured in Kodi 21.3 from screenshots of all four lines:
+# centre of the first line's capitals, and the line pitch), for the ▶ marker beside the value the
+# list is sorted by. The marker is centred in the 20 px gutter left of the values.
+LINE0_CY, LINE_PITCH = 72.0, 31.4
+MARKER_W, MARKER_H = 12, 15
+VALUE_X = 20                   # values start this far into their column
 
 
 def prop(name):
@@ -98,7 +103,7 @@ def markers(key, x):
         top = int(round(LINE0_CY + i * LINE_PITCH - MARKER_H / 2))
         out.append(f'''
 					<control type="image">
-						<left>{x + 2}</left>
+						<left>{x + (VALUE_X - MARKER_W) // 2}</left>
 						<top>{top}</top>
 						<width>{MARKER_W}</width>
 						<height>{MARKER_H}</height>
@@ -343,7 +348,7 @@ def build(spec):
 			<label>$INFO[{prop('empty')}]</label>
 			<visible>!String.IsEmpty({prop('empty')})</visible>
 		</control>
-	</controls>
+{np_chip.chip()}	</controls>
 </window>
 '''
     return xml

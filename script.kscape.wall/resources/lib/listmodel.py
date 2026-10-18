@@ -14,7 +14,7 @@ from collections import namedtuple
 Column = namedtuple('Column', 'key label width')
 
 SCROLL_W = 1060                    # visible width right of the title column
-AMBER = 'FFF5A01A'
+AMBER = 'kscape_amber'
 FULL_LINES = 4                     # values shown in the focused row's band
 
 # Kodi's default sort tokens: titles sort as if these leading words were absent.

@@ -10,8 +10,13 @@ library:
   List        the list view's rows, blue band, poster and columns
   Covers      the cover wall: covers bleeding off every edge, the focused one in the amber frame
               with the blue synopsis panel beside it
-  Favourites  the wall dimmed, with the amber heart favourites are marked with
+  Collections the collections view: the most recently added titles under the band, the poster
+              or cover, the New / Paused / Played tabs (New / Played for music)
   Now Playing (music) the playing album, title and progress
+
+Left/Right on a card switch to the next Home category with its cards (or submenu) still open:
+the bar moves (Control.Move) and focus goes through an off-screen router button (9030) whose
+onfocus picks the new category's cards or submenu.
 
 Kodi clips a container's items to the container, so covers could only bleed off the right and
 bottom edges of a panel container. Instead each cover is its own image control whose artwork
@@ -19,8 +24,9 @@ comes from a hidden source container (Container(id).ListItemAbsolute(n)); covers
 edge get a smaller box and keep their visible part (aspectratio scale + align), so the wall
 bleeds evenly on all four sides. Frames are solid bars, so their edges stay crisp.
 
-Includes written: KScapeHomeCards (the dimming, the three card columns and their edge target),
-KScapeHomeNowPlaying (what is playing, top left of Home).
+Includes written: KScapeHomeCards (the dimming, the three card columns, their edge target and
+the category router), KScapeHomeNowPlaying (what is playing, top right of Home under the clock,
+live video for a video).
 """
 import os
 import sys
@@ -32,6 +38,7 @@ sys.path.insert(0, TOOLS)
 from resources.lib import geometry as G  # noqa: E402
 from resources.lib import listmodel as L  # noqa: E402
 import gen_list_xml as LX  # noqa: E402
+import gen_collections_xml as CX  # noqa: E402
 
 S = 320 / 1920.0               # card scale
 CARD_W, CARD_H = 320, 192
@@ -43,7 +50,7 @@ AMBER_T = 16                    # focused card frame, outside the card
 AMBER_OUT = 14
 MICRO_LINE = 7.5                # line pitch of kscape_micro (6 px)
 
-PANEL_BLUE = 'FF1F5BD3'
+PANEL_BLUE = 'kscape_blue'
 CARD_BG = 'FF1A1A1F'
 WALL_BG = 'FF060607'
 
@@ -51,15 +58,17 @@ KINDS = [
     # name, tab x, layout, art, list spec, list columns -> info label, band art, extra card
     dict(name='movies', x=120, layout=G.POSTER, art='Art(poster)', spec=L.MOVIES, title='Label',
          cols={'genre': 'Genre', 'cast': 'Writer', 'director': 'Director', 'year': 'Year'},
-         path='videodb://movies/titles/', sort='title', body='Plot'),
+         path='videodb://movies/titles/', sort='title', body='Plot', recent='videodb://recentlyaddedmovies/'),
     dict(name='music', x=440, layout=G.SQUARE, art='Art(thumb)', spec=L.MUSIC, title='Artist',
          cols={'album': 'Label', 'genre': 'Genre', 'year': 'Year'},
-         path='musicdb://albums/', sort='artist', body='Artist', nowplaying=True),
+         path='musicdb://albums/', sort='artist', body='Artist', nowplaying=True,
+         recent='musicdb://recentlyaddedalbums/'),
     dict(name='tv', x=760, layout=G.POSTER, art='Art(poster)', spec=L.TV, title='Label',
          cols={'genre': 'Genre', 'cast': 'Studio', 'network': 'Studio', 'year': 'Year'},
-         path='videodb://tvshows/titles/', sort='title', body='Plot'),
+         path='videodb://tvshows/titles/', sort='title', body='Plot', recent='videodb://tvshows/titles/'),
 ]
-IDS = {'movies': 1, 'music': 2, 'tv': 3}     # source containers 904x (list) and 905x (covers)
+IDS = {'movies': 1, 'music': 2, 'tv': 3}     # source containers 904x (list) and 905x (covers);
+# 906x: the library's most recently added titles, for the Collections card
 LIST_IDS = {'movies': 9021, 'music': 9022, 'tv': 9023}
 
 
@@ -135,19 +144,17 @@ def wall_cells(lay, panel):
     return [(x, y, w, h, a, ay, i) for i, (x, y, w, h, a, ay, _, _) in enumerate(cells)], (fx, fy, cw, ch)
 
 
-def covers(k, src, panel=True, dim=False):
+def covers(k, src, panel=True):
     lay = k['layout']
     cells, (fx, fy, cw, ch) = wall_cells(lay, panel)
     out = image(0, 0, CARD_W, CARD_H, 'white.png', WALL_BG)
-    tint = '60FFFFFF' if dim else ''
     for x, y, w, h, align, aligny, i in cells:
         cover = image(x, y, w, h, 'white.png', CARD_BG, ind='\t\t\t\t\t')
         art = f'\t\t\t\t\t\t<aspectratio align="{align}" aligny="{aligny}">scale</aspectratio>\n'
-        d = f' colordiffuse="{tint}"' if tint else ''
         for a in art_layers(k):
             cover += (f'\t\t\t\t\t<control type="image">\n\t\t\t\t\t\t<left>{n(x)}</left>\n\t\t\t\t\t\t<top>{n(y)}</top>\n'
                       f'\t\t\t\t\t\t<width>{n(w)}</width>\n\t\t\t\t\t\t<height>{n(h)}</height>\n{art}'
-                      f'\t\t\t\t\t\t<texture background="true"{d}>{item(src, i, a)}</texture>\n\t\t\t\t\t</control>\n')
+                      f'\t\t\t\t\t\t<texture background="true">{item(src, i, a)}</texture>\n\t\t\t\t\t</control>\n')
         out += f'\t\t\t\t<control type="group">\n\t\t\t\t\t<visible>{has(src, i)}</visible>\n{cover}\t\t\t\t</control>\n'
     if panel:
         fr = max(3.0, lay.frame * S)
@@ -157,12 +164,10 @@ def covers(k, src, panel=True, dim=False):
         out += group(image(0, 0, pw, h, 'white.png', PANEL_BLUE)
                      + label(5, fr + 3, pw - 10, 11, item(src, 0, 'Label'), 'kscape_tiny_bold', 'FFFFFFFF')
                      + label(5, fr + 16, pw - 10, MICRO_LINE * int((h - fr - 20) // MICRO_LINE), item(src, 0, k['body']), 'kscape_micro',
-                             'FFF0F4FF', kind=body),
+                             'kscape_text', kind=body),
                      x, y, has(src, 0), ind='\t\t\t\t')
         out += group(bars(0, 0, cw + 2 * fr, ch + 2 * fr, fr, 'kscape_amber', ind='\t\t\t\t\t'),
                      fx - fr, fy - fr, has(src, 0), ind='\t\t\t\t')
-    if dim:
-        out += image(CARD_W / 2 - 34, CARD_H / 2 - 34, 68, 68, 'heart.png', 'kscape_amber')
     return out
 
 
@@ -178,11 +183,11 @@ def list_rows(k, src, band):
     cols = [(title_w + offsets[c.key] * S + 20 * S, c.width * S - 32 * S, k['cols'][c.key]) for c in spec.columns
             if c.key in k['cols'] and title_w + offsets[c.key] * S < CARD_W]
 
-    def row(i, y, color='FFE6EAF2'):
+    def row(i, y, color='kscape_tint_row'):
         out = label(title_x, y, title_w - title_x - 4, row_h, item(src, i, k['title']), 'kscape_micro', color,
                     ind='\t\t\t\t\t')
         for x, w, info in cols:
-            out += label(x, y, min(w, CARD_W - x), row_h, item(src, i, info), 'kscape_micro', 'FFA9C6FF',
+            out += label(x, y, min(w, CARD_W - x), row_h, item(src, i, info), 'kscape_micro', 'kscape_tint_cast',
                          ind='\t\t\t\t\t')
         return f'\t\t\t\t<control type="group">\n\t\t\t\t\t<visible>{has(src, i)}</visible>\n{out}\t\t\t\t</control>\n'
 
@@ -224,6 +229,71 @@ def list_card(k, src):
     out += image(0, CARD_H - 190 * S, CARD_W, 190 * S, 'fade.png', 'kscape_bg',
                  extra='').replace('<texture colordiffuse="kscape_bg">', '<texture colordiffuse="kscape_bg" flipy="true">')
     return out
+
+
+def collections_card(k):
+    """The collections view at 1/6 scale: the most recently added titles (the New collection)
+    in the list with the band, the focused one's poster or cover, and the tab bar."""
+    src = 9060 + IDS[k['name']]
+    square = k['layout'] is G.SQUARE
+    row_h, band_h = CX.ROW_H * S, CX.BAND_H * S
+    top = VOFF + CX.LIST_TOP * S
+    tx = CX.TEXT_X * S
+    lw = CX.LIST_W * S
+    out = image(0, 0, CARD_W, CARD_H, 'white.png', 'kscape_bg')
+    out += label(tx, VOFF + CX.HEAD_Y * S, 120, 6, '$ADDON[script.kscape.wall 32156]', 'kscape_micro', 'kscape_amber')
+    out += label(tx, VOFF + (CX.HEAD_Y + 30) * S, 160, 11, '$ADDON[script.kscape.wall 32151]', 'kscape_tiny_bold', 'FFFFFFFF')
+
+    def row(i, y):
+        return group(label(tx, y, lw - tx - 8, row_h, item(src, i, 'Label'), 'kscape_micro', 'kscape_tint_row', ind='\t\t\t\t\t\t'),
+                     visible=has(src, i), ind='\t\t\t\t\t')
+
+    rows = ''
+    for j in range(CX.FOCUS_POS):
+        rows += row(j, top + j * row_h)
+    by = top + CX.FOCUS_POS * row_h
+    band = image(0, by, CX.BAND_SOLID * S, band_h, 'white.png', 'kscape_blue', ind='\t\t\t\t\t\t')
+    band += image(CX.BAND_SOLID * S, by, lw - CX.BAND_SOLID * S, band_h, 'hfade.png', 'kscape_blue', ind='\t\t\t\t\t\t')
+    band += label(tx, by + 4, lw - tx - 8, 11, item(src, CX.FOCUS_POS, 'Label'), 'kscape_tiny_bold', 'FFFFFFFF',
+                  ind='\t\t\t\t\t\t')
+    band += label(CX.SUB_X * S, by + 15, lw - tx - 8, 7, item(src, CX.FOCUS_POS, 'DateAdded'), 'kscape_micro', 'kscape_tint_sub',
+                  ind='\t\t\t\t\t\t')
+    rows += group(band, visible=has(src, CX.FOCUS_POS), ind='\t\t\t\t\t')
+    y, i = by + band_h, CX.FOCUS_POS + 1
+    while y + row_h <= VOFF + CX.TAB_TOP * S - 2:
+        rows += row(i, y)
+        y += row_h
+        i += 1
+    out += group(rows, ind='\t\t\t\t')
+    px, py, pw, ph = (v * S for v in CX.art_rect(square))
+    out += image(px, VOFF + py, pw, ph, 'white.png', CARD_BG)
+    out += (f'\t\t\t\t<control type="image">\n\t\t\t\t\t<left>{n(px)}</left>\n\t\t\t\t\t<top>{n(VOFF + py)}</top>\n'
+            f'\t\t\t\t\t<width>{n(pw)}</width>\n\t\t\t\t\t<height>{n(ph)}</height>\n\t\t\t\t\t<aspectratio>scale</aspectratio>\n'
+            f'\t\t\t\t\t<texture background="true">{item(src, CX.FOCUS_POS, k["art"])}</texture>\n\t\t\t\t</control>\n')
+    bar_y = VOFF + CX.TAB_TOP * S
+    out += image(0, bar_y, CARD_W, CARD_H - bar_y, 'white.png', 'kscape_blue_bar')
+    tw = CX.TAB_W * S
+    tabs = (32151, 32153) if k['name'] == 'music' else (32151, 32152, 32153)
+    for j, sid in enumerate(tabs):
+        x = CX.TAB_LEFT * S + j * tw
+        if j == 0:
+            out += image(x, bar_y, tw, CX.TAB_H * S, 'white.png', 'kscape_blue_focus')
+        out += label(x, bar_y, tw, CX.TAB_H * S, f'$ADDON[script.kscape.wall {sid}]', 'kscape_micro_bold', 'FFFFFFFF',
+                     extra='\t\t\t\t\t<align>center</align>\n\t\t\t\t\t<aligny>center</aligny>\n')
+    return out
+
+
+def recent_source(k):
+    return f'''			<control type="list" id="{9060 + IDS[k['name']]}">
+				<left>-4000</left>
+				<width>10</width>
+				<height>10</height>
+				<scrolltime>0</scrolltime>
+				<itemlayout width="10" height="10"/>
+				<focusedlayout width="10" height="10"/>
+				<content sortby="dateadded" sortorder="descending" limit="30">{k['recent']}</content>
+			</control>
+'''
 
 
 NOW_PLAYING_CARD = '''				<control type="image">
@@ -310,7 +380,7 @@ def sources(k):
 
 def card_list(k, top, count):
     lid = LIST_IDS[k['name']]
-    views = [('31050', 'list'), ('31051', 'covers'), ('31052', 'favorites')]
+    views = [('31050', 'list'), ('31051', 'covers'), ('31057', 'collections')]
     if k.get('nowplaying'):
         views.append(('31053', 'nowplaying'))
     content = ''.join(f'''
@@ -335,8 +405,10 @@ def card_list(k, top, count):
 				<orientation>vertical</orientation>
 				<onup>9029</onup>
 				<ondown>9000</ondown>
-				<onleft>9029</onleft>
-				<onright>9029</onright>
+				<onleft>Control.Move(9000,-1)</onleft>
+				<onleft>SetFocus(9030)</onleft>
+				<onright>Control.Move(9000,1)</onright>
+				<onright>SetFocus(9030)</onright>
 				<onback>9000</onback>
 				<scrolltime>0</scrolltime>
 				<itemlayout width="{900 + o}" height="{CARD_PITCH}">
@@ -362,10 +434,10 @@ def stack(k):
     count = 4 if k.get('nowplaying') else 3
     top = BOTTOM - CARD_H - (count - 1) * CARD_PITCH
     x = k['x']
-    cards = [list_card(k, 9040 + i), covers(k, 9050 + i), covers(k, 9050 + i, panel=False, dim=True)]
+    cards = [list_card(k, 9040 + i), covers(k, 9050 + i), collections_card(k)]
     if k.get('nowplaying'):
         cards.append(NOW_PLAYING_CARD)
-    body = sources(k)
+    body = sources(k) + recent_source(k)
     for j, c in enumerate(cards):
         body += group(c, x, top + j * CARD_PITCH)
     body += card_list(k, top, count)
@@ -380,22 +452,25 @@ def stack(k):
 '''
 
 
-NOW_PLAYING = '''	<!-- What is playing, top left of Home (the clock is top right). -->
+NOW_PLAYING = '''	<!-- What is playing, top right of Home under the clock: clear of the view cards and the
+	     submenus, which rise from the bottom left. A video shows live (Kodi's videowindow). -->
 	<include name="KScapeHomeNowPlaying">
 		<definition>
 			<control type="group">
-				<left>80</left>
-				<top>40</top>
+				<left>1088</left>
+				<top>118</top>
 				<visible>Player.HasMedia</visible>
 				<animation effect="fade" start="0" end="100" time="300">Visible</animation>
 				<animation effect="fade" start="100" end="0" time="200">Hidden</animation>
 				<control type="image">
+					<left>88</left>
 					<width>112</width>
 					<height>112</height>
 					<texture colordiffuse="FF1A1A1F">white.png</texture>
 					<visible>Player.HasAudio</visible>
 				</control>
 				<control type="image">
+					<left>88</left>
 					<width>112</width>
 					<height>112</height>
 					<aspectratio>scale</aspectratio>
@@ -403,51 +478,48 @@ NOW_PLAYING = '''	<!-- What is playing, top left of Home (the clock is top right
 					<visible>Player.HasAudio</visible>
 				</control>
 				<control type="image">
-					<left>18</left>
-					<width>75</width>
+					<width>200</width>
 					<height>112</height>
-					<texture colordiffuse="FF1A1A1F">white.png</texture>
+					<texture colordiffuse="FF000000">white.png</texture>
 					<visible>Player.HasVideo</visible>
 				</control>
-				<control type="image">
-					<left>18</left>
-					<width>75</width>
+				<control type="videowindow">
+					<description>The playing video, live, in its own aspect ratio</description>
+					<width>200</width>
 					<height>112</height>
-					<aspectratio>scale</aspectratio>
-					<texture background="true">$VAR[KScapePlayerPoster]</texture>
 					<visible>Player.HasVideo</visible>
 				</control>
 				<control type="label">
-					<left>132</left>
+					<left>224</left>
 					<top>0</top>
-					<width>620</width>
+					<width>528</width>
 					<height>28</height>
 					<font>kscape_list_head</font>
 					<textcolor>kscape_amber</textcolor>
 					<label>$VAR[KScapePlayerState]</label>
 				</control>
 				<control type="label">
-					<left>132</left>
+					<left>224</left>
 					<top>28</top>
-					<width>620</width>
+					<width>528</width>
 					<height>40</height>
 					<font>kscape_sub</font>
 					<textcolor>white</textcolor>
 					<label>$INFO[Player.Title]</label>
 				</control>
 				<control type="label">
-					<left>132</left>
+					<left>224</left>
 					<top>66</top>
-					<width>620</width>
+					<width>528</width>
 					<height>30</height>
 					<font>kscape_small</font>
 					<textcolor>kscape_text_dim</textcolor>
 					<label>$VAR[KScapePlayerSubtitle]</label>
 				</control>
 				<control type="progress">
-					<left>132</left>
+					<left>224</left>
 					<top>102</top>
-					<width>420</width>
+					<width>330</width>
 					<height>6</height>
 					<texturebg colordiffuse="kscape_blue_dark">white.png</texturebg>
 					<midtexture colordiffuse="kscape_amber">white.png</midtexture>
@@ -458,6 +530,7 @@ NOW_PLAYING = '''	<!-- What is playing, top left of Home (the clock is top right
 					<top>90</top>
 					<width>186</width>
 					<height>28</height>
+					<align>right</align>
 					<font>kscape_badge</font>
 					<textcolor>kscape_text_dim</textcolor>
 					<label>$INFO[Player.Time]$INFO[Player.Duration, / ]</label>
@@ -487,7 +560,7 @@ def main():
     xml = f'''<?xml version="1.0" encoding="UTF-8"?>
 <!-- GENERATED by tools/gen_home_xml.py from the views' geometry. Do not edit by hand. -->
 <includes>
-	<!-- The view cards above Movies / Music / TV Shows: List, Covers, Favourites (and Now Playing
+	<!-- The view cards above Movies / Music / TV Shows: List, Covers, Collections (and Now Playing
 	     for music), each the real view at 1/6 scale. Up from the tab enters the cards; Down from
 	     the bottom card or Back returns to the bar. -->
 	<include name="KScapeHomeCards">
@@ -510,6 +583,22 @@ def main():
 			<texturefocus/>
 			<texturenofocus/>
 			<visible>false</visible>
+		</control>
+		<control type="button" id="9030">
+			<description>Category router: Left/Right on a card or submenu move the bar, then focus
+			lands here and goes on to the new category's cards or submenu (or the bar). Off screen
+			but visible, so it can take focus.</description>
+			<left>-200</left>
+			<top>-200</top>
+			<width>1</width>
+			<height>1</height>
+			<texturefocus/>
+			<texturenofocus/>
+			<onfocus condition="String.IsEqual(Container(9000).ListItem.Property(hassub),true)">SetFocus(9010)</onfocus>
+			<onfocus condition="String.IsEqual(Container(9000).ListItem.Property(id),movies) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9021)</onfocus>
+			<onfocus condition="String.IsEqual(Container(9000).ListItem.Property(id),music) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9022)</onfocus>
+			<onfocus condition="String.IsEqual(Container(9000).ListItem.Property(id),tv) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9023)</onfocus>
+			<onfocus condition="!System.AddonIsEnabled(script.kscape.wall) + !String.IsEqual(Container(9000).ListItem.Property(hassub),true)">SetFocus(9000)</onfocus>
 		</control>
 		</definition>
 	</include>

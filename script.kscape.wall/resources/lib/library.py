@@ -122,15 +122,61 @@ def show_total():
     return int((result.get('limits') or {}).get('total') or 0)
 
 
+def in_progress_shows():
+    """Ids of the shows with an episode that has a resume point (Kodi's in-progress shows)."""
+    result = rpc('VideoLibrary.GetInProgressTVShows', {})
+    return {int(t['tvshowid']) for t in result.get('tvshows', [])}
+
+
 def fetch_shows():
     result = rpc('VideoLibrary.GetTVShows', {'properties': SHOW_PROPERTIES, 'sort': SHOW_SORT})
-    return [Show.from_jsonrpc(t) for t in result.get('tvshows', [])]
+    busy = in_progress_shows()
+    return [Show.from_jsonrpc(dict(t, inprogress=int(t['tvshowid']) in busy)) for t in result.get('tvshows', [])]
 
 
 def fetch_show(tvshowid):
     details = rpc('VideoLibrary.GetTVShowDetails', {'tvshowid': tvshowid, 'properties': SHOW_PROPERTIES})
     t = details.get('tvshowdetails')
-    return Show.from_jsonrpc(t) if t else None
+    return Show.from_jsonrpc(dict(t, inprogress=tvshowid in in_progress_shows())) if t else None
+
+
+STATUS = {  # method, result key, id key, properties: what built-in collections are worked out from
+    'movies': ('VideoLibrary.GetMovies', 'movies', 'movieid', ['playcount', 'lastplayed', 'resume', 'dateadded']),
+    'music': ('AudioLibrary.GetAlbums', 'albums', 'albumid', ['playcount', 'lastplayed', 'dateadded']),
+    'tv': ('VideoLibrary.GetTVShows', 'tvshows', 'tvshowid', ['playcount', 'lastplayed', 'dateadded',
+                                                            'watchedepisodes']),
+}
+
+
+def fetch_status(kind_name):
+    """{id: record fields} of play state and dates for every item: one light query, so the
+    built-in collections are current even when the rest comes from the disk cache."""
+    method, key, idkey, props = STATUS[kind_name]
+    out = {}
+    busy = in_progress_shows() if kind_name == 'tv' else set()
+    for x in rpc(method, {'properties': props}).get(key, []):
+        i = int(x[idkey])
+        f = {'playcount': int(x.get('playcount') or 0), 'lastplayed': x.get('lastplayed') or '',
+             'dateadded': x.get('dateadded') or ''}
+        if kind_name == 'movies':
+            f['resume_position'] = float((x.get('resume') or {}).get('position') or 0)
+        if kind_name == 'tv':
+            f['watched'] = int(x.get('watchedepisodes') or 0)
+            f['inprogress'] = i in busy
+        out[i] = f
+    return out
+
+
+def parent_of(item_type, item_id):
+    """The album of a song, or the show of an episode: what a wall shows when one of those
+    changes (played, a resume point saved). None for anything else."""
+    if item_type == 'song':
+        d = rpc('AudioLibrary.GetSongDetails', {'songid': item_id, 'properties': ['albumid']})
+        return (d.get('songdetails') or {}).get('albumid') or None
+    if item_type == 'episode':
+        d = rpc('VideoLibrary.GetEpisodeDetails', {'episodeid': item_id, 'properties': ['tvshowid']})
+        return (d.get('episodedetails') or {}).get('tvshowid') or None
+    return None
 
 
 def fetch_seasons(tvshowid):

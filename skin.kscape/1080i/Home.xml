@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Home: random movie fanart crossfading full screen, a KScape-blue navigation bar along the
      bottom (Movies / Music / TV Shows / System / Power). Movies, Music and TV Shows show their
-     views above the tab as a column of live miniature cards (List, Covers, Favourites, and Now
+     views above the tab as a column of live miniature cards (List, Covers, Collections, and Now
      Playing for music); System and Power show, as in Aeon Nox: SiLVO, a submenu strip above the
-     bar. Up enters either, Down or Back return. The System and Power submenus and actions are
-     SiLVO's defaults. -->
+     bar. Up enters either, Down or Back return; Left/Right switch category with them still open
+     (past the ends of a submenu strip). The System and Power submenus and actions are SiLVO's
+     defaults.
+     While something plays, Back or Escape return to it: Kodi itself sends Back to full-screen
+     video (music goes through MusicVisualisation.xml to KScape's Now Playing), and Escape goes
+     to <previouswindow>, a dialog that sends it on (Custom_1190_KScapeBack.xml). -->
 <window>
 	<defaultcontrol always="true">9000</defaultcontrol>
+	<previouswindow>1190</previouswindow>
 	<controls>
 		<!-- ===== Background ===== -->
 		<control type="image">
@@ -29,13 +34,13 @@
 			<top>480</top>
 			<width>1920</width>
 			<height>600</height>
-			<texture colordiffuse="E6070B16" flipy="true">fade.png</texture>
+			<texture colordiffuse="kscape_bg_shade" flipy="true">fade.png</texture>
 		</control>
 		<control type="image">
 			<description>Light shade at the top for the clock</description>
 			<width>1920</width>
 			<height>220</height>
-			<texture colordiffuse="99070B16">fade.png</texture>
+			<texture colordiffuse="kscape_bg_veil">fade.png</texture>
 		</control>
 
 		<control type="wraplist" id="9100">
@@ -96,6 +101,10 @@
 				<orientation>horizontal</orientation>
 				<ondown>9000</ondown>
 				<onback>9000</onback>
+				<onleft>Control.Move(9000,-1)</onleft>
+				<onleft>SetFocus(9030)</onleft>
+				<onright>Control.Move(9000,1)</onright>
+				<onright>SetFocus(9030)</onright>
 				<scrolltime tween="cubic" easing="out">240</scrolltime>
 				<itemlayout width="240" height="72">
 					<control type="label">

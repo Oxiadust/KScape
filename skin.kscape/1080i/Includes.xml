@@ -68,7 +68,7 @@
 			<aligny>center</aligny>
 			<textcolor>FFE6E6EA</textcolor>
 			<focusedcolor>FF141418</focusedcolor>
-			<texturefocus colordiffuse="FFF5A01A">white.png</texturefocus>
+			<texturefocus colordiffuse="kscape_amber">white.png</texturefocus>
 			<texturenofocus colordiffuse="FF26262C">white.png</texturenofocus>
 		</definition>
 	</include>

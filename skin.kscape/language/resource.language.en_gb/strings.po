@@ -123,11 +123,6 @@ msgctxt "#31051"
 msgid "Covers"
 msgstr ""
 
-#. Home: view card
-msgctxt "#31052"
-msgid "Favourites"
-msgstr ""
-
 #. Home: view card (music)
 msgctxt "#31053"
 msgid "Now Playing"
@@ -146,4 +141,24 @@ msgstr ""
 #. Home: top-left player strip
 msgctxt "#31056"
 msgid "PAUSED"
+msgstr ""
+
+#. Home: view card (movies)
+msgctxt "#31057"
+msgid "Collections"
+msgstr ""
+
+#. Skin settings: section heading
+msgctxt "#31046"
+msgid "Colours"
+msgstr ""
+
+#. Skin settings: the main colour of the theme
+msgctxt "#31047"
+msgid "Theme colour"
+msgstr ""
+
+#. Skin settings: the highlight colour (selection frame, badges)
+msgctxt "#31048"
+msgid "Highlight colour"
 msgstr ""

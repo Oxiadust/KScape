@@ -28,6 +28,9 @@ class Kind:
     s_no_match = 32098              # empty search results
     has_extra = False               # a second, slower query fills in more (movie cast)
     merges = False                  # duplicate copies can be shown once
+    child_types = ()                # notification item types that change one of ours (a song)
+    collections_xml = 'script-kscape-collections.xml'
+    s_count, s_count_one = 32154, 32155     # "{} movies", "1 movie" (collections heading)
 
     def total(self):
         raise NotImplementedError
@@ -108,6 +111,9 @@ class Music(Kind):
     wall_xml = 'script-kscape-wall-square.xml'
     library = 'music'
     item_type = 'album'
+    child_types = ('song',)
+    collections_xml = 'script-kscape-collections-square.xml'
+    s_count, s_count_one = 32183, 32184
     record = Album
     score_fn = staticmethod(album_score)
     list_spec = L.MUSIC
@@ -146,6 +152,8 @@ class Music(Kind):
 class TV(Kind):
     name = 'tv'
     item_type = 'tvshow'
+    child_types = ('episode',)
+    s_count, s_count_one = 32185, 32186
     record = Show
     score_fn = staticmethod(show_score)
     list_spec = L.TV

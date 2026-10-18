@@ -7,6 +7,7 @@ MAX_CAST = 8
 JSONRPC_PROPERTIES = [
     'title', 'sorttitle', 'year', 'genre', 'director', 'cast', 'set', 'setid', 'tag',
     'art', 'plot', 'runtime', 'file', 'resume', 'playcount', 'streamdetails', 'mpaa',
+    'dateadded', 'lastplayed',
 ]
 # Cast is ~70% of the cost of listing a large library (28 of 41 s for 5,000 movies on the
 # development Mac) and only the shuffle ranking needs it, so it is fetched separately.
@@ -44,6 +45,9 @@ class Movie:
     badge: str = ''
     mpaa: str = ''                 # as scraped, e.g. 'Rated PG-13'
     file: str = ''                 # what Kodi's favourites store for a library movie
+    dateadded: str = ''            # 'YYYY-MM-DD HH:MM:SS', as Kodi reports them (collections)
+    lastplayed: str = ''
+    playcount: int = 0
 
     @property
     def key(self):
@@ -70,6 +74,9 @@ class Movie:
             badge=badge_for(m.get('streamdetails')),
             mpaa=m.get('mpaa') or '',
             file=m.get('file') or '',
+            dateadded=m.get('dateadded') or '',
+            lastplayed=m.get('lastplayed') or '',
+            playcount=int(m.get('playcount') or 0),
         )
 
     def to_cache(self):

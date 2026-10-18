@@ -12,7 +12,7 @@
 		<control type="image">
 			<width>1920</width>
 			<height>1080</height>
-			<texture colordiffuse="30245BD3">fade.png</texture>
+			<texture colordiffuse="kscape_glow">fade.png</texture>
 		</control>
 	</include>
 
@@ -94,6 +94,13 @@
 		<param name="height" default="60"/>
 		<definition>
 			<itemlayout width="$PARAM[width]" height="$PARAM[height]">
+				<control type="image">
+					<description>Checked row of a multi-select dialog (e.g. Add to collection)</description>
+					<width>10</width>
+					<height>$PARAM[height]</height>
+					<texture colordiffuse="kscape_amber">white.png</texture>
+					<visible>ListItem.IsSelected</visible>
+				</control>
 				<control type="label">
 					<left>30</left>
 					<width>$PARAM[width]</width>
@@ -101,6 +108,7 @@
 					<aligny>center</aligny>
 					<font>kscape_menu</font>
 					<textcolor>kscape_text</textcolor>
+					<selectedcolor>kscape_text</selectedcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 				<control type="label">
@@ -111,6 +119,7 @@
 					<aligny>center</aligny>
 					<font>kscape_small</font>
 					<textcolor>kscape_text_dim</textcolor>
+					<selectedcolor>kscape_text_dim</selectedcolor>
 					<label>$INFO[ListItem.Label2]</label>
 				</control>
 			</itemlayout>
@@ -121,6 +130,13 @@
 					<texture colordiffuse="kscape_blue_focus">white.png</texture>
 					<visible>Control.HasFocus($PARAM[id])</visible>
 				</control>
+				<control type="image">
+					<description>Checked row of a multi-select dialog (e.g. Add to collection)</description>
+					<width>10</width>
+					<height>$PARAM[height]</height>
+					<texture colordiffuse="kscape_amber">white.png</texture>
+					<visible>ListItem.IsSelected</visible>
+				</control>
 				<control type="label">
 					<left>30</left>
 					<width>$PARAM[width]</width>
@@ -128,6 +144,7 @@
 					<aligny>center</aligny>
 					<font>kscape_menu</font>
 					<textcolor>white</textcolor>
+					<selectedcolor>white</selectedcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 				<control type="label">
@@ -138,6 +155,7 @@
 					<aligny>center</aligny>
 					<font>kscape_small</font>
 					<textcolor>white</textcolor>
+					<selectedcolor>white</selectedcolor>
 					<label>$INFO[ListItem.Label2]</label>
 				</control>
 			</focusedlayout>
