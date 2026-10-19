@@ -620,3 +620,343 @@ msgstr ""
 msgctxt "#32202"
 msgid "Highlight colour"
 msgstr ""
+
+msgctxt "#32210"
+msgid "Scenes"
+msgstr ""
+
+msgctxt "#32211"
+msgid "Demo Scripts"
+msgstr ""
+
+msgctxt "#32212"
+msgid "{} scenes"
+msgstr ""
+
+msgctxt "#32213"
+msgid "1 scene"
+msgstr ""
+
+msgctxt "#32214"
+msgid "{} demo scripts"
+msgstr ""
+
+msgctxt "#32215"
+msgid "1 demo script"
+msgstr ""
+
+msgctxt "#32216"
+msgid "Mark scene start"
+msgstr ""
+
+msgctxt "#32217"
+msgid "Mark scene end"
+msgstr ""
+
+msgctxt "#32218"
+msgid "Scene start marked at {}. Open the controls again to mark the end."
+msgstr ""
+
+msgctxt "#32219"
+msgid "New scene"
+msgstr ""
+
+msgctxt "#32220"
+msgid "Name: {}"
+msgstr ""
+
+msgctxt "#32221"
+msgid "Start: {}"
+msgstr ""
+
+msgctxt "#32222"
+msgid "End: {}"
+msgstr ""
+
+msgctxt "#32223"
+msgid "Length: {}"
+msgstr ""
+
+msgctxt "#32224"
+msgid "Save"
+msgstr ""
+
+msgctxt "#32225"
+msgid "Description: {}"
+msgstr ""
+
+msgctxt "#32226"
+msgid "Scene start (H:MM:SS)"
+msgstr ""
+
+msgctxt "#32227"
+msgid "Scene end (H:MM:SS)"
+msgstr ""
+
+msgctxt "#32228"
+msgid "Scene name"
+msgstr ""
+
+msgctxt "#32229"
+msgid "The end must come after the start."
+msgstr ""
+
+msgctxt "#32230"
+msgid "A scene must last at least one second."
+msgstr ""
+
+msgctxt "#32231"
+msgid "That is past the end of the video."
+msgstr ""
+
+msgctxt "#32232"
+msgid "That is not a time. Use H:MM:SS, for example 1:02:30."
+msgstr ""
+
+msgctxt "#32233"
+msgid "Scene saved: {}"
+msgstr ""
+
+msgctxt "#32234"
+msgid "Scenes can be made from library movies and TV episodes."
+msgstr ""
+
+msgctxt "#32235"
+msgid "Description"
+msgstr ""
+
+msgctxt "#32236"
+msgid "Edit scene"
+msgstr ""
+
+msgctxt "#32238"
+msgid "The scene is removed from every demo script. The video itself is not touched."
+msgstr ""
+
+msgctxt "#32239"
+msgid "The demo script is removed. Its scenes and the videos stay."
+msgstr ""
+
+msgctxt "#32240"
+msgid "{} scenes are missing and were skipped"
+msgstr ""
+
+msgctxt "#32241"
+msgid "“{}” is missing and was skipped"
+msgstr ""
+
+msgctxt "#32242"
+msgid "Could not play “{}”. Skipped."
+msgstr ""
+
+msgctxt "#32243"
+msgid "Demo finished"
+msgstr ""
+
+msgctxt "#32244"
+msgid "Scene {} of {}"
+msgstr ""
+
+msgctxt "#32245"
+msgid "Demo script name"
+msgstr ""
+
+msgctxt "#32246"
+msgid "Back to normal playback"
+msgstr ""
+
+msgctxt "#32247"
+msgid "Play Scene"
+msgstr ""
+
+msgctxt "#32248"
+msgid "Edit Scene"
+msgstr ""
+
+msgctxt "#32249"
+msgid "Rename Scene"
+msgstr ""
+
+msgctxt "#32250"
+msgid "Add to Demo Script…"
+msgstr ""
+
+msgctxt "#32251"
+msgid "Remove from Demo Script"
+msgstr ""
+
+msgctxt "#32252"
+msgid "Delete Scene"
+msgstr ""
+
+msgctxt "#32253"
+msgid "View Scenes"
+msgstr ""
+
+msgctxt "#32254"
+msgid "Create Scene"
+msgstr ""
+
+msgctxt "#32255"
+msgid "Add Scene to Demo Script…"
+msgstr ""
+
+msgctxt "#32256"
+msgid "Play Demo Script"
+msgstr ""
+
+msgctxt "#32257"
+msgid "Edit Demo Script"
+msgstr ""
+
+msgctxt "#32258"
+msgid "Rename Demo Script"
+msgstr ""
+
+msgctxt "#32259"
+msgid "Duplicate Demo Script"
+msgstr ""
+
+msgctxt "#32260"
+msgid "Delete Demo Script"
+msgstr ""
+
+msgctxt "#32261"
+msgid "New demo script…"
+msgstr ""
+
+msgctxt "#32262"
+msgid "Copy of {}"
+msgstr ""
+
+msgctxt "#32263"
+msgid "Cut"
+msgstr ""
+
+msgctxt "#32264"
+msgid "Fade to black"
+msgstr ""
+
+msgctxt "#32265"
+msgid "Black pause"
+msgstr ""
+
+msgctxt "#32266"
+msgid "Transition: {}"
+msgstr ""
+
+msgctxt "#32267"
+msgid "Transition length: {} s"
+msgstr ""
+
+msgctxt "#32268"
+msgid "Play once"
+msgstr ""
+
+msgctxt "#32269"
+msgid "Loop the script"
+msgstr ""
+
+msgctxt "#32270"
+msgid "Loop one scene: {}"
+msgstr ""
+
+msgctxt "#32271"
+msgid "Loop: {}"
+msgstr ""
+
+msgctxt "#32272"
+msgid "Which scene loops?"
+msgstr ""
+
+msgctxt "#32273"
+msgid "Done"
+msgstr ""
+
+msgctxt "#32274"
+msgid "Previous scene"
+msgstr ""
+
+msgctxt "#32275"
+msgid "Next scene"
+msgstr ""
+
+msgctxt "#32276"
+msgid "Keep watching"
+msgstr ""
+
+msgctxt "#32277"
+msgid "Not in the library"
+msgstr ""
+
+msgctxt "#32278"
+msgid "Preview Scene"
+msgstr ""
+
+msgctxt "#32279"
+msgid "Move up"
+msgstr ""
+
+msgctxt "#32280"
+msgid "Move down"
+msgstr ""
+
+msgctxt "#32281"
+msgid "Add scenes…"
+msgstr ""
+
+msgctxt "#32282"
+msgid "This demo script has no scenes yet"
+msgstr ""
+
+msgctxt "#32283"
+msgid "No scenes yet"
+msgstr ""
+
+msgctxt "#32284"
+msgid "During a movie or episode, open the controls and choose Mark scene start."
+msgstr ""
+
+msgctxt "#32285"
+msgid "No demo scripts yet"
+msgstr ""
+
+msgctxt "#32286"
+msgid "Press C on this tab and choose New demo script…."
+msgstr ""
+
+msgctxt "#32287"
+msgid "Choose a scene"
+msgstr ""
+
+msgctxt "#32288"
+msgid "Demo scripts for “{}”"
+msgstr ""
+
+msgctxt "#32289"
+msgid "Play"
+msgstr ""
+
+msgctxt "#32290"
+msgid "Duplicate"
+msgstr ""
+
+msgctxt "#32291"
+msgid "Delete"
+msgstr ""
+
+msgctxt "#32292"
+msgid "Edit…"
+msgstr ""
+
+msgctxt "#32293"
+msgid "Moments saved from your videos"
+msgstr ""
+
+msgctxt "#32294"
+msgid "Scenes played one after another"
+msgstr ""
+
+msgctxt "#32295"
+msgid "Undo shuffle"
+msgstr ""

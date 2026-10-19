@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includes>
+	<!-- Playback controls: the title line names the scene during scenes and Demo Scripts. -->
+	<variable name="OSDTitleLabel">
+		<value condition="!String.IsEmpty(Window(Home).Property(kscape.demo.active))">$INFO[Window(Home).Property(kscape.demo.scene)]$INFO[Window(Home).Property(kscape.demo.title),  ·  ]</value>
+		<value>$INFO[VideoPlayer.Title]$INFO[VideoPlayer.Year,  (,)]</value>
+	</variable>
+	<variable name="OSDSceneLabel">
+		<value condition="!String.IsEmpty(Window(Home).Property(kscape.scene.start))">$ADDON[script.kscape.wall 32217]</value>
+		<value>$ADDON[script.kscape.wall 32216]</value>
+	</variable>
+
 	<!-- Skin settings: the colour theme, as script.kscape.wall last recorded it (default until then). -->
 	<variable name="KScapeColourMainLabel">
 		<value condition="!String.IsEmpty(Skin.String(KScapeColourMain))">$INFO[Skin.String(KScapeColourMain)]</value>

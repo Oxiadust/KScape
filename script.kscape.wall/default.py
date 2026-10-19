@@ -7,6 +7,9 @@ RunScript(script.kscape.wall,<kind>,collections) that library's Collections view
 RunScript(script.kscape.wall,music,nowplaying)   Now Playing
 RunScript(script.kscape.wall,switchskin)         choose another installed skin and switch to it
 RunScript(script.kscape.wall,colours,<part>)     part: main or highlight - pick a theme colour
+RunScript(script.kscape.wall,scene,mark)         playback controls: mark a scene's start, then end
+RunScript(script.kscape.wall,demo,<cmd>)         cmd: next, prev, exit (keep watching) or stop -
+                                                 passed to the scene playback service
 
 One view at a time: a second request while a view is on screen is ignored; a request made from
 Home while views are still open underneath it closes them first (modal.py).
@@ -53,6 +56,14 @@ def now_playing():
 
 
 def main(args):
+    if args[:2] == ['scene', 'mark']:
+        from resources.lib import scenes
+        scenes.mark()
+        return
+    if args[:1] == ['demo'] and len(args) > 1:
+        from resources.lib.demoservice import request
+        request(args[1])
+        return
     if args[:1] == ['colours']:
         from resources.lib import colours
         colours.choose(args[1] if len(args) > 1 else 'main')

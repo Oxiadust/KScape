@@ -3,8 +3,9 @@
 A cinematic skin for Kodi 21 (Omega), built around an edge-to-edge wall of covers you glide
 across with a remote. Pause on a movie, album or TV show and its synopsis appears, then related
 titles shuffle into place around it. Movies, Music and TV Shows each have a cover wall, a list
-view and Collections; music adds Now Playing. Kodi's own favourites and a search scoped to each
-library are one press of C away.
+view and Collections; music adds Now Playing. Bookmark scenes in movies and episodes and chain
+them into Demo Scripts that play from movie to movie by themselves. Kodi's own favourites and a
+search scoped to each library are one press of C away.
 
 KScape is built only from Kodi's own skinning and Python APIs and your own library artwork.
 
@@ -108,6 +109,40 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   - **Left/Right** choose a collection, **Up** enters its titles, **Select** on a tab opens it as
     the cover wall (C: as the list view), **Select** on a title opens it (movie info, album,
     show), **Play** plays it, **Down** past the last one or **Back** return to the tabs.
+- **Scenes and Demo Scripts** (movies and TV episodes), after Kaleidescape's scene bookmarks and
+  scripted demos.
+  - *Making a scene*: during a library movie or episode, open the controls (**OK / Menu**) and
+    choose **Mark scene start**; later (keep watching or seek) choose **Mark scene end**. Playback
+    pauses and the scene editor opens: name, start, end (typed as H:MM:SS, so they can be
+    adjusted), the length, an optional description. Save checks the times (the end must come
+    after the start, at least a second, within the video). The movie's own C menu offers the
+    same as **Create Scene** while it plays. Scenes point at the library file and are never
+    copied; they are kept in the add-on's profile folder (`scenes.json`), apart from Kodi's
+    metadata.
+  - *The Scenes collection* (built in, after Played, in the Movies and TV Shows Collections):
+    every scene, grouped by movie (or episode) in order, with its artwork, the scene name, the
+    movie and the length. **Select** or **Play** plays the scene from its start and stops at
+    its end. **C**: Play / Edit / Rename Scene, Add to Demo Script… (one or several), Delete
+    Scene. A movie's (or show's) C menu offers **View Scenes** and **Add Scene to Demo Script…**
+    when it has scenes.
+  - *The Demo Scripts collection* (built in, next to Scenes): ordered playlists of scenes from
+    any movies and episodes. **C** on the tab: New demo script…; on a script: Play, Edit,
+    Rename, Duplicate, Delete Demo Script (scenes and videos stay). **Select** opens the
+    script's screen: its cover, how many scenes and how long, its playback options and
+    description, **Play / Edit… / Duplicate / Delete**, and the scenes in order - **Select** on
+    one plays the script from there; **C** on one: Preview Scene, Move up / down, Remove from
+    Demo Script (the scene stays), Add scenes….
+  - *Playback options* (Edit…): transition - **Cut**, **Fade to black** or **Black pause**, with
+    its length (0.5-8 s) - and **Play once**, **Loop the script** or **Loop one scene** (that
+    scene repeats until you press Next).
+  - *Playing a script*: KScape opens the first movie straight at the scene's start, plays to its
+    end, moves to the next movie and scene, and so on, with no input. **Play/Pause** and **Stop**
+    work as usual; the remote's **Next / Previous** (or **Next scene / Previous scene** in the
+    controls) move between scenes; **Keep watching** in the controls, or seeking outside the
+    scene, leaves demo mode and the movie plays on normally. The controls show the scene, the
+    movie and "Scene 2 of 4"; nothing is drawn over the movie otherwise. Missing files are
+    skipped (and said so). Watching scenes does not leave resume points or play counts behind:
+    KScape puts back what they were.
 - **Search.** From the C menu. Kodi's on-screen keyboard (KScape-styled) asks what to look for;
   results open as a list view of that library only - movies match titles, then cast and
   directors; albums match album and artist (then genre); shows match titles, then cast - with a
@@ -123,11 +158,12 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
 | Arrows | Move across the wall (stops at the edges, no wrap-around) |
 | Select / Enter | Open the movie info screen |
 | Play | Play the movie (resumes from the last position if there is one) |
-| Back / Esc | Undo the last shuffle; with nothing left to undo, leave the wall |
-| Menu / C / Info | Menu: **Add to / Remove from Favourites** (labelled for the selected item), **Search…**, **Add to collection…**, then list view, shuffle now, automatic shuffle on/off, reduce motion on/off, show duplicates once on/off (movies), **Favourites** (the wall of your favourites), reload library, switch skin, exit |
+| Back / Esc | Leave the wall, straight back to Home (the shuffles can be undone from the menu) |
+| Menu / C / Info | Menu: **Add to / Remove from Favourites** (labelled for the selected item), **Search…**, **Add to collection…**, then **Undo shuffle** (after a shuffle), list view, shuffle now, automatic shuffle on/off, reduce motion on/off, show duplicates once on/off (movies), **Favourites** (the wall of your favourites), reload library, switch skin, exit |
 
 In the **list view**: Up/Down move through items, Left/Right between columns, Select opens the
-info, album or show screen, Play plays, Back returns to the cover wall on the same item, and
+info, album or show screen, Play plays, Back goes back to Home (or, when the list was opened
+from the wall's menu, returns to the wall on the same item), and
 Menu offers favourites / search / cover wall / switch skin / exit. The view you were in is
 remembered across restarts, per library.
 
@@ -140,6 +176,10 @@ offers favourites (for the playing album) and search.
 
 Leaving a view with the remote's Home key (or a long press on Back) while a movie plays no longer
 blocks the libraries: the view left open underneath is closed when you next open one from Home.
+
+During a scene or Demo Script the controls also offer **Previous scene / Next scene / Keep watching**
+(the remote's Next / Previous skip scenes too); otherwise **Mark scene start / end** for library
+movies and episodes.
 
 During playback: **OK / Menu** opens the controls, **Info** shows the movie's details, **Back** closes them,
 and the usual Kodi playback keys (pause, seek, stop) keep working.
@@ -229,7 +269,7 @@ bouncier settle), sizes and the pool size live in
    departing ones out and flies every new cover from its previous position (or the nearest
    screen edge) into place, with staggered timing and a mid-flight shrink.
 
-Back undoes shuffles from a history stack.
+**C → Undo shuffle** steps back through the shuffles (a history stack); Back leaves the wall.
 
 ## Project layout
 
@@ -246,9 +286,13 @@ script.kscape.wall/       The wall add-on: movies, music and TV (Python + window
                           show screens), listwindow (list view), nowplaying, collectionmodel
                           (pure), collectionui and collectionwindow (collections), modal (the
                           open windows, closed when Home asks for another view), colours
-                          (the colour theme pickers)
+                          (the colour theme pickers), scenemodel (pure), scenes (scene and
+                          script actions), demowindow (a Demo Script's screen), demoservice
+                          (the playback service: timed scenes, transitions, metadata restore)
+  service.py              starts demoservice with Kodi (the add-on is also a service)
   tests/                  unit tests for ranking, placement, badges, info text, list sorting,
-                          albums, shows, favourites, search, collections, colour themes
+                          albums, shows, favourites, search, collections, colour themes,
+                          scenes and Demo Scripts
 tools/
   gen_wall_xml.py         generates the wall window XMLs (poster, square) from geometry.py (do
                           not hand-edit the XML)
@@ -302,6 +346,20 @@ add-on's window XML and Python are re-read each time a view opens).
 - Favourites cover movies, albums and TV shows (the items the walls show), not single songs or
   episodes. A movie is a favourite by its file, as Kodi stores it, so a favourite added for one
   copy of a merged duplicate counts for the cover.
+- Scenes and Demo Scripts are played by a service (part of `script.kscape.wall`, starting with
+  Kodi): the skin alone cannot stop a video at a given time. After installing or updating the
+  add-on, restart Kodi once so the service starts.
+  - *Fade to black* fades the picture (a black layer over the paused last frame, then off the
+    next scene); Kodi offers no audio fade, so the sound cuts. During a transition's black screen
+    the remote talks to that black layer: Back or Stop there end the demo.
+  - Scenes start where Kodi can open the file: with sparse keyframes a scene may begin a moment
+    before its saved start. A scene counts as started only once playback is inside it; one that
+    cannot be reached within 15 s is skipped.
+  - Scene artwork is the movie's poster or the show's (Kodi gives add-ons no way to capture a
+    video frame).
+  - A demo interrupted by quitting Kodi is not resumed; on the next start KScape puts back the
+    resume points and play counts it changed.
+  - Seeking outside the playing scene is taken as leaving demo mode (the movie plays on).
 - Paused and Played dates are Kodi's "last played" date (Kodi keeps no separate date for a
   resume point). Music has no Paused collection. An album renamed or re-tagged (new artist or
   title) drops out of your collections, as they store albums by artist and title. Your own collections are reordered with Move in

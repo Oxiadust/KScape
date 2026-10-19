@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Demo Script transitions: black over the video, faded in and out by demoservice.py (it sets the
+     image's Visible / Hidden animations to the transition's length). -->
+<window type="dialog">
+	<defaultcontrol>10</defaultcontrol>
+	<controls>
+		<control type="image" id="10">
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="FF000000">kscape-white.png</texture>
+		</control>
+	</controls>
+</window>

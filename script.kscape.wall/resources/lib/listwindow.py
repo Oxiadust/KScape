@@ -21,6 +21,7 @@ import xbmcgui
 
 from . import listmodel as L
 from . import collectionui, menu, modal
+from . import scenes as S
 from .search import search
 
 ADDON = xbmcaddon.Addon('script.kscape.wall')
@@ -59,6 +60,7 @@ class ListWindow(xbmcgui.WindowXML):
         self.collection = kwargs.get('collection')   # listing this collection's movies
         self.copies = kwargs.get('copies') or (lambda m: [m])   # duplicate copies a row stands for
         self.result = 'wall'                     # 'wall', 'exit' or 'skin' once closed
+        self.back = kwargs.get('back') or 'wall'  # what Back does: 'wall', or 'exit' (to Home)
         self.focus_id = self.start_id            # key of the item under the band when closed
 
     def onInit(self):
@@ -189,7 +191,7 @@ class ListWindow(xbmcgui.WindowXML):
                 _set('col', self.col)
                 _set('off', L.scroll_for(self.col, self.spec))
             elif aid in BACK:
-                self._close('wall')
+                self._close(self.back if self.query is None else 'wall')
             elif aid in MENU:
                 follow = self._menu()
             elif aid in PLAY:
@@ -200,6 +202,9 @@ class ListWindow(xbmcgui.WindowXML):
             self._search()
         elif follow and follow[0] == 'play':
             self.kind.play(follow[1])
+        elif follow and follow[0] == 'scenes':
+            from .collectionwindow import show_collections
+            show_collections(self.kind, cid='scenes', focus=follow[1])
 
     def _collapse(self):
         self.moved = time.time()
@@ -245,6 +250,10 @@ class ListWindow(xbmcgui.WindowXML):
         else:
             entries = [('wall', tr(32066))]                   # Return
         row = self._current()
+        scene_store = S.store() if row and self.kind.name in S.MEDIA_OF_KIND else None
+        if row:
+            for e in reversed(S.item_entries(self.kind, row.movie, scene_store)):
+                entries.insert(0, e)
         if row and self.store is not None:
             entries.insert(0, ('collect', tr(collectionui.S_COLLECT)))
             if self.collection is not None and self.store.get(self.collection):
@@ -259,6 +268,10 @@ class ListWindow(xbmcgui.WindowXML):
         elif choice == 'uncollect':
             self.store.remove(self.collection, self._files(row.movie))
             self._drop_uncollected()
+        elif choice in S.ITEM_CHOICES:
+            focus = S.handle_item_choice(self.kind, row.movie, choice, scene_store)
+            if focus:
+                return ('scenes', focus)
         elif choice == 'search':
             return 'search'
         elif choice:
@@ -333,14 +346,14 @@ class ListWindow(xbmcgui.WindowXML):
 
 
 def show_list(kind, movies, focus, favs=None, query=None, library=None, store=None, collection=None,
-              copies=None):
+              copies=None, back='wall'):
     """Run the list view for `kind` (or search results, with `query`; `library` is what a new
     search searches; `store` the movie collections, `collection` the one listed, if any).
     Returns (result, key of the item under the band)."""
     menu.wait_for_dialogs()
     window = ListWindow(kind.list_spec.xml, ADDON.getAddonInfo('path'), 'Default', '1080i',
                         kind=kind, movies=movies, focus=focus, favs=favs, query=query, library=library,
-                        store=store, collection=collection, copies=copies)
+                        store=store, collection=collection, copies=copies, back=back)
     modal.run(window)
     result, focus_id = window.result, window.focus_id
     del window

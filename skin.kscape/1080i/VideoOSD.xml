@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Playback controls (OK / Menu during a movie). Audio and subtitles cycle in place, because
-     KScape has no audio/subtitle settings dialogs to open. -->
+     KScape has no audio/subtitle settings dialogs to open.
+     Scenes (script.kscape.wall): Mark scene start / end for a library movie or episode. During a
+     scene or Demo Script (Home property kscape.demo.active, set by the add-on's service) the
+     title line names the scene and its movie, the line above it the script and scene progress,
+     and Previous scene / Next scene / Keep watching (leave demo mode, play on) replace the audio
+     and subtitle buttons. -->
 <window>
 	<defaultcontrol always="true">101</defaultcontrol>
 	<depth>DepthOSD</depth>
@@ -21,7 +26,18 @@
 				<height>56</height>
 				<font>kscape_panel_title</font>
 				<textcolor>FFFFFFFF</textcolor>
-				<label>$INFO[VideoPlayer.Title]$INFO[VideoPlayer.Year,  (,)]</label>
+				<label>$VAR[OSDTitleLabel]</label>
+			</control>
+			<control type="label">
+				<description>Demo Script and scene progress (only while scenes play)</description>
+				<left>120</left>
+				<top>748</top>
+				<width>1680</width>
+				<height>30</height>
+				<font>kscape_badge</font>
+				<textcolor>kscape_amber</textcolor>
+				<label>$INFO[Window(Home).Property(kscape.demo.script),,  ·  ]$INFO[Window(Home).Property(kscape.demo.progress)]</label>
+				<visible>!String.IsEmpty(Window(Home).Property(kscape.demo.active))</visible>
 			</control>
 			<control type="label">
 				<left>1500</left>
@@ -75,24 +91,52 @@
 					<onclick>PlayerControl(Play)</onclick>
 				</control>
 				<control type="button" id="102">
-					<include content="OSDButton"><param name="width" value="200"/></include>
+					<include content="OSDButton"><param name="width" value="180"/></include>
 					<label>$LOCALIZE[31022]</label>
 					<onclick>Seek(-30)</onclick>
 				</control>
 				<control type="button" id="103">
-					<include content="OSDButton"><param name="width" value="200"/></include>
+					<include content="OSDButton"><param name="width" value="180"/></include>
 					<label>$LOCALIZE[31023]</label>
 					<onclick>Seek(30)</onclick>
 				</control>
 				<control type="button" id="104">
-					<include content="OSDButton"><param name="width" value="330"/></include>
+					<include content="OSDButton"><param name="width" value="270"/></include>
 					<label>$VAR[OSDAudioLabel]</label>
 					<onclick>Action(AudioNextLanguage)</onclick>
+					<visible>String.IsEmpty(Window(Home).Property(kscape.demo.active))</visible>
 				</control>
 				<control type="button" id="105">
-					<include content="OSDButton"><param name="width" value="330"/></include>
+					<include content="OSDButton"><param name="width" value="270"/></include>
 					<label>$VAR[OSDSubtitleLabel]</label>
 					<onclick>Action(CycleSubtitle)</onclick>
+					<visible>String.IsEmpty(Window(Home).Property(kscape.demo.active))</visible>
+				</control>
+				<control type="button" id="107">
+					<include content="OSDButton"><param name="width" value="230"/></include>
+					<label>$ADDON[script.kscape.wall 32274]</label>
+					<onclick>RunScript(script.kscape.wall,demo,prev)</onclick>
+					<visible>!String.IsEmpty(Window(Home).Property(kscape.demo.active))</visible>
+				</control>
+				<control type="button" id="108">
+					<include content="OSDButton"><param name="width" value="230"/></include>
+					<label>$ADDON[script.kscape.wall 32275]</label>
+					<onclick>RunScript(script.kscape.wall,demo,next)</onclick>
+					<visible>!String.IsEmpty(Window(Home).Property(kscape.demo.active))</visible>
+				</control>
+				<control type="button" id="109">
+					<include content="OSDButton"><param name="width" value="250"/></include>
+					<label>$ADDON[script.kscape.wall 32276]</label>
+					<onclick>RunScript(script.kscape.wall,demo,exit)</onclick>
+					<visible>!String.IsEmpty(Window(Home).Property(kscape.demo.active))</visible>
+				</control>
+				<control type="button" id="110">
+					<description>Scenes: mark the start, then the end (library movies and episodes)</description>
+					<include content="OSDButton"><param name="width" value="280"/></include>
+					<label>$VAR[OSDSceneLabel]</label>
+					<onclick>Dialog.Close(videoosd)</onclick>
+					<onclick>RunScript(script.kscape.wall,scene,mark)</onclick>
+					<visible>String.IsEmpty(Window(Home).Property(kscape.demo.active)) + !String.IsEmpty(VideoPlayer.DBID) + [VideoPlayer.Content(movies) | VideoPlayer.Content(episodes)] + System.AddonIsEnabled(script.kscape.wall)</visible>
 				</control>
 				<control type="button" id="106">
 					<include content="OSDButton"><param name="width" value="200"/></include>

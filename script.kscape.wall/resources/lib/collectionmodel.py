@@ -23,7 +23,13 @@ import re
 from datetime import datetime, timedelta
 
 BUILTIN = ('new', 'paused', 'played')
-BUILTINS = {'movies': BUILTIN, 'music': ('new', 'played'), 'tv': BUILTIN}
+SPECIAL = ('scenes', 'demos')        # built in too, but listing scenes and Demo Scripts (scenes.py)
+BUILTINS = {'movies': BUILTIN + SPECIAL, 'music': ('new', 'played'), 'tv': BUILTIN + SPECIAL}
+
+
+def is_builtin(cid):
+    """Built-in collections cannot be renamed, deleted or filled by hand."""
+    return cid in BUILTIN or cid in SPECIAL
 DEFAULT_NEW_DAYS = 30
 NEW_DAYS_CHOICES = (7, 14, 30, 60, 90, 180)
 DATE_RE = re.compile(r'(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?')

@@ -26,6 +26,7 @@ import xbmcvfs
 
 from . import geometry as G
 from . import cache, collectionui, menu, modal, state
+from . import scenes as S
 from .favourites import Favourites
 from .info import estimate_lines
 from .library import rpc
@@ -246,6 +247,7 @@ class WallWindow(xbmcgui.WindowXML):
         self.favs_seen = self.favs.version
         self.favs_checked = time.time()
         self.store = collectionui.store(self.kind)
+        self.scenes = S.store() if self.kind.name in S.MEDIA_OF_KIND else None
         self.new_days = collectionui.new_days()
 
         self.wall = Wall.column_major([], layout=self.lay)
@@ -288,7 +290,7 @@ class WallWindow(xbmcgui.WindowXML):
         if self.start_view and not self.filtered:
             state.save(**{view_key(self.kind): self.start_view})
         if view == 'list' and items:
-            self._open_list()             # chosen from Home, or in use when Kodi last closed
+            self._open_list(back_home=True)   # chosen from Home, or in use when Kodi last closed
 
     def _show_status(self):
         """Loading done: an empty library or empty favourites says so; otherwise no status."""
@@ -339,10 +341,7 @@ class WallWindow(xbmcgui.WindowXML):
                     self._remember(item)
                     overlay = 'play'
             elif aid in BACK:
-                if self.history:
-                    self._undo()
-                else:
-                    self._close()
+                self._close()                     # one press back to Home (C -> Undo shuffle undoes)
             elif aid in MENU:
                 overlay = self._menu()
         # Opened outside the lock: the wall's background work waits on `paused`, not the lock.
@@ -356,6 +355,8 @@ class WallWindow(xbmcgui.WindowXML):
             self._search()
         elif overlay == 'favourites':
             self._open_favourites()
+        elif overlay == 'scenes':
+            self._view_scenes()
 
     # ---- overlays: info screen, list view, search -------------------------------------------
 
@@ -381,7 +382,9 @@ class WallWindow(xbmcgui.WindowXML):
         if follow == 'search':
             self._search()
 
-    def _open_list(self):
+    def _open_list(self, back_home=False):
+        """The list view over the wall. Opened as the view itself (from Home), Back there goes
+        straight back to Home; opened from the wall's menu, Back returns to the wall."""
         with self.lock:
             current = self.wall.at(*self.focus)
             items = self._visible(self.all_movies)          # library order, whatever the wall's
@@ -390,7 +393,8 @@ class WallWindow(xbmcgui.WindowXML):
         library = self.kind.visible(self.all_movies, self.merge)
         result, key = self._covered(lambda: show_list(self.kind, items, current.key if current else None,
                                                       self.favs, library=library, store=self.store,
-                                                      collection=self.collection, copies=self._copies))
+                                                      collection=self.collection, copies=self._copies,
+                                                      back='exit' if back_home else 'wall'))
         self._after_favourites()
         self._after_collections()
         with self.lock:
@@ -410,6 +414,14 @@ class WallWindow(xbmcgui.WindowXML):
                     self._close()
             elif result == 'exit':
                 self._close()
+
+    def _view_scenes(self):
+        """View Scenes: the Collections view on the Scenes tab, at this title's first scene."""
+        from .collectionwindow import show_collections
+        skin = self._covered(lambda: show_collections(self.kind, cid='scenes', focus=self.scene_focus))
+        if skin:
+            self.pending_skin = skin
+            self._close()
 
     def _open_favourites(self):
         """The cover wall of just this library's favourites, over this one; Back returns here."""
@@ -673,6 +685,8 @@ class WallWindow(xbmcgui.WindowXML):
         on_off = lambda flag: tr(32030 if flag else 32031)
         item = self.wall.at(*self.focus)
         entries = []
+        if self.history:
+            entries.append(('undo', tr(32295)))
         if item:
             entries += [
                 ('list', tr(32071)),
@@ -683,6 +697,8 @@ class WallWindow(xbmcgui.WindowXML):
             if self.kind.merges:
                 entries.append(('merge', tr(32029).format(on_off(self.merge))))
         if item:
+            for e in reversed(S.item_entries(self.kind, item, self.scenes)):
+                entries.insert(0, e)
             entries.insert(0, ('collect', tr(collectionui.S_COLLECT)))
             if self.collection is not None and self.store.get(self.collection):
                 entries.insert(1, ('uncollect', tr(32165).format(collectionui.name_of(self.collection, self.store))))
@@ -698,10 +714,17 @@ class WallWindow(xbmcgui.WindowXML):
         self.last_input = time.time()
         if choice == 'favourite':
             self._toggle_favourite(item)
+        elif choice == 'undo':
+            if self.history:
+                self._undo()
         elif choice == 'collect':
             self._collect(item)
         elif choice == 'uncollect':
             self._uncollect(item)
+        elif choice in S.ITEM_CHOICES:
+            self.scene_focus = S.handle_item_choice(self.kind, item, choice, self.scenes)
+            if self.scene_focus:
+                return 'scenes'
         elif choice in ('search', 'list', 'favourites'):
             return choice
         elif choice == 'shuffle':

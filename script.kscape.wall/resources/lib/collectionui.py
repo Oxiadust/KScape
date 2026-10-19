@@ -11,7 +11,7 @@ from . import collectionmodel as C
 
 ADDON = xbmcaddon.Addon('script.kscape.wall')
 FOLDER = xbmcvfs.translatePath('special://profile/addon_data/script.kscape.wall/')
-NAMES = {'new': 32151, 'paused': 32152, 'played': 32153}
+NAMES = {'new': 32151, 'paused': 32152, 'played': 32153, 'scenes': 32210, 'demos': 32211}
 S_NEW_COLLECTION = 32158
 S_COLLECT = 32164
 S_NAME = 32169
