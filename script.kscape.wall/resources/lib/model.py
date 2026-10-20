@@ -2,7 +2,10 @@
 from dataclasses import asdict, dataclass
 from typing import FrozenSet, Tuple
 
+import re
+
 from . import streaminfo as SI
+from . import versions as V
 
 MAX_CAST = 8
 
@@ -60,6 +63,14 @@ class Movie:
     rt: int = 0                    # Rotten Tomatoes Tomatometer, percent
     imdb: str = ''                 # IMDb id, for an optional ratings lookup (ratings.py)
     setname: str = ''
+    stereo: bool = False           # the file is 3D
+    uid: str = ''                  # 'tmdb:603' / 'imdb:tt0133093': what makes copies one film
+    versions: Tuple[V.Version, ...] = ()   # Kodi's versions of this movie (two or more), or merged copies
+
+    @property
+    def formats(self):
+        """'4K', '1080p', '720p', '3D', 'SD' / 'DVD' this movie is available in (every version)."""
+        return V.formats(self.versions, self.resolution, self.stereo, self.file)
 
     @property
     def key(self):
@@ -98,6 +109,8 @@ class Movie:
             rt=SI.rt_percent(m.get('ratings')),
             imdb=(m.get('uniqueid') or {}).get('imdb') or '',
             setname=m.get('set') or '',
+            stereo=SI.stereo(m.get('streamdetails')),
+            uid=uid_of(m.get('uniqueid')),
         )
 
     def to_cache(self):
@@ -106,43 +119,110 @@ class Movie:
             d[key] = sorted(d[key])
         for key in ('cast', 'country', 'audio'):
             d[key] = list(d[key])
+        d['versions'] = [v.to_cache() for v in self.versions]
         return d
 
     @classmethod
     def from_cache(cls, d):
         return cls(**dict(d, genres=frozenset(d['genres']), directors=frozenset(d['directors']),
                           tags=frozenset(d['tags']), cast=tuple(d['cast']),
-                          country=tuple(d.get('country') or ()), audio=tuple(d.get('audio') or ())))
+                          country=tuple(d.get('country') or ()), audio=tuple(d.get('audio') or ()),
+                          versions=tuple(V.Version.from_cache(v) for v in d.get('versions') or ())))
 
     def looks_same(self, other):
         """True when the cover would render identically (cast-only changes are invisible)."""
-        return (self.poster, self.badge, self.title, self.year) == \
-               (other.poster, other.badge, other.title, other.year)
+        return (self.poster, self.badge, self.formats, self.title, self.year) == \
+               (other.poster, other.badge, other.formats, other.title, other.year)
+
+
+def uid_of(uniqueid):
+    """The film's stable id: TMDB, else IMDb ('' without either)."""
+    u = uniqueid or {}
+    if u.get('tmdb'):
+        return f'tmdb:{u["tmdb"]}'
+    if u.get('imdb'):
+        return f'imdb:{u["imdb"]}'
+    return ''
 
 
 BADGE_RANK = {'HDR': 2, 'UHD': 1, '': 0}
+EDITION = re.compile(r"(director'?s[ ._-]?cut|extended|unrated|uncut|theatrical|remastered|imax|"
+                     r"final[ ._-]?cut|special[ ._-]?edition|ultimate|criterion|redux|open[ ._-]?matte)",
+                     re.IGNORECASE)
+
+
+def edition_of(movie):
+    """Edition named in the title or file name ('directors cut', 'extended'...), '' if none: two
+    copies of one film in different editions stay apart."""
+    found = EDITION.findall(f'{movie.title} {movie.file}')
+    return ' '.join(sorted({re.sub(r'[^a-z]', '', f.lower()) for f in found}))
+
+
+def _film_key(movie):
+    """The cheap part of _title_key: TMDB / IMDb id, title and year (no edition)."""
+    uid = getattr(movie, 'uid', '')
+    if not uid:
+        return ('item', movie.key)
+    return (uid, ' '.join(movie.title.casefold().split()), movie.year)
 
 
 def _title_key(movie):
-    return (' '.join(movie.title.casefold().split()), movie.year)
+    """What separate library entries of one film share: the same TMDB / IMDb id, title, year and
+    edition. Entries without such an id never match another (titles alone are not enough)."""
+    k = _film_key(movie)
+    return k if k[0] == 'item' else k + (edition_of(movie),)
+
+
+def copy_groups(movies):
+    """Library entries of one film together, in library order ([[movie, ...], ...]): grouped by
+    _title_key, with the edition (a regex over title and file) only worked out for films that
+    have several entries - a library is mostly single copies."""
+    first, order = {}, []
+    for m in movies:
+        k = _film_key(m)
+        if k not in first:
+            first[k] = []
+            order.append(k)
+        first[k].append(m)
+    groups = []
+    for k in order:
+        group = first[k]
+        if len(group) == 1:
+            groups.append(group)
+            continue
+        by_edition = {}
+        for m in group:
+            by_edition.setdefault(edition_of(m), []).append(m)
+        groups.extend(by_edition.values())
+    position = {id(g[0]): i for i, g in enumerate(groups)}
+    return sorted(groups, key=lambda g: position[id(g[0])])
+
+
+def copy_versions(m, default=False):
+    """The versions a library entry brings to a merged film: its own (Kodi's) versions, or itself
+    (the kept copy counts as the default version)."""
+    if m.versions:
+        return m.versions
+    return (V.Version(movieid=m.movieid, file=m.file, name='', resolution=m.resolution, hdr=m.hdr,
+                      audio=m.audio, stereo=m.stereo, resume=m.resume_position, default=default),)
 
 
 def merge_duplicates(movies):
-    """One movie per title and year, in the original order.
+    """One cover per film, in the original order: separate library entries of one film (see
+    _title_key) are shown once. Kodi's own versions are already one movie each.
 
     The copy kept is the one with a resume point, then the best quality badge, then one with a
-    poster, then the lowest movie id, so the choice is stable.
+    poster, then the lowest movie id, so the choice is stable. It carries every copy's versions,
+    so its badges list all formats and Play Version offers them all.
     """
-    best = {}
-    order = []
-    for m in movies:
-        key = _title_key(m)
-        if key not in best:
-            order.append(key)
-            best[key] = m
+    from dataclasses import replace
+    rank = lambda x: (x.resume_position > 0, BADGE_RANK.get(x.badge, 0), bool(x.poster), -x.movieid)
+    out = []
+    for group in copy_groups(movies):
+        if len(group) == 1:
+            out.append(group[0])
             continue
-        cur = best[key]
-        rank = lambda x: (x.resume_position > 0, BADGE_RANK.get(x.badge, 0), bool(x.poster), -x.movieid)
-        if rank(m) > rank(cur):
-            best[key] = m
-    return [best[k] for k in order]
+        best = max(group, key=rank)
+        merged = tuple(v for m in group for v in copy_versions(m, m is best))
+        out.append(replace(best, versions=merged))
+    return out

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodi contract (file / folder browser: Add media source → Browse, Install from zip, every
+     folder or file picker in Settings): 411 heading, 450 list view, 451 thumbnail view (pictures),
+     412 current path, 413 OK, 414 Cancel, 415 Make new folder, 416 Flip (pictures), 60 scrollbar.
+     Without this window Kodi crashes when a browser opens. 9000 grouplist is skin-side. -->
+<window>
+	<defaultcontrol always="true">450</defaultcontrol>
+	<depth>DepthDialog</depth>
+	<controls>
+		<control type="group">
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>DialogDim</include>
+			<control type="group">
+				<left>310</left>
+				<top>115</top>
+				<include>PanelOpenClose</include>
+				<include content="SystemPanel">
+					<param name="width" value="1300"/>
+					<param name="height" value="850"/>
+					<param name="title"></param>
+				</include>
+				<control type="label" id="411">
+					<description>Heading, set by Kodi</description>
+					<left>30</left>
+					<width>1240</width>
+					<height>64</height>
+					<aligny>center</aligny>
+					<font>kscape_info_head</font>
+					<textcolor>white</textcolor>
+				</control>
+				<control type="image">
+					<left>30</left>
+					<top>90</top>
+					<width>920</width>
+					<height>680</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+				</control>
+				<control type="list" id="450">
+					<description>Folders and files</description>
+					<left>30</left>
+					<top>90</top>
+					<width>900</width>
+					<height>680</height>
+					<onleft>9000</onleft>
+					<onright>60</onright>
+					<onup>450</onup>
+					<ondown>450</ondown>
+					<pagecontrol>60</pagecontrol>
+					<scrolltime>200</scrolltime>
+					<itemlayout width="900" height="68">
+						<control type="label">
+							<left>28</left>
+							<width>40</width>
+							<height>68</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>kscape_text_dim</textcolor>
+							<label>▸</label>
+							<visible>ListItem.IsFolder + !ListItem.IsParentFolder</visible>
+						</control>
+						<control type="label">
+							<left>64</left>
+							<width>812</width>
+							<height>68</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>kscape_text</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+					</itemlayout>
+					<focusedlayout width="900" height="68">
+						<control type="image">
+							<width>900</width>
+							<height>68</height>
+							<texture colordiffuse="kscape_blue_focus">white.png</texture>
+							<animation effect="fade" start="100" end="40" time="0" condition="!Control.HasFocus(450)">Conditional</animation>
+						</control>
+						<control type="label">
+							<left>28</left>
+							<width>40</width>
+							<height>68</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>white</textcolor>
+							<label>▸</label>
+							<visible>ListItem.IsFolder + !ListItem.IsParentFolder</visible>
+						</control>
+						<control type="label">
+							<left>64</left>
+							<width>812</width>
+							<height>68</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>white</textcolor>
+							<scroll>true</scroll>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+					</focusedlayout>
+				</control>
+				<control type="panel" id="451">
+					<description>Thumbnails, when Kodi browses pictures</description>
+					<left>30</left>
+					<top>90</top>
+					<width>900</width>
+					<height>680</height>
+					<onleft>9000</onleft>
+					<onright>60</onright>
+					<onup>451</onup>
+					<ondown>451</ondown>
+					<pagecontrol>60</pagecontrol>
+					<scrolltime>200</scrolltime>
+					<itemlayout width="225" height="226">
+						<control type="image">
+							<left>12</left>
+							<top>12</top>
+							<width>201</width>
+							<height>150</height>
+							<aspectratio>keep</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+						<control type="label">
+							<left>8</left>
+							<top>168</top>
+							<width>209</width>
+							<height>50</height>
+							<align>center</align>
+							<font>kscape_small</font>
+							<textcolor>kscape_text</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+					</itemlayout>
+					<focusedlayout width="225" height="226">
+						<control type="image">
+							<width>225</width>
+							<height>226</height>
+							<texture colordiffuse="kscape_blue_focus">white.png</texture>
+							<animation effect="fade" start="100" end="40" time="0" condition="!Control.HasFocus(451)">Conditional</animation>
+						</control>
+						<control type="image">
+							<left>12</left>
+							<top>12</top>
+							<width>201</width>
+							<height>150</height>
+							<aspectratio>keep</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+						<control type="label">
+							<left>8</left>
+							<top>168</top>
+							<width>209</width>
+							<height>50</height>
+							<align>center</align>
+							<font>kscape_small</font>
+							<textcolor>white</textcolor>
+							<scroll>true</scroll>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+					</focusedlayout>
+				</control>
+				<control type="scrollbar" id="60">
+					<left>934</left>
+					<top>90</top>
+					<width>12</width>
+					<height>680</height>
+					<orientation>vertical</orientation>
+					<onleft>450</onleft>
+					<onright>9000</onright>
+					<texturesliderbackground colordiffuse="kscape_blue">white.png</texturesliderbackground>
+					<texturesliderbar colordiffuse="kscape_text_dim">white.png</texturesliderbar>
+					<texturesliderbarfocus colordiffuse="white">white.png</texturesliderbarfocus>
+					<textureslidernib/>
+					<textureslidernibfocus/>
+				</control>
+				<control type="grouplist" id="9000">
+					<left>970</left>
+					<top>90</top>
+					<width>300</width>
+					<height>400</height>
+					<orientation>vertical</orientation>
+					<itemgap>10</itemgap>
+					<onleft>450</onleft>
+					<onright>450</onright>
+					<onup>9000</onup>
+					<ondown>9000</ondown>
+					<control type="button" id="413">
+						<description>OK</description>
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="300"/>
+							<param name="height" value="80"/>
+						</include>
+						<label>$LOCALIZE[186]</label>
+					</control>
+					<control type="button" id="414">
+						<description>Cancel</description>
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="300"/>
+							<param name="height" value="80"/>
+						</include>
+						<label>$LOCALIZE[222]</label>
+					</control>
+					<control type="button" id="415">
+						<description>Make new folder (when Kodi enables it)</description>
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="300"/>
+							<param name="height" value="80"/>
+						</include>
+						<label>$LOCALIZE[119]</label>
+						<visible>Control.IsEnabled(415)</visible>
+					</control>
+					<control type="button" id="416">
+						<description>Flip (pictures, when Kodi enables it)</description>
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="300"/>
+							<param name="height" value="80"/>
+						</include>
+						<label>$LOCALIZE[749]</label>
+						<visible>Control.IsEnabled(416)</visible>
+					</control>
+				</control>
+				<control type="label" id="412">
+					<description>Current path</description>
+					<left>30</left>
+					<top>786</top>
+					<width>1240</width>
+					<height>44</height>
+					<aligny>center</aligny>
+					<haspath>true</haspath>
+					<font>kscape_small</font>
+					<textcolor>kscape_text_dim</textcolor>
+				</control>
+			</control>
+	
+		</control>
+	</controls>
+</window>

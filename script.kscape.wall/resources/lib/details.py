@@ -24,13 +24,14 @@ import threading
 import xbmcaddon
 import xbmcgui
 
-from . import badges, info, menu, modal, ratings
+from . import badges, displayui, info, menu, modal, ratings
 from . import explore as E
 from . import exploreui as X
 from . import scenemodel as SM
 from . import scenes as S
 from . import streaminfo as SI
-from .library import fetch_details
+from . import versions as VS
+from .library import fetch_details, fresh_resume, version_settings
 from .listmodel import rating_short
 
 ADDON = xbmcaddon.Addon('script.kscape.wall')
@@ -44,7 +45,8 @@ MENU = 100
 POSTER_CARD, POSTER_TEXT, POSTER_ART, POSTER_BADGE = 151, 152, 153, 154
 EXPLORE_LIST, SCENE_LIST = 310, 410
 FACTS, RES_BADGE, HDR_BADGE, AUDIO_BADGE = 270, 272, 273, 274
-RATINGS_HEAD, RATINGS, TMDB_ICON = 280, 285, 287
+MORE_FORMATS = (275, 276, 277)          # further formats of other versions
+RATINGS_HEAD, RATINGS, TMDB_ICON, RT_ICON = 280, 285, 287, 289
 SECTIONS = [  # (heading control, value control, string id, key)
     (220, 221, 32061, 'plot'),
     (230, 231, 32062, 'genre'),
@@ -89,6 +91,14 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         self.explore_filters = []
         self.scene_rows = []
         self.closed = False
+        # On a screen of another shape, Kodi stretches boxes but not text or artwork: boxes that
+        # must keep a shape (the poster, badges) have their widths divided by the stretch.
+        self.sx = displayui.current().sx
+        m = self.movie
+        # Kodi's versions with their resume points as they are now, in the order Play tries them.
+        self.versions = fresh_resume(m.versions, m.title) if m.versions else ()
+        self.pref = version_settings() if self.versions else ('4K', False)
+        self.playing = VS.choose(self.versions, *self.pref) if self.versions else None
 
     def onInit(self):
         m, d = self.movie, self.details
@@ -111,9 +121,14 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         m, d = self.movie, self.details
         items = [('return', tr(32066), '')]
         resume = ((d.get('resume') or {}).get('position') or m.resume_position or 0)
+        if self.versions:
+            paused = VS.choose(self.versions, *self.pref, resume=True)
+            resume = paused.resume if paused else 0
         if resume > 0:
             items.append(('resume', tr(32067), info.clock(resume)))
         items.append(('play', tr(32068), ''))
+        if len(self.versions) > 1:
+            items.append(('version', tr(32367), tr(32368).format(len(self.versions))))
         if d.get('trailer'):
             items.append(('trailer', tr(32069), ''))
         if m.file:
@@ -138,7 +153,7 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
 
     def _size_poster(self, room):
         h = min(POSTER_H, room)
-        w = int(round(h * 2 / 3.0))
+        w = min(POSTER_W, int(round(h * 2 / 3.0 / self.sx)))
         x = POSTER_X + (POSTER_W - w) // 2
         for cid in (POSTER_CARD, POSTER_ART):
             c = self.getControl(cid)
@@ -163,15 +178,25 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         res = SI.resolution(sd) if sd else m.resolution
         hdr = SI.hdr(sd) if sd else m.hdr
         audio = (SI.audio_formats(sd) if sd else m.audio)[:1]
+        if self.playing:                 # several versions: what Play would start
+            hdr, audio = self.playing.hdr, self.playing.audio[:1]
         return facts, res, hdr, audio[0] if audio else ''
 
     def _set_badges(self):
         facts, res, hdr, audio = self._facts()
         self.setProperty('facts', facts)
+        # Every format the movie is available in (all versions); the first takes the usual slot.
+        formats = list(VS.formats(self.versions, res, self.movie.stereo, self.movie.file)) or ([res] if res else [])
+        res = formats[0] if formats else ''
+        for n, cid in enumerate(MORE_FORMATS, start=2):
+            key = formats[n - 1] if len(formats) >= n else ''
+            self.setProperty(f'b.res{n}', badges.image(key) if key else '')
+            if key:
+                self.getControl(cid).setWidth(self._w(badges.width(key)))
         for cid, prop, key in ((RES_BADGE, 'b.res', res), (HDR_BADGE, 'b.hdr', hdr), (AUDIO_BADGE, 'b.audio', audio)):
             self.setProperty(prop, badges.image(key) if key else '')
             if key:
-                self.getControl(cid).setWidth(badges.width(key))
+                self.getControl(cid).setWidth(self._w(badges.width(key)))
         return bool(facts or res or hdr or audio)
 
     def _set_ratings(self):
@@ -179,7 +204,8 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         self.setProperty('r.mpaa', rating_short(d.get('mpaa') or m.mpaa))
         tmdb = SI.tmdb_rating(d.get('ratings')) or m.tmdb
         self.setProperty('r.tmdb', f'{tmdb:.1f}' if tmdb else '')
-        self.getControl(TMDB_ICON).setWidth(badges.width('tmdb'))
+        self.getControl(TMDB_ICON).setWidth(self._w(badges.width('tmdb')))
+        self.getControl(RT_ICON).setWidth(self._w(badges.width('rt_fresh')))
         rt = SI.rt_percent(d.get('ratings')) or ratings.lookup(m, self._rt_found)
         self._show_rt(rt)
         return bool(self.getProperty('r.mpaa') or tmdb or rt)
@@ -262,6 +288,9 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
             y += lines * LINE_H + ROW_GAP
 
     # ---- pages --------------------------------------------------------------------------------
+
+    def _w(self, width):
+        return max(1, int(round(width / self.sx)))
 
     def _set_page(self, page):
         self.page = page
@@ -403,6 +432,8 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
                 self._open_explore()
             elif key == 'scenes':
                 self._open_scenes()
+            elif key == 'version':
+                self._choose_version()
             else:
                 self.choice = None if key == 'return' else key
                 self._close()
@@ -457,6 +488,25 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
             elif choice == 'search':
                 self.choice = 'search'
                 self._close()
+
+    def _choose_version(self):
+        """Play Version: every version, labelled with its name, resolution, 3D, dynamic range and
+        audio; the one Play would start is preselected. A version with a resume point asks
+        whether to resume it."""
+        order = VS.order(self.versions, *self.pref)
+        i = xbmcgui.Dialog().select(tr(32369), VS.labels(order), preselect=0)
+        if i < 0:
+            return
+        v = order[i]
+        resume = False
+        if v.resume > 0:
+            j = xbmcgui.Dialog().contextmenu([tr(32370).format(info.clock(v.resume)), tr(32371)])
+            if j < 0:
+                return
+            resume = j == 0
+        self.choice = 'version'
+        self.extra = {'version': v, 'resume': resume}
+        self._close()
 
     def _close(self):
         self.closed = True

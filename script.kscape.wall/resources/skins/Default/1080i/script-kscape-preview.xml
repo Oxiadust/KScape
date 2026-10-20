@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Display & aspect ratio preview (displayui.preview): the whole KScape canvas, drawn through
+     the display transform like every other window, so the amber frame is exactly the area
+     KScape uses with the current settings: the CinemaScope band, offsets and safe area. -->
+<window type="dialog">
+	<defaultcontrol>10</defaultcontrol>
+	<controls>
+		<control type="image">
+			<description>Black where KScape draws nothing</description>
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="FF000000">kscape-white.png</texture>
+		</control>
+		<control type="group">
+			<include>KScapeDisplay</include>
+			<control type="image">
+				<width>1920</width>
+				<height>1080</height>
+				<texture colordiffuse="kscape_bg">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>0</left>
+				<top>0</top>
+				<width>1920</width>
+				<height>8</height>
+				<texture colordiffuse="kscape_amber">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>0</left>
+				<top>1072</top>
+				<width>1920</width>
+				<height>8</height>
+				<texture colordiffuse="kscape_amber">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>0</left>
+				<top>0</top>
+				<width>8</width>
+				<height>1080</height>
+				<texture colordiffuse="kscape_amber">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>1912</left>
+				<top>0</top>
+				<width>8</width>
+				<height>1080</height>
+				<texture colordiffuse="kscape_amber">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>900</left>
+				<top>538</top>
+				<width>120</width>
+				<height>4</height>
+				<texture colordiffuse="FFFFFFFF">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>958</left>
+				<top>480</top>
+				<width>4</width>
+				<height>120</height>
+				<texture colordiffuse="FFFFFFFF">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>360</left>
+				<top>640</top>
+				<width>186</width>
+				<height>279</height>
+				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>610</left>
+				<top>640</top>
+				<width>186</width>
+				<height>279</height>
+				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>860</left>
+				<top>640</top>
+				<width>186</width>
+				<height>279</height>
+				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>1110</left>
+				<top>640</top>
+				<width>186</width>
+				<height>279</height>
+				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<left>1360</left>
+				<top>640</top>
+				<width>186</width>
+				<height>279</height>
+				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+			</control>
+			<control type="label">
+				<top>160</top>
+				<width>1920</width>
+				<height>70</height>
+				<align>center</align>
+				<font>kscape_title</font>
+				<textcolor>FFFFFFFF</textcolor>
+				<label>$ADDON[script.kscape.wall 32399]</label>
+			</control>
+			<control type="label">
+				<top>240</top>
+				<width>1920</width>
+				<height>50</height>
+				<align>center</align>
+				<font>kscape_menu</font>
+				<textcolor>kscape_text_dim</textcolor>
+				<label>$INFO[Window.Property(aspect)]  ·  $INFO[Window.Property(screen)]</label>
+			</control>
+			<control type="label">
+				<top>320</top>
+				<width>1920</width>
+				<height>110</height>
+				<align>center</align>
+				<font>kscape_menu</font>
+				<textcolor>kscape_text</textcolor>
+				<wrapmultiline>true</wrapmultiline>
+				<label>$ADDON[script.kscape.wall 32400]</label>
+			</control>
+			<control type="button" id="10">
+				<description>Focus target: Back or Select close</description>
+				<left>-200</left>
+				<width>1</width>
+				<height>1</height>
+				<texturefocus/>
+				<texturenofocus/>
+			</control>
+		</control>
+	</controls>
+</window>

@@ -30,7 +30,7 @@ import xbmcgui
 import xbmcvfs
 
 from . import geometry as G
-from . import badges, cache, collectionui, menu, modal, ratings, state
+from . import badges, cache, collectionui, displayui, menu, modal, ratings, state
 from . import explore as E
 from . import exploreui as X
 from . import scenes as S
@@ -38,7 +38,7 @@ from .favourites import Favourites
 from .info import estimate_lines
 from .library import rpc
 from .listwindow import show_list
-from .model import _title_key
+from .model import copy_groups
 from .search import search
 from .skins import choose_skin
 from .ranking import rank_related
@@ -64,6 +64,10 @@ PROP_FRAME = 'kscape.frame'
 PROP_REDUCED = 'kscape.reduced'         # read by the info screen's slide-in animation
 FAVOURITES_FILE = xbmcvfs.translatePath('special://profile/favourites.xml')
 FAVOURITES_POLL_S = 1.0
+CAPTION_PX, CHIP_W = 62, 620                     # filter caption, now-playing chip (tools/np_chip.py)
+HEAL_EVERY_S = 10.0                     # idle wall: look for posters that never arrived
+HEAL_AFTER_S = 8.0                      # a poster this long on screen should be in Kodi's cache
+HEAL_RETRIES = 6                        # reload attempts per poster, 10 s apart and doubling
 PANEL_TITLE_PX = 40                     # kscape_panel_title, for the square panel's line estimate
 PANEL_TITLE_LINE = 50
 PANEL_PAD = 34
@@ -107,24 +111,31 @@ def view_key(kind):
 
 
 class Pool:
-    """One set of recycled cover slots. Slot k always serves grid cells congruent to it."""
+    """One set of recycled cover slots. Slot k always serves grid cells congruent to it.
 
-    def __init__(self, win, base, count, layout):
+    What a slot shows comes from an offscreen list item in the pool's hidden data list
+    (wallxml.slot): poster art and the properties on, text, badge, bw and fav. Updating those
+    takes no GUI lock; only moving a slot (setPosition) and its animations are control calls,
+    each of which waits for Kodi's GUI lock (a frame or so) - binding a screenful of covers
+    control by control took tens of seconds."""
+
+    def __init__(self, win, base, count, layout, sx=1.0):
+        from .wallxml import SOURCES
         self.count = count
+        self.base = base
         self.layout = layout
+        self.sx = sx                     # the screen's horizontal stretch (display.stage)
         self.slots = [win.getControl(base + k) for k in range(count)]
-        self.texts = [win.getControl(base + 200 + k) for k in range(count)]
-        self.posters = [win.getControl(base + 400 + k) for k in range(count)]
-        self.badges = [win.getControl(base + 600 + k) for k in range(count)]
-        self.badge_labels = [win.getControl(base + 800 + k) for k in range(count)]
-        self.hearts = [win.getControl(base + 1000 + k) for k in range(count)]
-        self.badge_shown = [True] * count
-        self.heart_shown = [True] * count
+        self.items = [xbmcgui.ListItem(offscreen=True) for _ in range(count)]
+        win.getControl(SOURCES[base]).addItems(self.items)
+        self.badge_text = [None] * count
+        self.heart_shown = [False] * count
+        self.bound_at = [0.0] * count    # when the poster was last set (window._heal_posters)
         self.cell = [None] * count
         self.shown = [None] * count      # key of the item currently bound
-        self.visible = [True] * count    # XML default
+        self.visible = [False] * count   # 'on' is unset: hidden
 
-    def bind(self, k, cell, item, fallback='', favourite=False):
+    def bind(self, k, cell, item, fallback='', favourite=False, badge=None):
         if item is None:
             self.set_visible(k, False)
             self.cell[k], self.shown[k] = cell, None
@@ -132,23 +143,32 @@ class Pool:
         if self.cell[k] != cell:
             self.slots[k].setPosition(*cell_origin(*cell, layout=self.layout))
             self.cell[k] = cell
+        li = self.items[k]
+        badge = item.badge if badge is None else badge
         if self.shown[k] != item.key:
-            self.posters[k].setImage(item.poster)
-            self.texts[k].setText('' if item.poster else fallback)
-            if item.badge:
-                self.badge_labels[k].setLabel(item.badge)
-            if self.badge_shown[k] != bool(item.badge):
-                self.badges[k].setVisible(bool(item.badge))
-                self.badge_shown[k] = bool(item.badge)
+            li.setArt({'poster': item.poster})
+            li.setProperty('text', '' if item.poster else fallback)
+            self.bound_at[k] = time.time()
             self.shown[k] = item.key
+        if self.badge_text[k] != badge:
+            li.setProperty('badge', badge or '')
+            li.setProperty('bw', badge_bucket(badge) if badge else '')
+            self.badge_text[k] = badge
         if self.heart_shown[k] != favourite:
-            self.hearts[k].setVisible(favourite)
+            li.setProperty('fav', '1' if favourite else '')
             self.heart_shown[k] = favourite
         self.set_visible(k, True)
 
+    def reload_poster(self, k, url, phase):
+        """Ask for a poster again (window._heal_posters): cleared first, set back a moment later,
+        so Kodi sees a new texture."""
+        self.items[k].setArt({'poster': '' if phase == 0 else url})
+        if phase:
+            self.bound_at[k] = time.time()
+
     def set_visible(self, k, on):
         if self.visible[k] != on:
-            self.slots[k].setVisible(on)
+            self.items[k].setProperty('on', '1' if on else '')
             self.visible[k] = on
 
     def reset(self):
@@ -156,6 +176,12 @@ class Pool:
         for k in range(self.count):
             self.slots[k].setAnimations([])
             self.set_visible(k, False)
+
+
+def badge_bucket(text):
+    """Which fixed badge box fits `text` (wallxml.BADGE_WIDTHS)."""
+    from .wallxml import BADGE_WIDTHS
+    return str(next(n for n, _ in BADGE_WIDTHS if len(text) <= n))
 
 
 class LibraryMonitor(xbmc.Monitor):
@@ -214,6 +240,8 @@ class WallWindow(xbmcgui.WindowXML):
         self.collection = kwargs.get('collection')   # collection id: show only its movies
         self.filtered = self.favourites_only or self.collection is not None
         self.start_view = kwargs.get('view')         # 'list' or 'wall' if chosen from Home
+        self.layout = kwargs.get('layout') or self.kind.layout
+        self.stage = kwargs.get('stage') or displayui.current(self.kind.layout.pitch_y)
         self.session = E.Session()                   # Explore / Filter… (movies)
         self.resolver = X.Resolver()
         start = kwargs.get('explore')                # (filter, movie key): a wall opened by Explore
@@ -229,7 +257,10 @@ class WallWindow(xbmcgui.WindowXML):
         self.lock = threading.RLock()
         self.closing = False
         self.window_id = xbmcgui.getCurrentWindowId()
-        self.lay = self.kind.layout
+        # Display & aspect ratio: the layout for this screen and the CinemaScope band, if any
+        # (open_wall built the XML for it).
+        self.lay = self.layout
+        self.sx = self.stage.sx
         self.pool_size = self.lay.pool_cols * self.lay.pool_rows
         self.camera = self.getControl(1000)
         self.frame = self.getControl(1001)
@@ -237,11 +268,9 @@ class WallWindow(xbmcgui.WindowXML):
         self.status = self.getControl(1950)
         self.caption = self.getControl(1960)
         self.caption.setVisible(False)
-        self.front = Pool(self, 10000, self.pool_size, self.lay)
-        self.back = Pool(self, 20000, self.pool_size, self.lay)
-        for k in range(self.pool_size):
-            self.front.set_visible(k, False)
-            self.back.set_visible(k, False)
+        self.front = Pool(self, 10000, self.pool_size, self.lay, self.sx)
+        self.back = Pool(self, 20000, self.pool_size, self.lay, self.sx)
+        self._place_view()
         self.frame.setVisible(False)
         self.panel.setVisible(False)
         self.reduced = (ADDON.getSettingBool('reduced_motion')
@@ -249,6 +278,7 @@ class WallWindow(xbmcgui.WindowXML):
         HOME.setProperty(PROP_REDUCED, '1' if self.reduced else '')
         self.auto_shuffle = ADDON.getSettingBool('auto_shuffle')
         self.merge = ADDON.getSettingBool('merge_duplicates')
+        self.show_badges = not xbmc.getCondVisibility('Skin.HasSetting(KScapeHideFormatBadges)')
         self.frame_pos = None            # frame target position (wall pixels)
         self.frame_anim = None           # (start time, start position, duration ms)
         self.frame_token = 0
@@ -278,6 +308,8 @@ class WallWindow(xbmcgui.WindowXML):
         self.panel_shown = False
         self.shuffled_for = None
         self.last_input = time.time()
+        self.heal_at = time.time() + HEAL_EVERY_S
+        self.retries = {}                # poster url -> (attempts, next attempt time)
 
         self.status.setLabel(ADDON.getLocalizedString(32001))
         items, self.cast_complete, cached, total = load_library(self.kind)
@@ -308,6 +340,30 @@ class WallWindow(xbmcgui.WindowXML):
             state.save(**{view_key(self.kind): self.start_view})
         if view == 'list' and items:
             self._open_list(back_home=True)   # chosen from Home, or in use when Kodi last closed
+
+    # ---- display & aspect ratio -----------------------------------------------------------------
+
+    def _place_view(self):
+        """Put the wall in its view (the screen, or a CinemaScope band), black outside it, and
+        the status, filter caption and now-playing chip inside it."""
+        vx, vy, vw, vh = self.lay.view
+        self.getControl(998).setPosition(vx, vy)
+        masks = ((0, 0, G.SCREEN_W, vy), (0, vy + vh, G.SCREEN_W, G.SCREEN_H - vy - vh),
+                 (0, vy, vx, vh), (vx + vw, vy, G.SCREEN_W - vx - vw, vh))
+        for cid, (x, y, w, h) in zip((1971, 1972, 1973, 1974), masks):
+            m = self.getControl(cid)
+            on = w > 0 and h > 0
+            if on:
+                m.setPosition(x, y)
+                m.setWidth(w)
+                m.setHeight(h)
+            m.setVisible(on)
+        self.status.setPosition(vx + (vw - 1400) // 2, vy + (vh - 200) // 2)
+        self.caption.setPosition(vx, vy + vh - CAPTION_PX)
+        for cid in (1961, 1963):
+            self.getControl(cid).setWidth(vw)
+        self.getControl(1962).setWidth(max(1, vw - 96))
+        self.getControl(1980).setPosition(vx + vw - CHIP_W - 28, vy + 26)
 
     def _show_status(self):
         """Loading done: an empty library or empty favourites says so; otherwise no status."""
@@ -566,8 +622,13 @@ class WallWindow(xbmcgui.WindowXML):
         """The library entries a cover stands for: itself, plus merged duplicate copies."""
         if not (self.kind.merges and self.merge):
             return [item]
-        key = _title_key(item)
-        return [m for m in self.all_movies if _title_key(m) == key] or [item]
+        if getattr(self, '_copy_of', (None,))[0] is not self.all_movies:
+            index = {}
+            for group in copy_groups(self.all_movies):      # once per library change, not per cover
+                for m in group:
+                    index[m.key] = group
+            self._copy_of = (self.all_movies, index)
+        return self._copy_of[1].get(item.key) or [item]
 
     def _is_favourite(self, item):
         return any(self.favs.contains(c) for c in self._copies(item))
@@ -646,8 +707,9 @@ class WallWindow(xbmcgui.WindowXML):
     def _origin(self):
         """Top-left grid cell of the pool window around the camera centre."""
         lay = self.lay
-        cx = self.cam[0] + G.SCREEN_W / 2.0
-        cy = self.cam[1] + G.SCREEN_H / 2.0
+        vw, vh = G.view_size(lay)
+        cx = self.cam[0] + vw / 2.0
+        cy = self.cam[1] + vh / 2.0
         return int(cx // lay.pitch_x) - lay.pool_cols // 2, int(cy // lay.pitch_y) - lay.pool_rows // 2
 
     def _slot_cells(self):
@@ -661,7 +723,8 @@ class WallWindow(xbmcgui.WindowXML):
         if item is None:
             pool.bind(k, cell, None)
         else:
-            pool.bind(k, cell, item, self.kind.fallback(item), self._is_favourite(item))
+            pool.bind(k, cell, item, self.kind.fallback(item), self._is_favourite(item),
+                      self.kind.cover_badge(item, self.show_badges))
 
     def _rebind(self, pool, wall=None):
         wall = wall or self.wall
@@ -682,7 +745,7 @@ class WallWindow(xbmcgui.WindowXML):
     def _set_frame(self, animate=False):
         """Move the focus frame; animated moves glide from wherever the frame is drawn now."""
         x, y = self._cell_xy(self.focus)
-        target = (x - self.lay.frame, y - self.lay.frame)
+        target = (x - G.fx(self.lay), y - self.lay.frame)
         now = time.time()
         animate = animate and not self.reduced and self.frame_pos is not None
         if animate:
@@ -714,7 +777,7 @@ class WallWindow(xbmcgui.WindowXML):
         left = [(c - i, r) for i in range(1, lay.panel_cells + 1)]
         right = [(c + i, r) for i in range(1, lay.panel_cells + 1)]
         left_on = self._cell_xy(left[-1])[0] - self.cam[0] >= 0
-        right_on = x + lay.cover_w + lay.frame + G.panel_w(lay) - self.cam[0] <= G.SCREEN_W
+        right_on = x + lay.cover_w + G.fx(lay) + G.panel_w(lay) - self.cam[0] <= G.view_size(lay)[0]
         hidden = lambda cells: sum(self.wall.at(*cell) is not None for cell in cells)
         if left_on and right_on and hidden(left) != hidden(right):
             cells = left if hidden(left) < hidden(right) else right   # e.g. a short favourites row
@@ -725,10 +788,11 @@ class WallWindow(xbmcgui.WindowXML):
         if cells[0][0] < c:
             px = self._cell_xy((c - lay.panel_cells, r))[0]       # far cell's left edge
         else:
-            px = x + lay.cover_w + lay.frame                       # frame's right edge
+            px = x + lay.cover_w + G.fx(lay)                       # frame's right edge
+        self.setProperty('kscape.panel.side', 'left' if cells[0][0] < c else 'right')   # entrance direction
         self.panel.setPosition(px, y - lay.frame)
         title, body = self.kind.panel(item)
-        if lay is G.SQUARE:
+        if lay.name == 'square':
             # Album title on one or two lines (a textbox), the artist right below it.
             self.getControl(1901).setText(title)
             lines = min(2, estimate_lines(title, G.panel_w(lay) - 2 * PANEL_PAD, PANEL_TITLE_PX))
@@ -746,10 +810,12 @@ class WallWindow(xbmcgui.WindowXML):
         """Resolution badge, TMDB score and Tomatometer under the synopsis (when known)."""
         h = 26
         self.setProperty('p.res', badges.image(item.resolution) if item.resolution else '')
+        X = lambda v: max(1, int(round(v / self.sx)))    # badges keep their shape on any screen
         if item.resolution:
-            self.getControl(1911).setWidth(badges.width(item.resolution, h))
+            self.getControl(1911).setWidth(X(badges.width(item.resolution, h)))
         self.setProperty('p.tmdb', f'{item.tmdb:.1f}' if item.tmdb else '')
-        self.getControl(1912).setWidth(badges.width('tmdb', h))
+        self.getControl(1912).setWidth(X(badges.width('tmdb', h)))
+        self.getControl(1914).setWidth(X(h))
 
         def found(rt):
             with self.lock:
@@ -790,6 +856,9 @@ class WallWindow(xbmcgui.WindowXML):
                     items, self.pending_library = self.pending_library, None
                     self._apply_library(items)
                     continue
+                heal = idle >= 2.0 and now >= self.heal_at and not self.shuffle_until
+                if heal:
+                    self.heal_at = now + HEAL_EVERY_S
                 item = self.wall.at(*self.focus)
                 if item and not self.panel_shown and idle >= G.PANEL_DELAY_S:
                     self._show_panel()
@@ -797,6 +866,55 @@ class WallWindow(xbmcgui.WindowXML):
                         and self.shuffled_for != item.key and len(self.wall.movies()) > 1):
                     self.shuffled_for = item.key
                     self._shuffle_related(item)
+            if heal:
+                self._heal_posters()
+
+    def _heal_posters(self):
+        """Reload covers whose poster never arrived. Kodi loads a cover's artwork once; if the
+        download failed (a network hiccup), the cover stays a grey card for the rest of the
+        session. So, while the wall is idle, the posters on show for a while are checked against
+        Kodi's texture cache (one query) and any still missing is asked for again, a few times,
+        further apart each time."""
+        now = time.time()
+        with self.lock:
+            pool = self.front
+            slots = [(k, self.wall.at(*pool.cell[k])) for k in range(self.pool_size)
+                     if pool.visible[k] and pool.shown[k] is not None and pool.cell[k]
+                     and now - pool.bound_at[k] >= HEAL_AFTER_S]
+            slots = [(k, item.poster) for k, item in slots if item is not None and item.poster
+                     and item.poster.startswith('image://')]
+        urls = list(dict.fromkeys(url for _, url in slots))
+        if not urls:
+            return
+        due = [u for u in urls if self.retries.get(u, (0, 0.0))[1] <= now
+               and self.retries.get(u, (0, 0.0))[0] < HEAL_RETRIES]
+        if not due:
+            return
+        cached = {t.get('url') for t in rpc('Textures.GetTextures', {
+            'properties': ['url'],
+            'filter': {'or': [{'field': 'url', 'operator': 'is', 'value': u} for u in due]}}).get('textures', [])}
+        missing = [u for u in due if u not in cached]
+        for u in urls:
+            if u in cached:
+                self.retries.pop(u, None)
+        if not missing:
+            return
+        with self.lock:
+            if self.paused or self.closing or pool is not self.front:
+                return
+            again = [(k, url) for k, url in slots if url in missing and pool.shown[k] is not None]
+            for k, url in again:
+                pool.reload_poster(k, url, 0)
+        time.sleep(0.2)                              # a few frames: Kodi drops the old texture
+        with self.lock:
+            if self.closing or pool is not self.front:
+                return
+            for k, url in again:
+                pool.reload_poster(k, url, 1)
+            for u in missing:
+                n = self.retries.get(u, (0, 0.0))[0]
+                self.retries[u] = (n + 1, now + HEAL_EVERY_S * 2 ** n)
+        xbmc.log(f'kscape.wall: asked again for {len(missing)} poster(s) not in the texture cache', xbmc.LOGINFO)
 
     # ---- menu and library changes -------------------------------------------------------------
 
@@ -968,7 +1086,7 @@ class WallWindow(xbmcgui.WindowXML):
                 self._start_reload()              # added or vanished: needs a full re-read
                 return
             if self.kind.has_extra and not self.cast_complete:
-                item = self.kind.with_extra(item, {key: current.cast})
+                item = self.kind.carry(item, current)
             was_in = self.collection is not None and self._in_view(current)
             self.all_movies = [item if m.key == key else m for m in self.all_movies]
             if self.collection is not None and was_in != self._in_view(item):
@@ -1065,7 +1183,8 @@ class WallWindow(xbmcgui.WindowXML):
         on = _is(PROP_FRONT, tok)
         rng = random.Random(tok)
         cx, cy = self.cam
-        view = (cx, cy, cx + G.SCREEN_W, cy + G.SCREEN_H)
+        vw, vh = G.view_size(lay)
+        view = (cx, cy, cx + vw, cy + vh)
         margin = lay.pitch_x
         longest = 0
         instant = self.reduced
@@ -1074,7 +1193,7 @@ class WallWindow(xbmcgui.WindowXML):
         anchor_cell = new.cell_of(anchor_key) if anchor_key is not None else None
         if anchor_cell:
             ax, ay = self._cell_xy(anchor_cell)
-            keep_out = (ax - lay.frame, ay - lay.frame, ax + lay.cover_w + lay.frame, ay + lay.cover_h + lay.frame)
+            keep_out = (ax - G.fx(lay), ay - lay.frame, ax + lay.cover_w + G.fx(lay), ay + lay.cover_h + lay.frame)
         size = (lay.cover_w, lay.cover_h)
 
         def path(a, b):
@@ -1235,11 +1354,31 @@ def collection_empty(cid, days):
     return f'{tr(32175)}[CR][COLOR FF9AA3B5]{tr(32176)}[/COLOR]'
 
 
+def wall_xml(kind):
+    """(script path, XML file, layout, stage) of the wall for the screen Kodi draws on now: the
+    shipped XML on a 16:9 screen, else XML built for the adapted layout (wallxml.prepare)."""
+    stage = displayui.current(kind.layout.pitch_y)
+    layout = G.adapt(kind.layout, stage)
+    path = ADDON.getAddonInfo('path')
+    if layout is kind.layout:
+        return path, kind.wall_xml, layout, stage
+    from . import wallxml
+    try:
+        root, name = wallxml.prepare(layout, stage.sx, path, xbmcvfs.translatePath(ADDON.getAddonInfo('profile')))
+    except OSError as e:
+        xbmc.log(f'kscape: could not write the adapted wall ({e}); using the 16:9 one', xbmc.LOGWARNING)
+        return path, kind.wall_xml, kind.layout, stage._replace(sx=1.0, view=(0, 0, G.SCREEN_W, G.SCREEN_H))
+    xbmc.log(f'kscape.wall: {layout.name} layout for this screen: covers {layout.cover_w}x{layout.cover_h}, '
+             f'{layout.pool_cols}x{layout.pool_rows} slots, view {layout.view}, stretch {stage.sx:.3f}', xbmc.LOGINFO)
+    return root, name, layout, stage
+
+
 def open_wall(kind, view=None, favourites=False, collection=None, explore=None):
     """Run the wall for `kind` (filtered by an Explore (filter, movie key) pair, if given).
     Returns the skin the user chose to switch to, if any."""
-    window = WallWindow(kind.wall_xml, ADDON.getAddonInfo('path'), 'Default', '1080i',
-                        kind=kind, view=view, favourites=favourites, collection=collection, explore=explore)
+    root, name, layout, stage = wall_xml(kind)
+    window = WallWindow(name, root, 'Default', '1080i', kind=kind, view=view, favourites=favourites,
+                        collection=collection, explore=explore, layout=layout, stage=stage)
     modal.run(window)
     skin = window.pending_skin
     del window

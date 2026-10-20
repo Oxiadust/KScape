@@ -3,427 +3,432 @@
 <window>
 	<defaultcontrol always="true">9000</defaultcontrol>
 	<controls>
-		<control type="image">
-			<width>1920</width>
-			<height>1080</height>
-			<texture colordiffuse="kscape_bg">kscape-white.png</texture>
-		</control>
-		<control type="button" id="901">
-			<description>Edge target: never visible, so the list stops at its ends</description>
-			<left>-200</left>
-			<top>-200</top>
-			<width>1</width>
-			<height>1</height>
-			<texturefocus/>
-			<texturenofocus/>
-			<visible>false</visible>
-		</control>
-		<control type="fixedlist" id="9000">
-			<left>0</left>
-			<top>8</top>
-			<width>1930</width>
-			<height>1072</height>
-			<onup>901</onup>
-			<ondown>901</ondown>
-			<onleft>901</onleft>
-			<onright>901</onright>
-			<focusposition>5</focusposition>
-			<animation effect="fade" start="100" end="35" time="90" condition="String.IsEqual(Window(Home).Property(kscape.list.jump),1)">Conditional</animation>
-			<scrolltime tween="cubic" easing="out">200</scrolltime>
-			<itemlayout width="1930" height="58">
-				<control type="group">
-					<left>860</left>
-
-					<control type="label">
-						<left>20</left>
-						<width>528</width>
-						<height>58</height>
-						<aligny>center</aligny>
-						<font>kscape_list_row</font>
-						<textcolor>kscape_tint_row</textcolor>
-						<label>$INFO[ListItem.Property(album)]</label>
-					</control>
-					<control type="label">
-						<left>580</left>
-						<width>288</width>
-						<height>58</height>
-						<aligny>center</aligny>
-						<font>kscape_list_row</font>
-						<textcolor>kscape_tint_row</textcolor>
-						<label>$INFO[ListItem.Property(genre)]</label>
-					</control>
-					<control type="label">
-						<left>900</left>
-						<width>118</width>
-						<height>58</height>
-						<aligny>center</aligny>
-						<font>kscape_list_row</font>
-						<textcolor>kscape_tint_row</textcolor>
-						<label>$INFO[ListItem.Property(year)]</label>
-					</control>
-				</control>
-				<control type="image">
-					<width>860</width>
-					<height>58</height>
-					<texture colordiffuse="kscape_bg">kscape-white.png</texture>
-				</control>
-				<control type="label">
-					<left>244</left>
-					<width>586</width>
-					<height>58</height>
-					<aligny>center</aligny>
-					<font>kscape_list_row</font>
-					<textcolor>FFFFFFFF</textcolor>
-					<label>$INFO[ListItem.Label]</label>
-				</control>
-				<control type="image">
-					<left>210</left>
-					<top>18</top>
-					<width>22</width>
-					<height>22</height>
-					<texture colordiffuse="kscape_amber">kscape-heart.png</texture>
-					<visible>String.IsEqual(ListItem.Property(fav),1)</visible>
-				</control>
-			</itemlayout>
-			<focusedlayout width="1930" height="236">
-				<control type="image">
-					<left>40</left>
-					<width>1890</width>
-					<height>236</height>
-					<texture colordiffuse="kscape_blue">kscape-white.png</texture>
-				</control>
-				<control type="group">
-					<left>860</left>
-
-					<control type="image">
-						<left>0</left>
-						<width>560</width>
-						<height>236</height>
-						<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
-						<visible>String.IsEqual(Window(Home).Property(kscape.list.col),album)</visible>
-					</control>
-					<control type="label">
-						<left>20</left>
-						<top>14</top>
-						<width>528</width>
-						<height>32</height>
-						<font>kscape_list_head</font>
-						<textcolor>FFFFFFFF</textcolor>
-						<label>$ADDON[script.kscape.wall 32081]</label>
-					</control>
-					<control type="label">
-						<left>20</left>
-						<top>50</top>
-						<width>528</width>
-						<height>40</height>
-						<font>kscape_list_value</font>
-						<textcolor>FFFFFFFF</textcolor>
-						<scroll>false</scroll>
-						<label>$INFO[ListItem.Property(album)]</label>
-					</control>
-					<control type="image">
-						<left>560</left>
-						<width>320</width>
-						<height>236</height>
-						<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
-						<visible>String.IsEqual(Window(Home).Property(kscape.list.col),genre)</visible>
-					</control>
-					<control type="label">
-						<left>580</left>
-						<top>14</top>
-						<width>288</width>
-						<height>32</height>
-						<font>kscape_list_head</font>
-						<textcolor>FFFFFFFF</textcolor>
-						<label>$ADDON[script.kscape.wall 32051]</label>
-					</control>
-					<control type="label">
-						<left>580</left>
-						<top>50</top>
-						<width>288</width>
-						<height>40</height>
-						<font>kscape_list_value</font>
-						<textcolor>FFFFFFFF</textcolor>
-						<scroll>false</scroll>
-						<label>$INFO[ListItem.Property(genre)]</label>
-						<visible>!String.IsEqual(Window(Home).Property(kscape.list.settled),1)</visible>
-					</control>
-					<control type="label">
-						<left>580</left>
-						<top>50</top>
-						<width>288</width>
-						<height>176</height>
-						<font>kscape_list_value</font>
-						<textcolor>FFFFFFFF</textcolor>
-						<wrapmultiline>true</wrapmultiline>
-						<scroll>false</scroll>
-						<label>$INFO[ListItem.Property(genre_full)]</label>
-						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1)</visible>
-						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
-					</control>
-					<control type="image">
-						<left>564</left>
-						<top>64</top>
-						<width>12</width>
-						<height>15</height>
-						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
-						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),0)</visible>
-						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
-					</control>
-					<control type="image">
-						<left>564</left>
-						<top>96</top>
-						<width>12</width>
-						<height>15</height>
-						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
-						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),1)</visible>
-						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
-					</control>
-					<control type="image">
-						<left>564</left>
-						<top>127</top>
-						<width>12</width>
-						<height>15</height>
-						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
-						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),2)</visible>
-						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
-					</control>
-					<control type="image">
-						<left>564</left>
-						<top>159</top>
-						<width>12</width>
-						<height>15</height>
-						<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
-						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),3)</visible>
-						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
-					</control>
-					<control type="image">
-						<left>880</left>
-						<width>150</width>
-						<height>236</height>
-						<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
-						<visible>String.IsEqual(Window(Home).Property(kscape.list.col),year)</visible>
-					</control>
-					<control type="label">
-						<left>900</left>
-						<top>14</top>
-						<width>118</width>
-						<height>32</height>
-						<font>kscape_list_head</font>
-						<textcolor>FFFFFFFF</textcolor>
-						<label>$ADDON[script.kscape.wall 32054]</label>
-					</control>
-					<control type="label">
-						<left>900</left>
-						<top>50</top>
-						<width>118</width>
-						<height>40</height>
-						<font>kscape_list_value</font>
-						<textcolor>FFFFFFFF</textcolor>
-						<scroll>false</scroll>
-						<label>$INFO[ListItem.Property(year)]</label>
-					</control>
-				</control>
-				<control type="image">
-					<width>40</width>
-					<height>236</height>
-					<texture colordiffuse="kscape_bg">kscape-white.png</texture>
-				</control>
-				<control type="image">
-					<left>40</left>
-					<width>820</width>
-					<height>236</height>
-					<texture colordiffuse="kscape_blue">kscape-white.png</texture>
-				</control>
-				<control type="image">
-					<left>40</left>
-					<width>820</width>
-					<height>236</height>
-					<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
-					<visible>String.IsEqual(Window(Home).Property(kscape.list.col),title)</visible>
-				</control>
-				<control type="group">
-					<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1)</visible>
-					<animation effect="fade" start="0" end="100" time="220">Visible</animation>
-					<control type="image">
-						<left>62</left>
-						<top>30</top>
-						<width>138</width>
-						<height>138</height>
-						<texture colordiffuse="FF1A1A1F">kscape-white.png</texture>
-					</control>
-					<control type="image">
-						<left>62</left>
-						<top>30</top>
-						<width>138</width>
-						<height>138</height>
-						<aspectratio>scale</aspectratio>
-						<texture background="true">$INFO[ListItem.Property(poster)]</texture>
-					</control>
-				</control>
-				<control type="label">
-					<left>244</left>
-					<top>14</top>
-					<width>300</width>
-					<height>32</height>
-					<font>kscape_list_head</font>
-					<textcolor>FFFFFFFF</textcolor>
-					<label>$ADDON[script.kscape.wall 32080]</label>
-				</control>
-				<control type="textbox">
-					<description>Title, wrapping to a second line (list labels only truncate)</description>
-					<left>244</left>
-					<top>46</top>
-					<width>586</width>
-					<height>116</height>
-					<font>kscape_list_title</font>
-					<textcolor>FFFFFFFF</textcolor>
-					<label>$INFO[ListItem.Label]</label>
-				</control>
-				<control type="image">
-					<left>210</left>
-					<top>60</top>
-					<width>22</width>
-					<height>22</height>
-					<texture colordiffuse="kscape_amber">kscape-heart.png</texture>
-					<visible>String.IsEqual(ListItem.Property(fav),1)</visible>
-				</control>
-			</focusedlayout>
-		</control>
-		<control type="image">
-			<description>Fade the rows into the background at the top and bottom</description>
-			<width>1920</width>
-			<height>150</height>
-			<texture colordiffuse="kscape_bg">kscape-fade.png</texture>
-		</control>
-		<control type="image">
-			<top>890</top>
-			<width>1920</width>
-			<height>190</height>
-			<texture colordiffuse="kscape_bg" flipy="true">kscape-fade.png</texture>
-		</control>
 		<control type="group">
-			<description>Search results: what was searched, and the count</description>
-			<visible>!String.IsEmpty(Window(Home).Property(kscape.list.heading))</visible>
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
 			<control type="image">
 				<width>1920</width>
-				<height>96</height>
+				<height>1080</height>
 				<texture colordiffuse="kscape_bg">kscape-white.png</texture>
 			</control>
+			<control type="button" id="901">
+				<description>Edge target: never visible, so the list stops at its ends</description>
+				<left>-200</left>
+				<top>-200</top>
+				<width>1</width>
+				<height>1</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<visible>false</visible>
+			</control>
+			<control type="fixedlist" id="9000">
+				<left>0</left>
+				<top>8</top>
+				<width>1930</width>
+				<height>1072</height>
+				<onup>901</onup>
+				<ondown>901</ondown>
+				<onleft>901</onleft>
+				<onright>901</onright>
+				<focusposition>5</focusposition>
+				<animation effect="fade" start="100" end="35" time="90" condition="String.IsEqual(Window(Home).Property(kscape.list.jump),1)">Conditional</animation>
+				<scrolltime tween="cubic" easing="out">200</scrolltime>
+				<itemlayout width="1930" height="58">
+					<control type="group">
+						<left>860</left>
+
+						<control type="label">
+							<left>20</left>
+							<width>528</width>
+							<height>58</height>
+							<aligny>center</aligny>
+							<font>kscape_list_row</font>
+							<textcolor>kscape_tint_row</textcolor>
+							<label>$INFO[ListItem.Property(album)]</label>
+						</control>
+						<control type="label">
+							<left>580</left>
+							<width>288</width>
+							<height>58</height>
+							<aligny>center</aligny>
+							<font>kscape_list_row</font>
+							<textcolor>kscape_tint_row</textcolor>
+							<label>$INFO[ListItem.Property(genre)]</label>
+						</control>
+						<control type="label">
+							<left>900</left>
+							<width>118</width>
+							<height>58</height>
+							<aligny>center</aligny>
+							<font>kscape_list_row</font>
+							<textcolor>kscape_tint_row</textcolor>
+							<label>$INFO[ListItem.Property(year)]</label>
+						</control>
+					</control>
+					<control type="image">
+						<width>860</width>
+						<height>58</height>
+						<texture colordiffuse="kscape_bg">kscape-white.png</texture>
+					</control>
+					<control type="label">
+						<left>244</left>
+						<width>586</width>
+						<height>58</height>
+						<aligny>center</aligny>
+						<font>kscape_list_row</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+					<control type="image">
+						<left>210</left>
+						<top>18</top>
+						<width>22</width>
+						<height>22</height>
+						<texture colordiffuse="kscape_amber">kscape-heart.png</texture>
+						<visible>String.IsEqual(ListItem.Property(fav),1)</visible>
+					</control>
+				</itemlayout>
+				<focusedlayout width="1930" height="236">
+					<control type="image">
+						<left>40</left>
+						<width>1890</width>
+						<height>236</height>
+						<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+					</control>
+					<control type="group">
+						<left>860</left>
+
+						<control type="image">
+							<left>0</left>
+							<width>560</width>
+							<height>236</height>
+							<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
+							<visible>String.IsEqual(Window(Home).Property(kscape.list.col),album)</visible>
+						</control>
+						<control type="label">
+							<left>20</left>
+							<top>14</top>
+							<width>528</width>
+							<height>32</height>
+							<font>kscape_list_head</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<label>$ADDON[script.kscape.wall 32081]</label>
+						</control>
+						<control type="label">
+							<left>20</left>
+							<top>50</top>
+							<width>528</width>
+							<height>40</height>
+							<font>kscape_list_value</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<scroll>false</scroll>
+							<label>$INFO[ListItem.Property(album)]</label>
+						</control>
+						<control type="image">
+							<left>560</left>
+							<width>320</width>
+							<height>236</height>
+							<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
+							<visible>String.IsEqual(Window(Home).Property(kscape.list.col),genre)</visible>
+						</control>
+						<control type="label">
+							<left>580</left>
+							<top>14</top>
+							<width>288</width>
+							<height>32</height>
+							<font>kscape_list_head</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<label>$ADDON[script.kscape.wall 32051]</label>
+						</control>
+						<control type="label">
+							<left>580</left>
+							<top>50</top>
+							<width>288</width>
+							<height>40</height>
+							<font>kscape_list_value</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<scroll>false</scroll>
+							<label>$INFO[ListItem.Property(genre)]</label>
+							<visible>!String.IsEqual(Window(Home).Property(kscape.list.settled),1)</visible>
+						</control>
+						<control type="label">
+							<left>580</left>
+							<top>50</top>
+							<width>288</width>
+							<height>176</height>
+							<font>kscape_list_value</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<wrapmultiline>true</wrapmultiline>
+							<scroll>false</scroll>
+							<label>$INFO[ListItem.Property(genre_full)]</label>
+							<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1)</visible>
+							<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+						</control>
+						<control type="image">
+							<left>564</left>
+							<top>64</top>
+							<width>12</width>
+							<height>15</height>
+							<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
+							<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),0)</visible>
+							<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+						</control>
+						<control type="image">
+							<left>564</left>
+							<top>96</top>
+							<width>12</width>
+							<height>15</height>
+							<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
+							<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),1)</visible>
+							<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+						</control>
+						<control type="image">
+							<left>564</left>
+							<top>127</top>
+							<width>12</width>
+							<height>15</height>
+							<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
+							<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),2)</visible>
+							<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+						</control>
+						<control type="image">
+							<left>564</left>
+							<top>159</top>
+							<width>12</width>
+							<height>15</height>
+							<texture colordiffuse="kscape_amber">kscape-marker.png</texture>
+							<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1) + String.IsEqual(ListItem.Property(genre_mark),3)</visible>
+							<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+						</control>
+						<control type="image">
+							<left>880</left>
+							<width>150</width>
+							<height>236</height>
+							<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
+							<visible>String.IsEqual(Window(Home).Property(kscape.list.col),year)</visible>
+						</control>
+						<control type="label">
+							<left>900</left>
+							<top>14</top>
+							<width>118</width>
+							<height>32</height>
+							<font>kscape_list_head</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<label>$ADDON[script.kscape.wall 32054]</label>
+						</control>
+						<control type="label">
+							<left>900</left>
+							<top>50</top>
+							<width>118</width>
+							<height>40</height>
+							<font>kscape_list_value</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<scroll>false</scroll>
+							<label>$INFO[ListItem.Property(year)]</label>
+						</control>
+					</control>
+					<control type="image">
+						<width>40</width>
+						<height>236</height>
+						<texture colordiffuse="kscape_bg">kscape-white.png</texture>
+					</control>
+					<control type="image">
+						<left>40</left>
+						<width>820</width>
+						<height>236</height>
+						<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+					</control>
+					<control type="image">
+						<left>40</left>
+						<width>820</width>
+						<height>236</height>
+						<texture colordiffuse="kscape_blue_focus">kscape-white.png</texture>
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.col),title)</visible>
+					</control>
+					<control type="group">
+						<visible>String.IsEqual(Window(Home).Property(kscape.list.settled),1)</visible>
+						<animation effect="fade" start="0" end="100" time="220">Visible</animation>
+						<control type="image">
+							<left>62</left>
+							<top>30</top>
+							<width>138</width>
+							<height>138</height>
+							<texture colordiffuse="FF1A1A1F">kscape-white.png</texture>
+						</control>
+						<control type="image">
+							<left>62</left>
+							<top>30</top>
+							<width>138</width>
+							<height>138</height>
+							<aspectratio>scale</aspectratio>
+							<texture background="true">$INFO[ListItem.Property(poster)]</texture>
+						</control>
+					</control>
+					<control type="label">
+						<left>244</left>
+						<top>14</top>
+						<width>300</width>
+						<height>32</height>
+						<font>kscape_list_head</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<label>$ADDON[script.kscape.wall 32080]</label>
+					</control>
+					<control type="textbox">
+						<description>Title, wrapping to a second line (list labels only truncate)</description>
+						<left>244</left>
+						<top>46</top>
+						<width>586</width>
+						<height>116</height>
+						<font>kscape_list_title</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+					<control type="image">
+						<left>210</left>
+						<top>60</top>
+						<width>22</width>
+						<height>22</height>
+						<texture colordiffuse="kscape_amber">kscape-heart.png</texture>
+						<visible>String.IsEqual(ListItem.Property(fav),1)</visible>
+					</control>
+				</focusedlayout>
+			</control>
+			<control type="image">
+				<description>Fade the rows into the background at the top and bottom</description>
+				<width>1920</width>
+				<height>150</height>
+				<texture colordiffuse="kscape_bg">kscape-fade.png</texture>
+			</control>
+			<control type="image">
+				<top>890</top>
+				<width>1920</width>
+				<height>190</height>
+				<texture colordiffuse="kscape_bg" flipy="true">kscape-fade.png</texture>
+			</control>
+			<control type="group">
+				<description>Search results: what was searched, and the count</description>
+				<visible>!String.IsEmpty(Window(Home).Property(kscape.list.heading))</visible>
+				<control type="image">
+					<width>1920</width>
+					<height>96</height>
+					<texture colordiffuse="kscape_bg">kscape-white.png</texture>
+				</control>
+				<control type="label">
+					<left>244</left>
+					<top>20</top>
+					<width>1596</width>
+					<height>56</height>
+					<aligny>center</aligny>
+					<font>kscape_panel_title</font>
+					<textcolor>kscape_amber</textcolor>
+					<label>$INFO[Window(Home).Property(kscape.list.heading)]</label>
+				</control>
+			</control>
 			<control type="label">
-				<left>244</left>
-				<top>20</top>
-				<width>1596</width>
-				<height>56</height>
+				<description>Search results: nothing matched</description>
+				<left>260</left>
+				<top>460</top>
+				<width>1400</width>
+				<height>120</height>
+				<align>center</align>
 				<aligny>center</aligny>
-				<font>kscape_panel_title</font>
-				<textcolor>kscape_amber</textcolor>
-				<label>$INFO[Window(Home).Property(kscape.list.heading)]</label>
+				<font>kscape_title</font>
+				<textcolor>FFE6E6EA</textcolor>
+				<wrapmultiline>true</wrapmultiline>
+				<label>$INFO[Window(Home).Property(kscape.list.empty)]</label>
+				<visible>!String.IsEmpty(Window(Home).Property(kscape.list.empty))</visible>
 			</control>
-		</control>
-		<control type="label">
-			<description>Search results: nothing matched</description>
-			<left>260</left>
-			<top>460</top>
-			<width>1400</width>
-			<height>120</height>
-			<align>center</align>
-			<aligny>center</aligny>
-			<font>kscape_title</font>
-			<textcolor>FFE6E6EA</textcolor>
-			<wrapmultiline>true</wrapmultiline>
-			<label>$INFO[Window(Home).Property(kscape.list.empty)]</label>
-			<visible>!String.IsEmpty(Window(Home).Property(kscape.list.empty))</visible>
-		</control>
-		<control type="group">
-			<description>Now playing chip (tools/np_chip.py)</description>
-			<left>1272</left>
-			<top>26</top>
-			<visible>Player.HasMedia</visible>
-			<animation effect="fade" start="0" end="100" time="300">Visible</animation>
-			<animation effect="fade" start="100" end="0" time="200">Hidden</animation>
-			<control type="image">
-				<width>620</width>
-				<height>108</height>
-				<texture colordiffuse="kscape_bg_chip">kscape-white.png</texture>
+			<control type="group">
+				<description>Now playing chip (tools/np_chip.py)</description>
+				<left>1272</left>
+				<top>26</top>
+				<visible>Player.HasMedia</visible>
+				<animation effect="fade" start="0" end="100" time="300">Visible</animation>
+				<animation effect="fade" start="100" end="0" time="200">Hidden</animation>
+				<control type="image">
+					<width>620</width>
+					<height>108</height>
+					<texture colordiffuse="kscape_bg_chip">kscape-white.png</texture>
+				</control>
+				<control type="image">
+					<width>620</width>
+					<height>3</height>
+					<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+				</control>
+				<control type="image">
+					<left>9</left>
+					<top>9</top>
+					<width>160</width>
+					<height>90</height>
+					<texture colordiffuse="FF000000">kscape-white.png</texture>
+					<visible>Player.HasVideo</visible>
+				</control>
+				<control type="videowindow">
+					<left>9</left>
+					<top>9</top>
+					<width>160</width>
+					<height>90</height>
+					<visible>Player.HasVideo</visible>
+				</control>
+				<control type="image">
+					<left>79</left>
+					<top>9</top>
+					<width>90</width>
+					<height>90</height>
+					<aspectratio>scale</aspectratio>
+					<texture background="true">$INFO[Player.Art(thumb)]</texture>
+					<visible>Player.HasAudio</visible>
+				</control>
+				<control type="label">
+					<left>187</left>
+					<top>10</top>
+					<width>415</width>
+					<height>26</height>
+					<font>kscape_badge</font>
+					<textcolor>kscape_amber</textcolor>
+					<label>$ADDON[script.kscape.wall 32133]</label>
+					<visible>!Player.Paused</visible>
+				</control>
+				<control type="label">
+					<left>187</left>
+					<top>10</top>
+					<width>415</width>
+					<height>26</height>
+					<font>kscape_badge</font>
+					<textcolor>kscape_amber</textcolor>
+					<label>$ADDON[script.kscape.wall 32134]</label>
+					<visible>Player.Paused</visible>
+				</control>
+				<control type="label">
+					<left>187</left>
+					<top>10</top>
+					<width>415</width>
+					<height>26</height>
+					<align>right</align>
+					<font>kscape_badge</font>
+					<textcolor>FF9AA3B5</textcolor>
+					<label>$INFO[Player.Time]$INFO[Player.Duration, / ]</label>
+				</control>
+				<control type="label">
+					<left>187</left>
+					<top>38</top>
+					<width>415</width>
+					<height>36</height>
+					<font>kscape_small</font>
+					<textcolor>FFFFFFFF</textcolor>
+					<label>$INFO[Player.Title]</label>
+				</control>
+				<control type="progress">
+					<left>187</left>
+					<top>86</top>
+					<width>415</width>
+					<height>5</height>
+					<texturebg colordiffuse="kscape_track">kscape-white.png</texturebg>
+					<midtexture colordiffuse="kscape_amber">kscape-white.png</midtexture>
+					<info>Player.Progress</info>
+				</control>
 			</control>
-			<control type="image">
-				<width>620</width>
-				<height>3</height>
-				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
-			</control>
-			<control type="image">
-				<left>9</left>
-				<top>9</top>
-				<width>160</width>
-				<height>90</height>
-				<texture colordiffuse="FF000000">kscape-white.png</texture>
-				<visible>Player.HasVideo</visible>
-			</control>
-			<control type="videowindow">
-				<left>9</left>
-				<top>9</top>
-				<width>160</width>
-				<height>90</height>
-				<visible>Player.HasVideo</visible>
-			</control>
-			<control type="image">
-				<left>79</left>
-				<top>9</top>
-				<width>90</width>
-				<height>90</height>
-				<aspectratio>scale</aspectratio>
-				<texture background="true">$INFO[Player.Art(thumb)]</texture>
-				<visible>Player.HasAudio</visible>
-			</control>
-			<control type="label">
-				<left>187</left>
-				<top>10</top>
-				<width>415</width>
-				<height>26</height>
-				<font>kscape_badge</font>
-				<textcolor>kscape_amber</textcolor>
-				<label>$ADDON[script.kscape.wall 32133]</label>
-				<visible>!Player.Paused</visible>
-			</control>
-			<control type="label">
-				<left>187</left>
-				<top>10</top>
-				<width>415</width>
-				<height>26</height>
-				<font>kscape_badge</font>
-				<textcolor>kscape_amber</textcolor>
-				<label>$ADDON[script.kscape.wall 32134]</label>
-				<visible>Player.Paused</visible>
-			</control>
-			<control type="label">
-				<left>187</left>
-				<top>10</top>
-				<width>415</width>
-				<height>26</height>
-				<align>right</align>
-				<font>kscape_badge</font>
-				<textcolor>FF9AA3B5</textcolor>
-				<label>$INFO[Player.Time]$INFO[Player.Duration, / ]</label>
-			</control>
-			<control type="label">
-				<left>187</left>
-				<top>38</top>
-				<width>415</width>
-				<height>36</height>
-				<font>kscape_small</font>
-				<textcolor>FFFFFFFF</textcolor>
-				<label>$INFO[Player.Title]</label>
-			</control>
-			<control type="progress">
-				<left>187</left>
-				<top>86</top>
-				<width>415</width>
-				<height>5</height>
-				<texturebg colordiffuse="kscape_track">kscape-white.png</texturebg>
-				<midtexture colordiffuse="kscape_amber">kscape-white.png</midtexture>
-				<info>Player.Progress</info>
-			</control>
+	
 		</control>
 	</controls>
 </window>

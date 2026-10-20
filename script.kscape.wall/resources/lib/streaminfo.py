@@ -64,6 +64,13 @@ def hdr(streamdetails):
     return kind if kind in HDR_LABELS else ('dolbyvision' if 'dolby' in kind or kind == 'dv' else 'hdr10')
 
 
+def stereo(streamdetails):
+    """True when the first video stream is 3D (Kodi records its stereo mode: left_right,
+    top_bottom, block_lr (MVC)...)."""
+    mode = (first_video(streamdetails).get('stereomode') or '').lower()
+    return bool(mode) and mode not in ('mono', '2d')
+
+
 def audio_key(codec):
     """AUDIO_FORMATS key for one Kodi audio codec name, or None for formats not shown."""
     c = (codec or '').lower().replace('-', '_').replace(' ', '_')

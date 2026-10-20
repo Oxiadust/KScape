@@ -8,421 +8,140 @@
 	<defaultcontrol always="true">100</defaultcontrol>
 	<controls>
 		<control type="group">
-			<description>Panel: slides up from the bottom edge, as in the reference</description>
-			<left>96</left>
-			<top>48</top>
-			<animation effect="slide" start="0,1032" end="0,0" time="420" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1)">WindowOpen</animation>
-			<animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1)">WindowOpen</animation>
-			<animation effect="slide" start="0,0" end="0,1032" time="300" tween="cubic" easing="in" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1)">WindowClose</animation>
-			<control type="image">
-				<description>Shadow on the wall</description>
-				<left>-24</left>
-				<top>-24</top>
-				<width>1776</width>
-				<height>1032</height>
-				<texture colordiffuse="90000000">kscape-white.png</texture>
-			</control>
-			<control type="image">
-				<width>1728</width>
-				<height>984</height>
-				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
-			</control>
-			<control type="image">
-				<description>Left column</description>
-				<top>64</top>
-				<width>480</width>
-				<height>920</height>
-				<texture colordiffuse="kscape_blue_dark">kscape-white.png</texture>
-			</control>
-			<control type="image">
-				<description>Header strip</description>
-				<width>1728</width>
-				<height>64</height>
-				<texture colordiffuse="kscape_blue_head">kscape-white.png</texture>
-			</control>
-			<control type="label">
-				<left>30</left>
-				<width>1660</width>
-				<height>64</height>
-				<aligny>center</aligny>
-				<font>kscape_info_head</font>
-				<textcolor>FFFFFFFF</textcolor>
-				<label>$INFO[Window.Property(title)]</label>
-			</control>
-
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
 			<control type="group">
-				<description>Poster with fallback card and quality badge (sized by Python to leave room for the menu)</description>
-				<left>30</left>
-				<top>88</top>
-				<control type="image" id="151">
-					<width>420</width>
-					<height>630</height>
-					<texture colordiffuse="FF1A1A1F">kscape-white.png</texture>
+				<description>Panel: slides up from the bottom edge, as in the reference</description>
+				<left>96</left>
+				<top>48</top>
+				<animation effect="slide" start="0,1032" end="0,0" time="420" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1)">WindowOpen</animation>
+				<animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1)">WindowOpen</animation>
+				<animation effect="slide" start="0,0" end="0,1032" time="300" tween="cubic" easing="in" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1)">WindowClose</animation>
+				<control type="image">
+					<description>Shadow on the wall</description>
+					<left>-24</left>
+					<top>-24</top>
+					<width>1776</width>
+					<height>1032</height>
+					<texture colordiffuse="90000000">kscape-white.png</texture>
 				</control>
-				<control type="textbox" id="152">
-					<left>24</left>
-					<top>24</top>
-					<width>372</width>
-					<height>582</height>
-					<align>center</align>
+				<control type="image">
+					<width>1728</width>
+					<height>984</height>
+					<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+				</control>
+				<control type="image">
+					<description>Left column</description>
+					<top>64</top>
+					<width>480</width>
+					<height>920</height>
+					<texture colordiffuse="kscape_blue_dark">kscape-white.png</texture>
+				</control>
+				<control type="image">
+					<description>Header strip</description>
+					<width>1728</width>
+					<height>64</height>
+					<texture colordiffuse="kscape_blue_head">kscape-white.png</texture>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<width>1660</width>
+					<height>64</height>
 					<aligny>center</aligny>
-					<font>kscape_panel_title</font>
-					<textcolor>FFC8C8D0</textcolor>
+					<font>kscape_info_head</font>
+					<textcolor>FFFFFFFF</textcolor>
 					<label>$INFO[Window.Property(title)]</label>
-					<visible>String.IsEmpty(Window.Property(poster))</visible>
 				</control>
-				<control type="image" id="153">
-					<width>420</width>
-					<height>630</height>
-					<aspectratio>scale</aspectratio>
-					<fadetime>150</fadetime>
-					<texture background="true">$INFO[Window.Property(poster)]</texture>
-				</control>
-				<control type="group" id="154">
-					<left>330</left>
-					<top>588</top>
-					<control type="group">
-					<visible>!String.IsEmpty(Window.Property(badge))</visible>
-					<control type="image">
-						<width>80</width>
-						<height>32</height>
-						<texture colordiffuse="kscape_amber">kscape-white.png</texture>
+
+				<control type="group">
+					<description>Poster with fallback card and quality badge (sized by Python to leave room for the menu)</description>
+					<left>30</left>
+					<top>88</top>
+					<control type="image" id="151">
+						<width>420</width>
+						<height>630</height>
+						<texture colordiffuse="FF1A1A1F">kscape-white.png</texture>
 					</control>
-					<control type="image">
-						<left>2</left>
-						<top>2</top>
-						<width>76</width>
-						<height>28</height>
-						<texture colordiffuse="F0141210">kscape-white.png</texture>
-					</control>
-					<control type="label">
-						<width>80</width>
-						<height>32</height>
+					<control type="textbox" id="152">
+						<left>24</left>
+						<top>24</top>
+						<width>372</width>
+						<height>582</height>
 						<align>center</align>
 						<aligny>center</aligny>
-						<font>kscape_badge</font>
-						<textcolor>kscape_amber</textcolor>
-						<label>$INFO[Window.Property(badge)]</label>
+						<font>kscape_panel_title</font>
+						<textcolor>FFC8C8D0</textcolor>
+						<label>$INFO[Window.Property(title)]</label>
+						<visible>String.IsEmpty(Window.Property(poster))</visible>
 					</control>
+					<control type="image" id="153">
+						<width>420</width>
+						<height>630</height>
+						<aspectratio>scale</aspectratio>
+						<fadetime>150</fadetime>
+						<texture background="true">$INFO[Window.Property(poster)]</texture>
 					</control>
-				</control>
-			</control>
-
-			<control type="list" id="100">
-				<description>Return / Resume / Play / Trailer / Play Scenes / Explore (placed by Python)</description>
-				<top>662</top>
-				<width>480</width>
-				<height>312</height>
-				<onup>100</onup>
-				<ondown>100</ondown>
-				<onleft>999</onleft>
-				<onright>999</onright>
-				<scrolltime>0</scrolltime>
-				<itemlayout width="480" height="52">
-					<control type="image">
-						<description>The page this entry opened, while its list has focus</description>
-						<width>480</width>
-						<height>52</height>
-						<texture colordiffuse="kscape_blue_mid">kscape-white.png</texture>
-						<visible>[String.IsEqual(ListItem.Property(action),explore) + String.IsEqual(Window.Property(page),explore)] | [String.IsEqual(ListItem.Property(action),scenes) + String.IsEqual(Window.Property(page),scenes)]</visible>
-					</control>
-					<control type="label">
-						<left>30</left>
-						<width>300</width>
-						<height>52</height>
-						<aligny>center</aligny>
-						<font>kscape_menu</font>
-						<textcolor>kscape_tint_light</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-					</control>
-					<control type="label">
-						<left>300</left>
-						<width>150</width>
-						<height>52</height>
-						<align>right</align>
-						<aligny>center</aligny>
-						<font>kscape_small</font>
-						<textcolor>kscape_text_dim</textcolor>
-						<label>$INFO[ListItem.Label2]</label>
-					</control>
-				</itemlayout>
-				<focusedlayout width="480" height="52">
-					<control type="image">
-						<width>480</width>
-						<height>52</height>
-						<texture colordiffuse="kscape_blue_light">kscape-white.png</texture>
-					</control>
-					<control type="label">
-						<left>30</left>
-						<width>300</width>
-						<height>52</height>
-						<aligny>center</aligny>
-						<font>kscape_menu</font>
-						<textcolor>FFFFFFFF</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-					</control>
-					<control type="label">
-						<left>300</left>
-						<width>150</width>
-						<height>52</height>
-						<align>right</align>
-						<aligny>center</aligny>
-						<font>kscape_small</font>
-						<textcolor>FFFFFFFF</textcolor>
-						<label>$INFO[ListItem.Label2]</label>
-					</control>
-				</focusedlayout>
-			</control>
-
-			<control type="group" id="200">
-			<description>Page: the movie's facts</description>
-			<visible>String.IsEmpty(Window.Property(page))</visible>
-			<animation effect="fade" start="0" end="100" time="200">Visible</animation>
-			<control type="label" id="220">
-				<left>530</left>
-				<width>1150</width>
-				<height>44</height>
-				<font>kscape_info_label</font>
-				<textcolor>FFFFFFFF</textcolor>
-			</control>
-			<control type="textbox" id="221">
-				<description>Synopsis</description>
-				<left>530</left>
-				<width>1150</width>
-				<height>228</height>
-				<font>kscape_panel_body</font>
-				<textcolor>kscape_text</textcolor>
-				<autoscroll delay="6000" time="3000" repeat="8000">true</autoscroll>
-			</control>
-			<control type="label" id="230">
-				<left>530</left>
-				<width>220</width>
-				<height>38</height>
-				<font>kscape_info_label</font>
-				<textcolor>FFFFFFFF</textcolor>
-			</control>
-			<control type="textbox" id="231">
-				<left>770</left>
-				<width>910</width>
-				<height>38</height>
-				<font>kscape_panel_body</font>
-				<textcolor>kscape_text</textcolor>
-			</control>
-			<control type="label" id="240">
-				<left>530</left>
-				<width>220</width>
-				<height>38</height>
-				<font>kscape_info_label</font>
-				<textcolor>FFFFFFFF</textcolor>
-			</control>
-			<control type="textbox" id="241">
-				<left>770</left>
-				<width>910</width>
-				<height>76</height>
-				<font>kscape_panel_body</font>
-				<textcolor>kscape_text</textcolor>
-			</control>
-			<control type="label" id="250">
-				<left>530</left>
-				<width>220</width>
-				<height>38</height>
-				<font>kscape_info_label</font>
-				<textcolor>FFFFFFFF</textcolor>
-			</control>
-			<control type="textbox" id="251">
-				<left>770</left>
-				<width>910</width>
-				<height>38</height>
-				<font>kscape_panel_body</font>
-				<textcolor>kscape_text</textcolor>
-			</control>
-			<control type="label" id="260">
-				<left>530</left>
-				<width>220</width>
-				<height>38</height>
-				<font>kscape_info_label</font>
-				<textcolor>FFFFFFFF</textcolor>
-			</control>
-			<control type="textbox" id="261">
-				<left>770</left>
-				<width>910</width>
-				<height>38</height>
-				<font>kscape_panel_body</font>
-				<textcolor>kscape_text</textcolor>
-			</control>
-			<control type="group" id="270">
-				<description>Runtime, aspect ratio, country, year; resolution, dynamic range, audio (a group: Python cannot hold a grouplist)</description>
-				<left>530</left>
-				<width>1150</width>
-				<height>44</height>
-			<control type="grouplist">
-				<width>1150</width>
-				<height>44</height>
-				<orientation>horizontal</orientation>
-				<itemgap>10</itemgap>
-				<usecontrolcoords>true</usecontrolcoords>
-				<control type="label" id="271">
-					<width>auto</width>
-					<height>44</height>
-					<aligny>center</aligny>
-					<font>kscape_panel_body</font>
-					<textcolor>kscape_text</textcolor>
-					<label>$INFO[Window.Property(facts)]</label>
-					<visible>!String.IsEmpty(Window.Property(facts))</visible>
-				</control>
-				<control type="image" id="279">
-					<width>8</width>
-					<height>44</height>
-					<texture/>
-					<visible>!String.IsEmpty(Window.Property(facts))</visible>
-				</control>
-				<control type="image" id="272">
-					<top>7</top>
-					<width>41</width>
-					<height>30</height>
-					<texture colordiffuse="kscape_amber">$INFO[Window.Property(b.res)]</texture>
-					<visible>!String.IsEmpty(Window.Property(b.res))</visible>
-				</control>
-				<control type="image" id="273">
-					<top>7</top>
-					<width>56</width>
-					<height>30</height>
-					<texture colordiffuse="kscape_text">$INFO[Window.Property(b.hdr)]</texture>
-					<visible>!String.IsEmpty(Window.Property(b.hdr))</visible>
-				</control>
-				<control type="image" id="274">
-					<top>7</top>
-					<width>151</width>
-					<height>30</height>
-					<texture colordiffuse="kscape_text">$INFO[Window.Property(b.audio)]</texture>
-					<visible>!String.IsEmpty(Window.Property(b.audio))</visible>
-				</control>
-			</control>
-			</control>
-			<control type="label" id="280">
-				<left>530</left>
-				<width>220</width>
-				<height>44</height>
-				<aligny>center</aligny>
-				<font>kscape_info_label</font>
-				<textcolor>FFFFFFFF</textcolor>
-			</control>
-			<control type="group" id="285">
-				<description>Certificate, TMDB score, Rotten Tomatoes Tomatometer (a group: Python cannot hold a grouplist)</description>
-				<left>770</left>
-				<width>910</width>
-				<height>44</height>
-			<control type="grouplist">
-				<width>910</width>
-				<height>44</height>
-				<orientation>horizontal</orientation>
-				<itemgap>8</itemgap>
-				<usecontrolcoords>true</usecontrolcoords>
-				<control type="label" id="286">
-					<width>auto</width>
-					<height>44</height>
-					<aligny>center</aligny>
-					<font>kscape_panel_body</font>
-					<textcolor>kscape_text</textcolor>
-					<label>$INFO[Window.Property(r.mpaa)]</label>
-					<visible>!String.IsEmpty(Window.Property(r.mpaa))</visible>
-				</control>
-				<control type="image" id="291">
-					<width>18</width>
-					<height>44</height>
-					<texture/>
-					<visible>!String.IsEmpty(Window.Property(r.mpaa)) + [!String.IsEmpty(Window.Property(r.tmdb)) | !String.IsEmpty(Window.Property(r.rt))]</visible>
-				</control>
-				<control type="image" id="287">
-					<top>7</top>
-					<width>57</width>
-					<height>30</height>
-					<texture>kscape-tmdb.png</texture>
-					<visible>!String.IsEmpty(Window.Property(r.tmdb))</visible>
-				</control>
-				<control type="label" id="288">
-					<width>auto</width>
-					<height>44</height>
-					<aligny>center</aligny>
-					<font>kscape_panel_body</font>
-					<textcolor>kscape_text</textcolor>
-					<label>$INFO[Window.Property(r.tmdb)]</label>
-					<visible>!String.IsEmpty(Window.Property(r.tmdb))</visible>
-				</control>
-				<control type="image" id="292">
-					<width>18</width>
-					<height>44</height>
-					<texture/>
-					<visible>!String.IsEmpty(Window.Property(r.tmdb)) + !String.IsEmpty(Window.Property(r.rt))</visible>
-				</control>
-				<control type="image" id="289">
-					<top>7</top>
-					<width>30</width>
-					<height>30</height>
-					<texture>$INFO[Window.Property(r.rticon)]</texture>
-					<visible>!String.IsEmpty(Window.Property(r.rt))</visible>
-				</control>
-				<control type="label" id="290">
-					<width>auto</width>
-					<height>44</height>
-					<aligny>center</aligny>
-					<font>kscape_panel_body</font>
-					<textcolor>kscape_text</textcolor>
-					<label>$INFO[Window.Property(r.rt)]</label>
-					<visible>!String.IsEmpty(Window.Property(r.rt))</visible>
-				</control>
-			</control>
-			</control>
-			</control>
-
-			<control type="button" id="999">
-				<description>Never visible: list edges point here so they stop instead of wrapping</description>
-				<width>1</width>
-				<height>1</height>
-				<visible>false</visible>
-			</control>
-
-			<control type="group" id="300">
-				<description>Page: Explore - the movie's people, genres, year and country; Select filters the library</description>
-				<visible>String.IsEqual(Window.Property(page),explore)</visible>
-				<animation effect="fade" start="0" end="100" time="200">Visible</animation>
-				<animation effect="slide" start="60,0" end="0,0" time="260" tween="cubic" easing="out">Visible</animation>
-				<control type="list" id="310">
-					<description>Section headings are rows of their own (property heading); details.py steps over them</description>
-					<left>480</left>
-					<top>80</top>
-					<width>1248</width>
-					<height>870</height>
-					<onup>999</onup>
-					<ondown>999</ondown>
-					<onleft>100</onleft>
-					<onright>999</onright>
-					<scrolltime tween="cubic" easing="out">200</scrolltime>
-					<itemlayout width="1248" height="58">
-						<control type="label">
-							<left>70</left>
-							<width>1100</width>
-							<height>58</height>
-							<aligny>bottom</aligny>
-							<font>kscape_info_label</font>
-							<textcolor>kscape_text_dim</textcolor>
-							<label>$INFO[ListItem.Property(heading)]</label>
-							<visible>!String.IsEmpty(ListItem.Property(heading))</visible>
+					<control type="group" id="154">
+						<left>330</left>
+						<top>588</top>
+						<control type="group">
+						<visible>!String.IsEmpty(Window.Property(badge))</visible>
+						<control type="image">
+							<width>80</width>
+							<height>32</height>
+							<texture colordiffuse="kscape_amber">kscape-white.png</texture>
+						</control>
+						<control type="image">
+							<left>2</left>
+							<top>2</top>
+							<width>76</width>
+							<height>28</height>
+							<texture colordiffuse="F0141210">kscape-white.png</texture>
 						</control>
 						<control type="label">
-							<left>110</left>
-							<width>900</width>
-							<height>58</height>
+							<width>80</width>
+							<height>32</height>
+							<align>center</align>
+							<aligny>center</aligny>
+							<font>kscape_badge</font>
+							<textcolor>kscape_amber</textcolor>
+							<label>$INFO[Window.Property(badge)]</label>
+						</control>
+						</control>
+					</control>
+				</control>
+
+				<control type="list" id="100">
+					<description>Return / Resume / Play / Trailer / Play Scenes / Explore (placed by Python)</description>
+					<top>662</top>
+					<width>480</width>
+					<height>312</height>
+					<onup>100</onup>
+					<ondown>100</ondown>
+					<onleft>999</onleft>
+					<onright>999</onright>
+					<scrolltime>0</scrolltime>
+					<itemlayout width="480" height="52">
+						<control type="image">
+							<description>The page this entry opened, while its list has focus</description>
+							<width>480</width>
+							<height>52</height>
+							<texture colordiffuse="kscape_blue_mid">kscape-white.png</texture>
+							<visible>[String.IsEqual(ListItem.Property(action),explore) + String.IsEqual(Window.Property(page),explore)] | [String.IsEqual(ListItem.Property(action),scenes) + String.IsEqual(Window.Property(page),scenes)]</visible>
+						</control>
+						<control type="label">
+							<left>30</left>
+							<width>300</width>
+							<height>52</height>
 							<aligny>center</aligny>
 							<font>kscape_menu</font>
 							<textcolor>kscape_tint_light</textcolor>
 							<label>$INFO[ListItem.Label]</label>
-							<visible>String.IsEmpty(ListItem.Property(heading))</visible>
 						</control>
 						<control type="label">
-							<left>1010</left>
-							<width>180</width>
-							<height>58</height>
+							<left>300</left>
+							<width>150</width>
+							<height>52</height>
 							<align>right</align>
 							<aligny>center</aligny>
 							<font>kscape_small</font>
@@ -430,37 +149,25 @@
 							<label>$INFO[ListItem.Label2]</label>
 						</control>
 					</itemlayout>
-					<focusedlayout width="1248" height="58">
+					<focusedlayout width="480" height="52">
 						<control type="image">
-							<width>1248</width>
-							<height>58</height>
+							<width>480</width>
+							<height>52</height>
 							<texture colordiffuse="kscape_blue_light">kscape-white.png</texture>
-							<visible>String.IsEmpty(ListItem.Property(heading))</visible>
 						</control>
 						<control type="label">
-							<left>70</left>
-							<width>1100</width>
-							<height>58</height>
-							<aligny>bottom</aligny>
-							<font>kscape_info_label</font>
-							<textcolor>kscape_text_dim</textcolor>
-							<label>$INFO[ListItem.Property(heading)]</label>
-							<visible>!String.IsEmpty(ListItem.Property(heading))</visible>
-						</control>
-						<control type="label">
-							<left>110</left>
-							<width>900</width>
-							<height>58</height>
+							<left>30</left>
+							<width>300</width>
+							<height>52</height>
 							<aligny>center</aligny>
 							<font>kscape_menu</font>
 							<textcolor>FFFFFFFF</textcolor>
 							<label>$INFO[ListItem.Label]</label>
-							<visible>String.IsEmpty(ListItem.Property(heading))</visible>
 						</control>
 						<control type="label">
-							<left>1010</left>
-							<width>180</width>
-							<height>58</height>
+							<left>300</left>
+							<width>150</width>
+							<height>52</height>
 							<align>right</align>
 							<aligny>center</aligny>
 							<font>kscape_small</font>
@@ -469,107 +176,429 @@
 						</control>
 					</focusedlayout>
 				</control>
-			</control>
 
-			<control type="group" id="400">
-				<description>Page: Play Scenes - Play All Scenes, the movie's scenes with their lengths, Create / Import</description>
-				<visible>String.IsEqual(Window.Property(page),scenes)</visible>
+				<control type="group" id="200">
+				<description>Page: the movie's facts</description>
+				<visible>String.IsEmpty(Window.Property(page))</visible>
 				<animation effect="fade" start="0" end="100" time="200">Visible</animation>
-				<animation effect="slide" start="60,0" end="0,0" time="260" tween="cubic" easing="out">Visible</animation>
-				<control type="label">
+				<control type="label" id="220">
 					<left>530</left>
-					<top>88</top>
 					<width>1150</width>
 					<height>44</height>
 					<font>kscape_info_label</font>
 					<textcolor>FFFFFFFF</textcolor>
-					<label>$INFO[Window.Property(scenes.heading)]</label>
 				</control>
-				<control type="textbox">
+				<control type="textbox" id="221">
+					<description>Synopsis</description>
 					<left>530</left>
-					<top>150</top>
 					<width>1150</width>
-					<height>160</height>
+					<height>228</height>
 					<font>kscape_panel_body</font>
 					<textcolor>kscape_text</textcolor>
-					<label>$INFO[Window.Property(scenes.empty)]</label>
-					<visible>!String.IsEmpty(Window.Property(scenes.empty))</visible>
+					<autoscroll delay="6000" time="3000" repeat="8000">true</autoscroll>
 				</control>
-				<control type="list" id="410">
-					<left>480</left>
-					<top>150</top>
-					<width>1248</width>
-					<height>812</height>
-					<onup>999</onup>
-					<ondown>999</ondown>
-					<onleft>100</onleft>
-					<onright>999</onright>
-					<scrolltime tween="cubic" easing="out">200</scrolltime>
-					<itemlayout width="1248" height="58">
-						<control type="image">
-							<left>50</left>
-							<top>15</top>
-							<width>28</width>
-							<height>28</height>
-							<texture colordiffuse="kscape_amber">kscape-heart.png</texture>
-							<visible>!String.IsEmpty(ListItem.Property(fav))</visible>
-						</control>
-						<control type="label">
-							<left>90</left>
-							<width>920</width>
-							<height>58</height>
-							<aligny>center</aligny>
-							<font>kscape_menu</font>
-							<textcolor>kscape_tint_light</textcolor>
-							<label>$INFO[ListItem.Label]</label>
-						</control>
-						<control type="label">
-							<left>1010</left>
-							<width>180</width>
-							<height>58</height>
-							<align>right</align>
-							<aligny>center</aligny>
-							<font>kscape_menu</font>
-							<textcolor>kscape_text_dim</textcolor>
-							<label>$INFO[ListItem.Label2]</label>
-						</control>
-					</itemlayout>
-					<focusedlayout width="1248" height="58">
-						<control type="image">
-							<width>1248</width>
-							<height>58</height>
-							<texture colordiffuse="kscape_blue_light">kscape-white.png</texture>
-						</control>
-						<control type="image">
-							<left>50</left>
-							<top>15</top>
-							<width>28</width>
-							<height>28</height>
-							<texture colordiffuse="FFFFFFFF">kscape-heart.png</texture>
-							<visible>!String.IsEmpty(ListItem.Property(fav))</visible>
-						</control>
-						<control type="label">
-							<left>90</left>
-							<width>920</width>
-							<height>58</height>
-							<aligny>center</aligny>
-							<font>kscape_menu</font>
-							<textcolor>FFFFFFFF</textcolor>
-							<label>$INFO[ListItem.Label]</label>
-						</control>
-						<control type="label">
-							<left>1010</left>
-							<width>180</width>
-							<height>58</height>
-							<align>right</align>
-							<aligny>center</aligny>
-							<font>kscape_menu</font>
-							<textcolor>FFFFFFFF</textcolor>
-							<label>$INFO[ListItem.Label2]</label>
-						</control>
-					</focusedlayout>
+				<control type="label" id="230">
+					<left>530</left>
+					<width>220</width>
+					<height>38</height>
+					<font>kscape_info_label</font>
+					<textcolor>FFFFFFFF</textcolor>
+				</control>
+				<control type="textbox" id="231">
+					<left>770</left>
+					<width>910</width>
+					<height>38</height>
+					<font>kscape_panel_body</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="240">
+					<left>530</left>
+					<width>220</width>
+					<height>38</height>
+					<font>kscape_info_label</font>
+					<textcolor>FFFFFFFF</textcolor>
+				</control>
+				<control type="textbox" id="241">
+					<left>770</left>
+					<width>910</width>
+					<height>76</height>
+					<font>kscape_panel_body</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="250">
+					<left>530</left>
+					<width>220</width>
+					<height>38</height>
+					<font>kscape_info_label</font>
+					<textcolor>FFFFFFFF</textcolor>
+				</control>
+				<control type="textbox" id="251">
+					<left>770</left>
+					<width>910</width>
+					<height>38</height>
+					<font>kscape_panel_body</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="label" id="260">
+					<left>530</left>
+					<width>220</width>
+					<height>38</height>
+					<font>kscape_info_label</font>
+					<textcolor>FFFFFFFF</textcolor>
+				</control>
+				<control type="textbox" id="261">
+					<left>770</left>
+					<width>910</width>
+					<height>38</height>
+					<font>kscape_panel_body</font>
+					<textcolor>kscape_text</textcolor>
+				</control>
+				<control type="group" id="270">
+					<description>Runtime, aspect ratio, country, year; resolution, dynamic range, audio (a group: Python cannot hold a grouplist)</description>
+					<left>530</left>
+					<width>1150</width>
+					<height>44</height>
+				<control type="grouplist">
+					<width>1150</width>
+					<height>44</height>
+					<orientation>horizontal</orientation>
+					<itemgap>10</itemgap>
+					<usecontrolcoords>true</usecontrolcoords>
+					<control type="label" id="271">
+						<width>auto</width>
+						<height>44</height>
+						<aligny>center</aligny>
+						<font>kscape_panel_body</font>
+						<textcolor>kscape_text</textcolor>
+						<label>$INFO[Window.Property(facts)]</label>
+						<visible>!String.IsEmpty(Window.Property(facts))</visible>
+					</control>
+					<control type="image" id="279">
+						<width>8</width>
+						<height>44</height>
+						<texture/>
+						<visible>!String.IsEmpty(Window.Property(facts))</visible>
+					</control>
+					<control type="image" id="272">
+						<top>7</top>
+						<width>41</width>
+						<height>30</height>
+						<texture colordiffuse="kscape_amber">$INFO[Window.Property(b.res)]</texture>
+						<visible>!String.IsEmpty(Window.Property(b.res))</visible>
+					</control>
+					<control type="image" id="275">
+						<description>Further format available in another version</description>
+						<top>7</top>
+						<width>41</width>
+						<height>30</height>
+						<texture colordiffuse="kscape_amber">$INFO[Window.Property(b.res2)]</texture>
+						<visible>!String.IsEmpty(Window.Property(b.res2))</visible>
+					</control>
+					<control type="image" id="276">
+						<description>Further format available in another version</description>
+						<top>7</top>
+						<width>41</width>
+						<height>30</height>
+						<texture colordiffuse="kscape_amber">$INFO[Window.Property(b.res3)]</texture>
+						<visible>!String.IsEmpty(Window.Property(b.res3))</visible>
+					</control>
+					<control type="image" id="277">
+						<description>Further format available in another version</description>
+						<top>7</top>
+						<width>41</width>
+						<height>30</height>
+						<texture colordiffuse="kscape_amber">$INFO[Window.Property(b.res4)]</texture>
+						<visible>!String.IsEmpty(Window.Property(b.res4))</visible>
+					</control>
+					<control type="image" id="273">
+						<top>7</top>
+						<width>56</width>
+						<height>30</height>
+						<texture colordiffuse="kscape_text">$INFO[Window.Property(b.hdr)]</texture>
+						<visible>!String.IsEmpty(Window.Property(b.hdr))</visible>
+					</control>
+					<control type="image" id="274">
+						<top>7</top>
+						<width>151</width>
+						<height>30</height>
+						<texture colordiffuse="kscape_text">$INFO[Window.Property(b.audio)]</texture>
+						<visible>!String.IsEmpty(Window.Property(b.audio))</visible>
+					</control>
+				</control>
+				</control>
+				<control type="label" id="280">
+					<left>530</left>
+					<width>220</width>
+					<height>44</height>
+					<aligny>center</aligny>
+					<font>kscape_info_label</font>
+					<textcolor>FFFFFFFF</textcolor>
+				</control>
+				<control type="group" id="285">
+					<description>Certificate, TMDB score, Rotten Tomatoes Tomatometer (a group: Python cannot hold a grouplist)</description>
+					<left>770</left>
+					<width>910</width>
+					<height>44</height>
+				<control type="grouplist">
+					<width>910</width>
+					<height>44</height>
+					<orientation>horizontal</orientation>
+					<itemgap>8</itemgap>
+					<usecontrolcoords>true</usecontrolcoords>
+					<control type="label" id="286">
+						<width>auto</width>
+						<height>44</height>
+						<aligny>center</aligny>
+						<font>kscape_panel_body</font>
+						<textcolor>kscape_text</textcolor>
+						<label>$INFO[Window.Property(r.mpaa)]</label>
+						<visible>!String.IsEmpty(Window.Property(r.mpaa))</visible>
+					</control>
+					<control type="image" id="291">
+						<width>18</width>
+						<height>44</height>
+						<texture/>
+						<visible>!String.IsEmpty(Window.Property(r.mpaa)) + [!String.IsEmpty(Window.Property(r.tmdb)) | !String.IsEmpty(Window.Property(r.rt))]</visible>
+					</control>
+					<control type="image" id="287">
+						<top>7</top>
+						<width>57</width>
+						<height>30</height>
+						<texture>kscape-tmdb.png</texture>
+						<visible>!String.IsEmpty(Window.Property(r.tmdb))</visible>
+					</control>
+					<control type="label" id="288">
+						<width>auto</width>
+						<height>44</height>
+						<aligny>center</aligny>
+						<font>kscape_panel_body</font>
+						<textcolor>kscape_text</textcolor>
+						<label>$INFO[Window.Property(r.tmdb)]</label>
+						<visible>!String.IsEmpty(Window.Property(r.tmdb))</visible>
+					</control>
+					<control type="image" id="292">
+						<width>18</width>
+						<height>44</height>
+						<texture/>
+						<visible>!String.IsEmpty(Window.Property(r.tmdb)) + !String.IsEmpty(Window.Property(r.rt))</visible>
+					</control>
+					<control type="image" id="289">
+						<top>7</top>
+						<width>30</width>
+						<height>30</height>
+						<texture>$INFO[Window.Property(r.rticon)]</texture>
+						<visible>!String.IsEmpty(Window.Property(r.rt))</visible>
+					</control>
+					<control type="label" id="290">
+						<width>auto</width>
+						<height>44</height>
+						<aligny>center</aligny>
+						<font>kscape_panel_body</font>
+						<textcolor>kscape_text</textcolor>
+						<label>$INFO[Window.Property(r.rt)]</label>
+						<visible>!String.IsEmpty(Window.Property(r.rt))</visible>
+					</control>
+				</control>
+				</control>
+				</control>
+
+				<control type="button" id="999">
+					<description>Never visible: list edges point here so they stop instead of wrapping</description>
+					<width>1</width>
+					<height>1</height>
+					<visible>false</visible>
+				</control>
+
+				<control type="group" id="300">
+					<description>Page: Explore - the movie's people, genres, year and country; Select filters the library</description>
+					<visible>String.IsEqual(Window.Property(page),explore)</visible>
+					<animation effect="fade" start="0" end="100" time="200">Visible</animation>
+					<animation effect="slide" start="60,0" end="0,0" time="260" tween="cubic" easing="out">Visible</animation>
+					<control type="list" id="310">
+						<description>Section headings are rows of their own (property heading); details.py steps over them</description>
+						<left>480</left>
+						<top>80</top>
+						<width>1248</width>
+						<height>870</height>
+						<onup>999</onup>
+						<ondown>999</ondown>
+						<onleft>100</onleft>
+						<onright>999</onright>
+						<scrolltime tween="cubic" easing="out">200</scrolltime>
+						<itemlayout width="1248" height="58">
+							<control type="label">
+								<left>70</left>
+								<width>1100</width>
+								<height>58</height>
+								<aligny>bottom</aligny>
+								<font>kscape_info_label</font>
+								<textcolor>kscape_text_dim</textcolor>
+								<label>$INFO[ListItem.Property(heading)]</label>
+								<visible>!String.IsEmpty(ListItem.Property(heading))</visible>
+							</control>
+							<control type="label">
+								<left>110</left>
+								<width>900</width>
+								<height>58</height>
+								<aligny>center</aligny>
+								<font>kscape_menu</font>
+								<textcolor>kscape_tint_light</textcolor>
+								<label>$INFO[ListItem.Label]</label>
+								<visible>String.IsEmpty(ListItem.Property(heading))</visible>
+							</control>
+							<control type="label">
+								<left>1010</left>
+								<width>180</width>
+								<height>58</height>
+								<align>right</align>
+								<aligny>center</aligny>
+								<font>kscape_small</font>
+								<textcolor>kscape_text_dim</textcolor>
+								<label>$INFO[ListItem.Label2]</label>
+							</control>
+						</itemlayout>
+						<focusedlayout width="1248" height="58">
+							<control type="image">
+								<width>1248</width>
+								<height>58</height>
+								<texture colordiffuse="kscape_blue_light">kscape-white.png</texture>
+								<visible>String.IsEmpty(ListItem.Property(heading))</visible>
+							</control>
+							<control type="label">
+								<left>70</left>
+								<width>1100</width>
+								<height>58</height>
+								<aligny>bottom</aligny>
+								<font>kscape_info_label</font>
+								<textcolor>kscape_text_dim</textcolor>
+								<label>$INFO[ListItem.Property(heading)]</label>
+								<visible>!String.IsEmpty(ListItem.Property(heading))</visible>
+							</control>
+							<control type="label">
+								<left>110</left>
+								<width>900</width>
+								<height>58</height>
+								<aligny>center</aligny>
+								<font>kscape_menu</font>
+								<textcolor>FFFFFFFF</textcolor>
+								<label>$INFO[ListItem.Label]</label>
+								<visible>String.IsEmpty(ListItem.Property(heading))</visible>
+							</control>
+							<control type="label">
+								<left>1010</left>
+								<width>180</width>
+								<height>58</height>
+								<align>right</align>
+								<aligny>center</aligny>
+								<font>kscape_small</font>
+								<textcolor>FFFFFFFF</textcolor>
+								<label>$INFO[ListItem.Label2]</label>
+							</control>
+						</focusedlayout>
+					</control>
+				</control>
+
+				<control type="group" id="400">
+					<description>Page: Play Scenes - Play All Scenes, the movie's scenes with their lengths, Create / Import</description>
+					<visible>String.IsEqual(Window.Property(page),scenes)</visible>
+					<animation effect="fade" start="0" end="100" time="200">Visible</animation>
+					<animation effect="slide" start="60,0" end="0,0" time="260" tween="cubic" easing="out">Visible</animation>
+					<control type="label">
+						<left>530</left>
+						<top>88</top>
+						<width>1150</width>
+						<height>44</height>
+						<font>kscape_info_label</font>
+						<textcolor>FFFFFFFF</textcolor>
+						<label>$INFO[Window.Property(scenes.heading)]</label>
+					</control>
+					<control type="textbox">
+						<left>530</left>
+						<top>150</top>
+						<width>1150</width>
+						<height>160</height>
+						<font>kscape_panel_body</font>
+						<textcolor>kscape_text</textcolor>
+						<label>$INFO[Window.Property(scenes.empty)]</label>
+						<visible>!String.IsEmpty(Window.Property(scenes.empty))</visible>
+					</control>
+					<control type="list" id="410">
+						<left>480</left>
+						<top>150</top>
+						<width>1248</width>
+						<height>812</height>
+						<onup>999</onup>
+						<ondown>999</ondown>
+						<onleft>100</onleft>
+						<onright>999</onright>
+						<scrolltime tween="cubic" easing="out">200</scrolltime>
+						<itemlayout width="1248" height="58">
+							<control type="image">
+								<left>50</left>
+								<top>15</top>
+								<width>28</width>
+								<height>28</height>
+								<texture colordiffuse="kscape_amber">kscape-heart.png</texture>
+								<visible>!String.IsEmpty(ListItem.Property(fav))</visible>
+							</control>
+							<control type="label">
+								<left>90</left>
+								<width>920</width>
+								<height>58</height>
+								<aligny>center</aligny>
+								<font>kscape_menu</font>
+								<textcolor>kscape_tint_light</textcolor>
+								<label>$INFO[ListItem.Label]</label>
+							</control>
+							<control type="label">
+								<left>1010</left>
+								<width>180</width>
+								<height>58</height>
+								<align>right</align>
+								<aligny>center</aligny>
+								<font>kscape_menu</font>
+								<textcolor>kscape_text_dim</textcolor>
+								<label>$INFO[ListItem.Label2]</label>
+							</control>
+						</itemlayout>
+						<focusedlayout width="1248" height="58">
+							<control type="image">
+								<width>1248</width>
+								<height>58</height>
+								<texture colordiffuse="kscape_blue_light">kscape-white.png</texture>
+							</control>
+							<control type="image">
+								<left>50</left>
+								<top>15</top>
+								<width>28</width>
+								<height>28</height>
+								<texture colordiffuse="FFFFFFFF">kscape-heart.png</texture>
+								<visible>!String.IsEmpty(ListItem.Property(fav))</visible>
+							</control>
+							<control type="label">
+								<left>90</left>
+								<width>920</width>
+								<height>58</height>
+								<aligny>center</aligny>
+								<font>kscape_menu</font>
+								<textcolor>FFFFFFFF</textcolor>
+								<label>$INFO[ListItem.Label]</label>
+							</control>
+							<control type="label">
+								<left>1010</left>
+								<width>180</width>
+								<height>58</height>
+								<align>right</align>
+								<aligny>center</aligny>
+								<font>kscape_menu</font>
+								<textcolor>FFFFFFFF</textcolor>
+								<label>$INFO[ListItem.Label2]</label>
+							</control>
+						</focusedlayout>
+					</control>
 				</control>
 			</control>
+	
 		</control>
 	</controls>
 </window>

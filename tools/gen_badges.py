@@ -22,7 +22,7 @@ RADIUS = 5
 LINE = 2                     # outline, 1080p pixels
 PAD_X = 9
 
-FILLED = {'4K': '4K', '1080p': '1080p', '720p': '720p', 'SD': 'SD'}
+FILLED = {'4K': '4K', '1080p': '1080p', '720p': '720p', 'SD': 'SD', '3D': '3D', 'DVD': 'DVD'}
 OUTLINED = {
     'sdr': 'SDR', 'hdr10': 'HDR10', 'hdr10plus': 'HDR10+', 'dolbyvision': 'DOLBY VISION', 'hlg': 'HLG',
     'atmos': 'DOLBY ATMOS', 'dtsx': 'DTS:X', 'truehd': 'DOLBY TrueHD', 'dtshdma': 'DTS-HD MA',

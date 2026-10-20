@@ -13,9 +13,11 @@ STRINGS = {32040: '{} hour', 32041: '{} hours', 32042: '{} minute', 32043: '{} m
 tr = STRINGS.get
 
 
-def movie(i, title, year=2000, genres=(), directors=(), cast=(), runtime=6000, mpaa='', badge=''):
+def movie(i, title, year=2000, genres=(), directors=(), cast=(), runtime=6000, mpaa='', badge='', resolution='',
+          stereo=False):
     return Movie(i, title, title.lower(), year, frozenset(genres), frozenset(directors),
-                 tuple(cast), 0, frozenset(), '', '', runtime, 0.0, badge, mpaa)
+                 tuple(cast), 0, frozenset(), '', '', runtime, 0.0, badge, mpaa, resolution=resolution,
+                 stereo=stereo)
 
 
 class InfoTest(unittest.TestCase):
@@ -55,9 +57,9 @@ class InfoTest(unittest.TestCase):
 
 
 A = movie(1, 'Alien', 1979, ['Horror', 'Science Fiction'], ['Ridley Scott'], ['Sigourney Weaver'],
-          runtime=7020, mpaa='Rated R', badge='UHD')
-B = movie(2, 'Babe', 1995, ['Family'], runtime=5460, mpaa='Rated G')
-C = movie(3, 'Cars', 2006, ['Animation', 'Family'], mpaa='Rated G', badge='HDR')
+          runtime=7020, mpaa='Rated R', badge='UHD', resolution='1080p', stereo=True)
+B = movie(2, 'Babe', 1995, ['Family'], runtime=5460, mpaa='Rated G', resolution='SD')
+C = movie(3, 'Cars', 2006, ['Animation', 'Family'], mpaa='Rated G', badge='HDR', resolution='4K')
 D = movie(4, 'Dune', 0, [], runtime=0)
 MOVIES = [A, B, C, D]
 
@@ -105,7 +107,7 @@ class ListModelTest(unittest.TestCase):
         v = L.row_values(L.Row(A, ''), 'title')
         self.assertEqual(v['genre_mark'], '')
         self.assertEqual(v['label'], f'[COLOR {L.AMBER}]A[/COLOR]lien')
-        self.assertEqual((v['year'], v['time'], v['rating'], v['quality']), ('1979', '1:57', 'R', 'UHD'))
+        self.assertEqual((v['year'], v['time'], v['rating'], v['quality']), ('1979', '1:57', 'R', '1080p · 3D'))
         self.assertEqual(L.row_values(L.Row(D, ''), 'title')['year'], '')
 
     def test_first_press_sorts_and_stays_on_the_movie(self):
@@ -135,7 +137,7 @@ class ListModelTest(unittest.TestCase):
         self.assertEqual(L.scroll_for('cast'), 280)
         total = sum(c.width for c in L.COLUMNS)
         self.assertEqual(L.scroll_for('quality'), total - L.SCROLL_W)
-        self.assertEqual(L.scroll_stops(), [0, 280, total - L.SCROLL_W])
+        self.assertEqual(L.scroll_stops(), [0, 280, 680, total - L.SCROLL_W])
 
 
 if __name__ == '__main__':

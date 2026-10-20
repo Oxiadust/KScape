@@ -11,48 +11,53 @@
 		<top>0</top>
 	</coordinates>
 	<controls>
-		<control type="image">
-			<description>Dimmer (oversized because Kodi offsets the window)</description>
-			<left>-1920</left>
-			<top>-1080</top>
-			<width>5760</width>
-			<height>3240</height>
-			<texture colordiffuse="kscape_dim">white.png</texture>
-			<animation effect="fade" start="0" end="100" time="200">WindowOpen</animation>
-			<animation effect="fade" start="100" end="0" time="160">WindowClose</animation>
-		</control>
-		<control type="button">
-			<description>Click outside the menu to close it</description>
-			<left>-1920</left>
-			<top>-1080</top>
-			<width>5760</width>
-			<height>3240</height>
-			<texturefocus/>
-			<texturenofocus/>
-			<onclick>Action(close)</onclick>
-		</control>
 		<control type="group">
-			<include>PanelOpenClose</include>
-			<control type="image" id="999">
-				<description>Panel background, resized by Kodi to fit the items</description>
-				<width>600</width>
-				<height>770</height>
-				<texture colordiffuse="kscape_blue">white.png</texture>
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<control type="image">
+				<description>Dimmer (oversized because Kodi offsets the window)</description>
+				<left>-1920</left>
+				<top>-1080</top>
+				<width>5760</width>
+				<height>3240</height>
+				<texture colordiffuse="kscape_dim">white.png</texture>
+				<animation effect="fade" start="0" end="100" time="200">WindowOpen</animation>
+				<animation effect="fade" start="100" end="0" time="160">WindowClose</animation>
 			</control>
-			<control type="grouplist" id="996">
-				<description>Context buttons, filled by Kodi</description>
-				<width>600</width>
-				<height max="770">auto</height>
-				<usecontrolcoords>true</usecontrolcoords>
-				<onup>996</onup>
-				<ondown>996</ondown>
+			<control type="button">
+				<description>Click outside the menu to close it</description>
+				<left>-1920</left>
+				<top>-1080</top>
+				<width>5760</width>
+				<height>3240</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onclick>Action(close)</onclick>
 			</control>
-		</control>
-		<control type="button" id="1000">
-			<description>Button template</description>
-			<left>0</left>
-			<top></top>
-			<include content="SystemButton"><param name="width" value="600"/><param name="height" value="70"/></include>
+			<control type="group">
+				<include>PanelOpenClose</include>
+				<control type="image" id="999">
+					<description>Panel background, resized by Kodi to fit the items</description>
+					<width>600</width>
+					<height>770</height>
+					<texture colordiffuse="kscape_blue">white.png</texture>
+				</control>
+				<control type="grouplist" id="996">
+					<description>Context buttons, filled by Kodi</description>
+					<width>600</width>
+					<height max="770">auto</height>
+					<usecontrolcoords>true</usecontrolcoords>
+					<onup>996</onup>
+					<ondown>996</ondown>
+				</control>
+			</control>
+			<control type="button" id="1000">
+				<description>Button template</description>
+				<left>0</left>
+				<top></top>
+				<include content="SystemButton"><param name="width" value="600"/><param name="height" value="70"/></include>
+			</control>
+	
 		</control>
 	</controls>
 </window>

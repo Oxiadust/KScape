@@ -4,15 +4,20 @@
 	<depth>DepthMax</depth>
 	<controls>
 		<control type="group">
-			<visible>!Window.IsActive(startup)</visible>
-			<left>760</left>
-			<top>60</top>
-			<control type="progress" id="29999">
-				<width>400</width>
-				<height>6</height>
-				<texturebg colordiffuse="40FFFFFF">white.png</texturebg>
-				<midtexture colordiffuse="FFFFFFFF">white.png</midtexture>
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<control type="group">
+				<visible>!Window.IsActive(startup)</visible>
+				<left>760</left>
+				<top>60</top>
+				<control type="progress" id="29999">
+					<width>400</width>
+					<height>6</height>
+					<texturebg colordiffuse="40FFFFFF">white.png</texturebg>
+					<midtexture colordiffuse="FFFFFFFF">white.png</midtexture>
+				</control>
 			</control>
+	
 		</control>
 	</controls>
 </window>

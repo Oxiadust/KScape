@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodi contract (colour picker, e.g. Settings → Player → Subtitles colours): 1 heading,
+     6 colours (Label the name, Label2 the colour, drawn as a swatch), 61 scrollbar, 7 Cancel. -->
+<window>
+	<defaultcontrol always="true">6</defaultcontrol>
+	<depth>DepthDialog</depth>
+	<controls>
+		<control type="group">
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>DialogDim</include>
+			<control type="group">
+				<left>335</left>
+				<top>145</top>
+				<include>PanelOpenClose</include>
+				<include content="SystemPanel">
+					<param name="width" value="1250"/>
+					<param name="height" value="790"/>
+					<param name="title"></param>
+				</include>
+				<control type="label" id="1">
+					<left>30</left>
+					<width>1190</width>
+					<height>64</height>
+					<aligny>center</aligny>
+					<font>kscape_info_head</font>
+					<textcolor>white</textcolor>
+				</control>
+				<control type="image">
+					<left>30</left>
+					<top>90</top>
+					<width>920</width>
+					<height>580</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+				</control>
+				<control type="panel" id="6">
+					<left>40</left>
+					<top>100</top>
+					<width>900</width>
+					<height>560</height>
+					<orientation>vertical</orientation>
+					<onup>6</onup>
+					<ondown>6</ondown>
+					<onleft>9001</onleft>
+					<onright>61</onright>
+					<pagecontrol>61</pagecontrol>
+					<scrolltime>200</scrolltime>
+					<itemlayout width="150" height="90">
+						<control type="image">
+							<left>6</left>
+							<top>6</top>
+							<width>138</width>
+							<height>78</height>
+							<texture colordiffuse="FF000000">white.png</texture>
+						</control>
+						<control type="image">
+							<left>10</left>
+							<top>10</top>
+							<width>130</width>
+							<height>70</height>
+							<texture>white.png</texture>
+							<colordiffuse>$INFO[ListItem.Label2]</colordiffuse>
+						</control>
+					</itemlayout>
+					<focusedlayout width="150" height="90">
+						<control type="image">
+							<width>150</width>
+							<height>90</height>
+							<texture colordiffuse="white">white.png</texture>
+							<visible>Control.HasFocus(6)</visible>
+						</control>
+						<control type="image">
+							<left>6</left>
+							<top>6</top>
+							<width>138</width>
+							<height>78</height>
+							<texture colordiffuse="FF000000">white.png</texture>
+						</control>
+						<control type="image">
+							<left>10</left>
+							<top>10</top>
+							<width>130</width>
+							<height>70</height>
+							<texture>white.png</texture>
+							<colordiffuse>$INFO[ListItem.Label2]</colordiffuse>
+						</control>
+					</focusedlayout>
+				</control>
+				<control type="scrollbar" id="61">
+					<left>954</left>
+					<top>90</top>
+					<width>12</width>
+					<height>580</height>
+					<orientation>vertical</orientation>
+					<onleft>6</onleft>
+					<onright>9001</onright>
+					<texturesliderbackground colordiffuse="kscape_blue">white.png</texturesliderbackground>
+					<texturesliderbar colordiffuse="kscape_text_dim">white.png</texturesliderbar>
+					<texturesliderbarfocus colordiffuse="white">white.png</texturesliderbarfocus>
+					<textureslidernib/>
+					<textureslidernibfocus/>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<top>690</top>
+					<width>920</width>
+					<height>60</height>
+					<aligny>center</aligny>
+					<font>kscape_menu</font>
+					<textcolor>kscape_text</textcolor>
+					<label>[COLOR kscape_text_dim]$LOCALIZE[31059]:[/COLOR] $INFO[Container(6).ListItem.Label]$INFO[Container(6).ListItem.Label2,  #,]</label>
+				</control>
+				<control type="grouplist" id="9001">
+					<left>980</left>
+					<top>90</top>
+					<width>240</width>
+					<height>300</height>
+					<orientation>vertical</orientation>
+					<onleft>61</onleft>
+					<onright>6</onright>
+					<control type="button" id="7">
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="240"/>
+							<param name="height" value="80"/>
+						</include>
+						<label>$LOCALIZE[222]</label>
+					</control>
+				</control>
+			</control>
+	
+		</control>
+	</controls>
+</window>

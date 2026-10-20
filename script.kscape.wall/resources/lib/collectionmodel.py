@@ -135,8 +135,10 @@ def member_key(item):
 
 
 def title_key(movie):
-    """Duplicate copies of one film share this (model.merge_duplicates)."""
-    return (' '.join(movie.title.casefold().split()), movie.year)
+    """Duplicate copies of one film share this (model.merge_duplicates): the same TMDB / IMDb id,
+    title, year and edition."""
+    from .model import _title_key
+    return _title_key(movie)
 
 
 def resolve(keys, library, shown):

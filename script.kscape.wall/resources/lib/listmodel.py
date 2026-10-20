@@ -204,6 +204,15 @@ def _first(values):
     return sorted(values)[0] if values else ''
 
 
+def _formats_key(m):
+    """Best available format first (4K, 1080p, 720p, SD), 3D after 2D, unknown last."""
+    from .versions import FORMATS
+    f = m.formats
+    if not f:
+        return (len(FORMATS), 1)
+    return (min(FORMATS.index(x) for x in f if x != '3D') if any(x != '3D' for x in f) else 3, '3D' in f)
+
+
 def _number(n):
     return str(n) if n > 0 else ''
 
@@ -218,17 +227,17 @@ MOVIES = ListSpec(
         Column('year', 32054, 150),
         Column('time', 32055, 150),
         Column('rating', 32056, 170),
-        Column('quality', 32057, 210),
+        Column('quality', 32366, 250),
     ],
     multi={'genre': lambda m: sorted(m.genres),
            'cast': lambda m: list(m.cast[:FULL_LINES]),      # the names the band shows
            'director': lambda m: sorted(m.directors)},
     single={'year': lambda m: _number(m.year), 'time': lambda m: runtime_clock(m.runtime),
-            'rating': lambda m: rating_short(m.mpaa), 'quality': lambda m: m.badge},
+            'rating': lambda m: rating_short(m.mpaa), 'quality': lambda m: ' · '.join(m.formats)},
     sorts={'year': lambda m: (m.year <= 0, m.year),
            'time': lambda m: (m.runtime <= 0, m.runtime),
            'rating': _rating_key,
-           'quality': lambda m: QUALITY_ORDER.get(m.badge, 2)},
+           'quality': _formats_key},
     title_text=lambda m: m.title,
     xml='script-kscape-list.xml',
 )

@@ -5,233 +5,238 @@
 <window>
 	<defaultcontrol always="true">9000</defaultcontrol>
 	<controls>
-		<include>SystemBackdrop</include>
 		<control type="group">
-			<left>96</left>
-			<top>48</top>
-			<include>WindowFade</include>
-			<include content="SystemPanel">
-				<param name="width" value="1728"/>
-				<param name="height" value="984"/>
-				<param name="title" value="$LOCALIZE[13200]"/>
-			</include>
-			<control type="image">
-				<description>Left column</description>
-				<top>64</top>
-				<width>480</width>
-				<height>920</height>
-				<texture colordiffuse="kscape_blue_dark">white.png</texture>
-			</control>
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>SystemBackdrop</include>
+			<control type="group">
+				<left>96</left>
+				<top>48</top>
+				<include>WindowFade</include>
+				<include content="SystemPanel">
+					<param name="width" value="1728"/>
+					<param name="height" value="984"/>
+					<param name="title" value="$LOCALIZE[13200]"/>
+				</include>
+				<control type="image">
+					<description>Left column</description>
+					<top>64</top>
+					<width>480</width>
+					<height>920</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+				</control>
 
-			<control type="list" id="9000">
-				<description>Categories: General / Profiles</description>
-				<top>94</top>
-				<width>480</width>
-				<height>160</height>
-				<onleft>9100</onleft>
-				<onright>9100</onright>
-				<onup>9000</onup>
-				<ondown>9000</ondown>
-				<scrolltime>0</scrolltime>
-				<itemlayout width="480" height="80">
-					<control type="label">
-						<left>30</left>
-						<width>420</width>
-						<height>80</height>
-						<aligny>center</aligny>
-						<font>kscape_menu</font>
-						<textcolor>kscape_text</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-					</control>
-				</itemlayout>
-				<focusedlayout width="480" height="80">
-					<control type="image">
-						<description>Stays half-lit while the right side has focus, marking the open category</description>
-						<width>480</width>
-						<height>80</height>
-						<texture colordiffuse="kscape_blue_focus">white.png</texture>
-						<animation effect="fade" start="100" end="40" time="0" condition="!Control.HasFocus(9000)">Conditional</animation>
-					</control>
-					<control type="label">
-						<left>30</left>
-						<width>420</width>
-						<height>80</height>
-						<aligny>center</aligny>
-						<font>kscape_menu</font>
-						<textcolor>white</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-					</control>
-				</focusedlayout>
-				<content>
-					<item id="1">
-						<label>$LOCALIZE[128]</label>
-						<onclick>noop</onclick>
-					</item>
-					<item id="2">
-						<label>$LOCALIZE[13200]</label>
-						<onclick>noop</onclick>
-					</item>
-				</content>
-			</control>
-
-			<control type="group" id="9100">
-				<left>480</left>
-				<top>64</top>
-				<control type="panel" id="2">
-					<description>Profiles, filled by Kodi</description>
-					<left>50</left>
-					<top>30</top>
-					<width>1180</width>
-					<height>860</height>
-					<onleft>9000</onleft>
-					<onright>9000</onright>
-					<onup>2</onup>
-					<ondown>2</ondown>
-					<scrolltime tween="cubic" easing="out">200</scrolltime>
-					<visible>Container(9000).HasFocus(2)</visible>
-					<itemlayout width="295" height="430">
-						<control type="image">
-							<width>270</width>
-							<height>410</height>
-							<texture colordiffuse="kscape_blue_dark">white.png</texture>
-						</control>
-						<control type="image">
-							<left>45</left>
-							<top>30</top>
-							<width>180</width>
-							<height>180</height>
-							<aspectratio>scale</aspectratio>
-							<texture fallback="DefaultUser.png">$INFO[ListItem.Icon]</texture>
-						</control>
+				<control type="list" id="9000">
+					<description>Categories: General / Profiles</description>
+					<top>94</top>
+					<width>480</width>
+					<height>160</height>
+					<onleft>9100</onleft>
+					<onright>9100</onright>
+					<onup>9000</onup>
+					<ondown>9000</ondown>
+					<scrolltime>0</scrolltime>
+					<itemlayout width="480" height="80">
 						<control type="label">
-							<left>12</left>
-							<top>226</top>
-							<width>246</width>
-							<height>44</height>
-							<align>center</align>
+							<left>30</left>
+							<width>420</width>
+							<height>80</height>
 							<aligny>center</aligny>
-							<font>kscape_info_label</font>
+							<font>kscape_menu</font>
 							<textcolor>kscape_text</textcolor>
 							<label>$INFO[ListItem.Label]</label>
 						</control>
-						<control type="label">
-							<left>12</left>
-							<top>288</top>
-							<width>246</width>
-							<height>34</height>
-							<align>center</align>
-							<aligny>center</aligny>
-							<font>kscape_small</font>
-							<textcolor>kscape_text_dim</textcolor>
-							<label>$LOCALIZE[12012]</label>
-							<visible>!String.IsEqual(ListItem.Label,$LOCALIZE[20058])</visible>
-						</control>
-						<control type="label">
-							<left>12</left>
-							<top>322</top>
-							<width>246</width>
-							<height>40</height>
-							<align>center</align>
-							<aligny>center</aligny>
-							<font>kscape_list_value</font>
-							<textcolor>kscape_text_dim</textcolor>
-							<label fallback="13170">$INFO[ListItem.Label2]</label>
-							<visible>!String.IsEqual(ListItem.Label,$LOCALIZE[20058])</visible>
-						</control>
 					</itemlayout>
-					<focusedlayout width="295" height="430">
+					<focusedlayout width="480" height="80">
 						<control type="image">
-							<width>270</width>
-							<height>410</height>
-							<texture colordiffuse="kscape_blue_dark">white.png</texture>
-						</control>
-						<control type="image">
-							<width>270</width>
-							<height>410</height>
+							<description>Stays half-lit while the right side has focus, marking the open category</description>
+							<width>480</width>
+							<height>80</height>
 							<texture colordiffuse="kscape_blue_focus">white.png</texture>
-							<visible>Control.HasFocus(2)</visible>
-						</control>
-						<control type="image">
-							<left>45</left>
-							<top>30</top>
-							<width>180</width>
-							<height>180</height>
-							<aspectratio>scale</aspectratio>
-							<texture fallback="DefaultUser.png">$INFO[ListItem.Icon]</texture>
+							<animation effect="fade" start="100" end="40" time="0" condition="!Control.HasFocus(9000)">Conditional</animation>
 						</control>
 						<control type="label">
-							<left>12</left>
-							<top>226</top>
-							<width>246</width>
-							<height>44</height>
-							<align>center</align>
+							<left>30</left>
+							<width>420</width>
+							<height>80</height>
 							<aligny>center</aligny>
-							<font>kscape_info_label</font>
+							<font>kscape_menu</font>
 							<textcolor>white</textcolor>
-							<scroll>true</scroll>
 							<label>$INFO[ListItem.Label]</label>
 						</control>
-						<control type="label">
-							<left>12</left>
-							<top>288</top>
-							<width>246</width>
-							<height>34</height>
-							<align>center</align>
-							<aligny>center</aligny>
-							<font>kscape_small</font>
-							<textcolor>white</textcolor>
-							<label>$LOCALIZE[12012]</label>
-							<visible>!String.IsEqual(ListItem.Label,$LOCALIZE[20058])</visible>
-						</control>
-						<control type="label">
-							<left>12</left>
-							<top>322</top>
-							<width>246</width>
-							<height>40</height>
-							<align>center</align>
-							<aligny>center</aligny>
-							<font>kscape_list_value</font>
-							<textcolor>white</textcolor>
-							<label fallback="13170">$INFO[ListItem.Label2]</label>
-							<visible>!String.IsEqual(ListItem.Label,$LOCALIZE[20058])</visible>
-						</control>
 					</focusedlayout>
+					<content>
+						<item id="1">
+							<label>$LOCALIZE[128]</label>
+							<onclick>noop</onclick>
+						</item>
+						<item id="2">
+							<label>$LOCALIZE[13200]</label>
+							<onclick>noop</onclick>
+						</item>
+					</content>
 				</control>
 
-				<control type="grouplist" id="9001">
-					<description>General options</description>
-					<left>50</left>
-					<top>30</top>
-					<width>1180</width>
-					<height>860</height>
-					<onleft>9000</onleft>
-					<onright>9000</onright>
-					<onup>9001</onup>
-					<ondown>9001</ondown>
-					<visible>Container(9000).HasFocus(1)</visible>
-					<control type="radiobutton" id="4">
-						<description>Show login screen on startup</description>
-						<include content="SystemButton"><param name="width" value="1180"/><param name="height" value="80"/></include>
-						<label>$LOCALIZE[20096]</label>
-						<radioposx>1110</radioposx>
-						<radiowidth>36</radiowidth>
-						<radioheight>36</radioheight>
-						<textureradioonfocus colordiffuse="white">white.png</textureradioonfocus>
-						<textureradioonnofocus colordiffuse="kscape_text">white.png</textureradioonnofocus>
-						<textureradioofffocus colordiffuse="40FFFFFF">white.png</textureradioofffocus>
-						<textureradiooffnofocus colordiffuse="40FFFFFF">white.png</textureradiooffnofocus>
-						<textureradioondisabled colordiffuse="kscape_text_off">white.png</textureradioondisabled>
-						<textureradiooffdisabled colordiffuse="20FFFFFF">white.png</textureradiooffdisabled>
+				<control type="group" id="9100">
+					<left>480</left>
+					<top>64</top>
+					<control type="panel" id="2">
+						<description>Profiles, filled by Kodi</description>
+						<left>50</left>
+						<top>30</top>
+						<width>1180</width>
+						<height>860</height>
+						<onleft>9000</onleft>
+						<onright>9000</onright>
+						<onup>2</onup>
+						<ondown>2</ondown>
+						<scrolltime tween="cubic" easing="out">200</scrolltime>
+						<visible>Container(9000).HasFocus(2)</visible>
+						<itemlayout width="295" height="430">
+							<control type="image">
+								<width>270</width>
+								<height>410</height>
+								<texture colordiffuse="kscape_blue_dark">white.png</texture>
+							</control>
+							<control type="image">
+								<left>45</left>
+								<top>30</top>
+								<width>180</width>
+								<height>180</height>
+								<aspectratio>scale</aspectratio>
+								<texture fallback="DefaultUser.png">$INFO[ListItem.Icon]</texture>
+							</control>
+							<control type="label">
+								<left>12</left>
+								<top>226</top>
+								<width>246</width>
+								<height>44</height>
+								<align>center</align>
+								<aligny>center</aligny>
+								<font>kscape_info_label</font>
+								<textcolor>kscape_text</textcolor>
+								<label>$INFO[ListItem.Label]</label>
+							</control>
+							<control type="label">
+								<left>12</left>
+								<top>288</top>
+								<width>246</width>
+								<height>34</height>
+								<align>center</align>
+								<aligny>center</aligny>
+								<font>kscape_small</font>
+								<textcolor>kscape_text_dim</textcolor>
+								<label>$LOCALIZE[12012]</label>
+								<visible>!String.IsEqual(ListItem.Label,$LOCALIZE[20058])</visible>
+							</control>
+							<control type="label">
+								<left>12</left>
+								<top>322</top>
+								<width>246</width>
+								<height>40</height>
+								<align>center</align>
+								<aligny>center</aligny>
+								<font>kscape_list_value</font>
+								<textcolor>kscape_text_dim</textcolor>
+								<label fallback="13170">$INFO[ListItem.Label2]</label>
+								<visible>!String.IsEqual(ListItem.Label,$LOCALIZE[20058])</visible>
+							</control>
+						</itemlayout>
+						<focusedlayout width="295" height="430">
+							<control type="image">
+								<width>270</width>
+								<height>410</height>
+								<texture colordiffuse="kscape_blue_dark">white.png</texture>
+							</control>
+							<control type="image">
+								<width>270</width>
+								<height>410</height>
+								<texture colordiffuse="kscape_blue_focus">white.png</texture>
+								<visible>Control.HasFocus(2)</visible>
+							</control>
+							<control type="image">
+								<left>45</left>
+								<top>30</top>
+								<width>180</width>
+								<height>180</height>
+								<aspectratio>scale</aspectratio>
+								<texture fallback="DefaultUser.png">$INFO[ListItem.Icon]</texture>
+							</control>
+							<control type="label">
+								<left>12</left>
+								<top>226</top>
+								<width>246</width>
+								<height>44</height>
+								<align>center</align>
+								<aligny>center</aligny>
+								<font>kscape_info_label</font>
+								<textcolor>white</textcolor>
+								<scroll>true</scroll>
+								<label>$INFO[ListItem.Label]</label>
+							</control>
+							<control type="label">
+								<left>12</left>
+								<top>288</top>
+								<width>246</width>
+								<height>34</height>
+								<align>center</align>
+								<aligny>center</aligny>
+								<font>kscape_small</font>
+								<textcolor>white</textcolor>
+								<label>$LOCALIZE[12012]</label>
+								<visible>!String.IsEqual(ListItem.Label,$LOCALIZE[20058])</visible>
+							</control>
+							<control type="label">
+								<left>12</left>
+								<top>322</top>
+								<width>246</width>
+								<height>40</height>
+								<align>center</align>
+								<aligny>center</aligny>
+								<font>kscape_list_value</font>
+								<textcolor>white</textcolor>
+								<label fallback="13170">$INFO[ListItem.Label2]</label>
+								<visible>!String.IsEqual(ListItem.Label,$LOCALIZE[20058])</visible>
+							</control>
+						</focusedlayout>
 					</control>
-					<control type="button" id="5">
-						<description>Automatic login on startup</description>
-						<include content="SystemButton"><param name="width" value="1180"/><param name="height" value="80"/></include>
-						<label>$LOCALIZE[33084]</label>
-						<label2>[B]$INFO[System.ProfileAutoLogin][/B]</label2>
-						<enable>!Window.IsVisible(ProfileSettings) + !System.HasLoginScreen</enable>
+
+					<control type="grouplist" id="9001">
+						<description>General options</description>
+						<left>50</left>
+						<top>30</top>
+						<width>1180</width>
+						<height>860</height>
+						<onleft>9000</onleft>
+						<onright>9000</onright>
+						<onup>9001</onup>
+						<ondown>9001</ondown>
+						<visible>Container(9000).HasFocus(1)</visible>
+						<control type="radiobutton" id="4">
+							<description>Show login screen on startup</description>
+							<include content="SystemButton"><param name="width" value="1180"/><param name="height" value="80"/></include>
+							<label>$LOCALIZE[20096]</label>
+							<radioposx>1110</radioposx>
+							<radiowidth>36</radiowidth>
+							<radioheight>36</radioheight>
+							<textureradioonfocus colordiffuse="white">white.png</textureradioonfocus>
+							<textureradioonnofocus colordiffuse="kscape_text">white.png</textureradioonnofocus>
+							<textureradioofffocus colordiffuse="40FFFFFF">white.png</textureradioofffocus>
+							<textureradiooffnofocus colordiffuse="40FFFFFF">white.png</textureradiooffnofocus>
+							<textureradioondisabled colordiffuse="kscape_text_off">white.png</textureradioondisabled>
+							<textureradiooffdisabled colordiffuse="20FFFFFF">white.png</textureradiooffdisabled>
+						</control>
+						<control type="button" id="5">
+							<description>Automatic login on startup</description>
+							<include content="SystemButton"><param name="width" value="1180"/><param name="height" value="80"/></include>
+							<label>$LOCALIZE[33084]</label>
+							<label2>[B]$INFO[System.ProfileAutoLogin][/B]</label2>
+							<enable>!Window.IsVisible(ProfileSettings) + !System.HasLoginScreen</enable>
+						</control>
 					</control>
 				</control>
 			</control>
+	
 		</control>
 	</controls>
 </window>

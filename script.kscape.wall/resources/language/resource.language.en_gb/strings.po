@@ -1216,3 +1216,139 @@ msgstr ""
 msgctxt "#32364"
 msgid "UP NEXT"
 msgstr ""
+
+msgctxt "#32365"
+msgid "The trailer did not start. If it is a YouTube trailer, check the YouTube add-on (Settings → Add-ons) and your network."
+msgstr ""
+
+msgctxt "#32366"
+msgid "Formats"
+msgstr ""
+
+msgctxt "#32367"
+msgid "Play Version"
+msgstr ""
+
+msgctxt "#32368"
+msgid "{} versions"
+msgstr ""
+
+msgctxt "#32369"
+msgid "Choose a version"
+msgstr ""
+
+msgctxt "#32370"
+msgid "Resume from {}"
+msgstr ""
+
+msgctxt "#32371"
+msgid "Play from the beginning"
+msgstr ""
+
+msgctxt "#32372"
+msgid "4K first (then 1080p, 720p, SD)"
+msgstr ""
+
+msgctxt "#32373"
+msgid "1080p first"
+msgstr ""
+
+msgctxt "#32374"
+msgid "720p first"
+msgstr ""
+
+msgctxt "#32375"
+msgid "SD first"
+msgstr ""
+
+msgctxt "#32376"
+msgid "Kodi's default version"
+msgstr ""
+
+msgctxt "#32377"
+msgid "Version Play starts"
+msgstr ""
+
+msgctxt "#32380"
+msgid "Auto (recommended)"
+msgstr ""
+
+msgctxt "#32381"
+msgid "16:9 Standard"
+msgstr ""
+
+msgctxt "#32382"
+msgid "21:9 Ultrawide"
+msgstr ""
+
+msgctxt "#32383"
+msgid "2.35:1 CinemaScope"
+msgstr ""
+
+msgctxt "#32384"
+msgid "2.39:1 CinemaScope"
+msgstr ""
+
+msgctxt "#32385"
+msgid "2.40:1 CinemaScope"
+msgstr ""
+
+msgctxt "#32386"
+msgid "Automatic layout"
+msgstr ""
+
+msgctxt "#32387"
+msgid "Two poster rows"
+msgstr ""
+
+msgctxt "#32388"
+msgid "Three poster rows"
+msgstr ""
+
+msgctxt "#32389"
+msgid "Interface aspect ratio"
+msgstr ""
+
+msgctxt "#32390"
+msgid "CinemaScope poster wall"
+msgstr ""
+
+msgctxt "#32391"
+msgid "Vertical UI offset"
+msgstr ""
+
+msgctxt "#32392"
+msgid "Horizontal UI offset"
+msgstr ""
+
+msgctxt "#32393"
+msgid "Safe area / overscan"
+msgstr ""
+
+msgctxt "#32394"
+msgid "Keep this layout?"
+msgstr ""
+
+msgctxt "#32395"
+msgid "KScape now uses the new display settings. Without an answer they go back in {} seconds."
+msgstr ""
+
+msgctxt "#32396"
+msgid "this screen: {} — {} × {}"
+msgstr ""
+
+msgctxt "#32397"
+msgid "{} px"
+msgstr ""
+
+msgctxt "#32398"
+msgid "{} %"
+msgstr ""
+
+msgctxt "#32399"
+msgid "KScape draws inside the amber frame"
+msgstr ""
+
+msgctxt "#32400"
+msgid "Line it up with your screen using the aspect ratio, offsets and safe area.[CR]Back closes the preview."
+msgstr ""

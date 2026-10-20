@@ -13,327 +13,332 @@
 	<defaultcontrol always="true">21</defaultcontrol>
 	<depth>0.52</depth>
 	<controls>
-		<include>DialogDim</include>
 		<control type="group">
-			<left>655</left>
-			<top>209</top>
-			<include>PanelOpenClose</include>
-			<include content="SystemPanel">
-				<param name="width" value="610"/>
-				<param name="height" value="662"/>
-				<param name="title" value=""/>
-			</include>
-			<control type="textbox" id="1">
-				<description>Heading (set by Kodi)</description>
-				<left>30</left>
-				<width>550</width>
-				<height>64</height>
-				<aligny>center</aligny>
-				<font>kscape_info_label</font>
-				<textcolor>white</textcolor>
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>DialogDim</include>
+			<control type="group">
+				<left>655</left>
+				<top>209</top>
+				<include>PanelOpenClose</include>
+				<include content="SystemPanel">
+					<param name="width" value="610"/>
+					<param name="height" value="662"/>
+					<param name="title" value=""/>
+				</include>
+				<control type="textbox" id="1">
+					<description>Heading (set by Kodi)</description>
+					<left>30</left>
+					<width>550</width>
+					<height>64</height>
+					<aligny>center</aligny>
+					<font>kscape_info_label</font>
+					<textcolor>white</textcolor>
+				</control>
+				<control type="image">
+					<description>Input field</description>
+					<left>30</left>
+					<top>88</top>
+					<width>550</width>
+					<height>84</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+				</control>
+				<control type="label" id="4">
+					<description>Input text (set by Kodi)</description>
+					<left>30</left>
+					<top>88</top>
+					<width>550</width>
+					<height>84</height>
+					<align>center</align>
+					<aligny>center</aligny>
+					<font>kscape_title</font>
+					<textcolor>white</textcolor>
+				</control>
+				<control type="button" id="11">
+					<left>30</left>
+					<top>196</top>
+					<width>120</width>
+					<height>100</height>
+					<font>kscape_title</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>$LOCALIZE[12311]</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onup>20</onup>
+					<ondown>14</ondown>
+					<onleft>23</onleft>
+					<onright>12</onright>
+				</control>
+				<control type="button" id="12">
+					<left>162</left>
+					<top>196</top>
+					<width>120</width>
+					<height>100</height>
+					<font>kscape_title</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>$LOCALIZE[12312]</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onup>10</onup>
+					<ondown>15</ondown>
+					<onleft>11</onleft>
+					<onright>13</onright>
+				</control>
+				<control type="button" id="13">
+					<left>294</left>
+					<top>196</top>
+					<width>120</width>
+					<height>100</height>
+					<font>kscape_title</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>$LOCALIZE[12313]</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onup>22</onup>
+					<ondown>16</ondown>
+					<onleft>12</onleft>
+					<onright>23</onright>
+				</control>
+				<control type="button" id="14">
+					<left>30</left>
+					<top>308</top>
+					<width>120</width>
+					<height>100</height>
+					<font>kscape_title</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>$LOCALIZE[12314]</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onup>11</onup>
+					<ondown>17</ondown>
+					<onleft>23</onleft>
+					<onright>15</onright>
+				</control>
+				<control type="button" id="15">
+					<left>162</left>
+					<top>308</top>
+					<width>120</width>
+					<height>100</height>
+					<font>kscape_title</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>$LOCALIZE[12315]</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onup>12</onup>
+					<ondown>18</ondown>
+					<onleft>14</onleft>
+					<onright>16</onright>
+				</control>
+				<control type="button" id="16">
+					<left>294</left>
+					<top>308</top>
+					<width>120</width>
+					<height>100</height>
+					<font>kscape_title</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>$LOCALIZE[12316]</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onup>13</onup>
+					<ondown>19</ondown>
+					<onleft>15</onleft>
+					<onright>23</onright>
+				</control>
+				<control type="button" id="17">
+					<left>30</left>
+					<top>420</top>
+					<width>120</width>
+					<height>100</height>
+					<font>kscape_title</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>$LOCALIZE[12317]</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onup>14</onup>
+					<ondown>20</ondown>
+					<onleft>21</onleft>
+					<onright>18</onright>
+				</control>
+				<control type="button" id="18">
+					<left>162</left>
+					<top>420</top>
+					<width>120</width>
+					<height>100</height>
+					<font>kscape_title</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>$LOCALIZE[12318]</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onup>15</onup>
+					<ondown>10</ondown>
+					<onleft>17</onleft>
+					<onright>19</onright>
+				</control>
+				<control type="button" id="19">
+					<left>294</left>
+					<top>420</top>
+					<width>120</width>
+					<height>100</height>
+					<font>kscape_title</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>$LOCALIZE[12319]</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onup>16</onup>
+					<ondown>22</ondown>
+					<onleft>18</onleft>
+					<onright>21</onright>
+				</control>
+				<control type="radiobutton" id="20">
+					<description>Previous field</description>
+					<left>30</left>
+					<top>532</top>
+					<width>120</width>
+					<height>100</height>
+					<font>kscape_title</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>&lt;</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<radiowidth>1</radiowidth>
+					<radioheight>1</radioheight>
+					<textureradioonfocus/>
+					<textureradioonnofocus/>
+					<textureradioofffocus/>
+					<textureradiooffnofocus/>
+					<onup>17</onup>
+					<ondown>11</ondown>
+					<onleft>21</onleft>
+					<onright>10</onright>
+				</control>
+				<control type="button" id="10">
+					<description>0 button</description>
+					<left>162</left>
+					<top>532</top>
+					<width>120</width>
+					<height>100</height>
+					<font>kscape_title</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>$LOCALIZE[12310]</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onup>18</onup>
+					<ondown>12</ondown>
+					<onleft>20</onleft>
+					<onright>22</onright>
+				</control>
+				<control type="radiobutton" id="22">
+					<description>Next field</description>
+					<left>294</left>
+					<top>532</top>
+					<width>120</width>
+					<height>100</height>
+					<font>kscape_title</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>&gt;</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<radiowidth>1</radiowidth>
+					<radioheight>1</radioheight>
+					<textureradioonfocus/>
+					<textureradioonnofocus/>
+					<textureradioofffocus/>
+					<textureradiooffnofocus/>
+					<onup>19</onup>
+					<ondown>13</ondown>
+					<onleft>10</onleft>
+					<onright>21</onright>
+				</control>
+				<control type="button" id="23">
+					<description>Backspace</description>
+					<left>426</left>
+					<top>196</top>
+					<width>154</width>
+					<height>212</height>
+					<font>kscape_small</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>$LOCALIZE[20181]</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onup>21</onup>
+					<ondown>21</ondown>
+					<onleft>13</onleft>
+					<onright>11</onright>
+				</control>
+				<control type="button" id="21">
+					<description>Done</description>
+					<left>426</left>
+					<top>420</top>
+					<width>154</width>
+					<height>212</height>
+					<font>kscape_info_label</font>
+					<align>center</align>
+					<aligny>center</aligny>
+					<textcolor>kscape_text</textcolor>
+					<focusedcolor>white</focusedcolor>
+					<disabledcolor>kscape_text_off</disabledcolor>
+					<label>$LOCALIZE[20177]</label>
+					<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
+					<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+					<onup>23</onup>
+					<ondown>23</ondown>
+					<onleft>19</onleft>
+					<onright>17</onright>
+				</control>
 			</control>
-			<control type="image">
-				<description>Input field</description>
-				<left>30</left>
-				<top>88</top>
-				<width>550</width>
-				<height>84</height>
-				<texture colordiffuse="kscape_blue_dark">white.png</texture>
-			</control>
-			<control type="label" id="4">
-				<description>Input text (set by Kodi)</description>
-				<left>30</left>
-				<top>88</top>
-				<width>550</width>
-				<height>84</height>
-				<align>center</align>
-				<aligny>center</aligny>
-				<font>kscape_title</font>
-				<textcolor>white</textcolor>
-			</control>
-			<control type="button" id="11">
-				<left>30</left>
-				<top>196</top>
-				<width>120</width>
-				<height>100</height>
-				<font>kscape_title</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>$LOCALIZE[12311]</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<onup>20</onup>
-				<ondown>14</ondown>
-				<onleft>23</onleft>
-				<onright>12</onright>
-			</control>
-			<control type="button" id="12">
-				<left>162</left>
-				<top>196</top>
-				<width>120</width>
-				<height>100</height>
-				<font>kscape_title</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>$LOCALIZE[12312]</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<onup>10</onup>
-				<ondown>15</ondown>
-				<onleft>11</onleft>
-				<onright>13</onright>
-			</control>
-			<control type="button" id="13">
-				<left>294</left>
-				<top>196</top>
-				<width>120</width>
-				<height>100</height>
-				<font>kscape_title</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>$LOCALIZE[12313]</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<onup>22</onup>
-				<ondown>16</ondown>
-				<onleft>12</onleft>
-				<onright>23</onright>
-			</control>
-			<control type="button" id="14">
-				<left>30</left>
-				<top>308</top>
-				<width>120</width>
-				<height>100</height>
-				<font>kscape_title</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>$LOCALIZE[12314]</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<onup>11</onup>
-				<ondown>17</ondown>
-				<onleft>23</onleft>
-				<onright>15</onright>
-			</control>
-			<control type="button" id="15">
-				<left>162</left>
-				<top>308</top>
-				<width>120</width>
-				<height>100</height>
-				<font>kscape_title</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>$LOCALIZE[12315]</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<onup>12</onup>
-				<ondown>18</ondown>
-				<onleft>14</onleft>
-				<onright>16</onright>
-			</control>
-			<control type="button" id="16">
-				<left>294</left>
-				<top>308</top>
-				<width>120</width>
-				<height>100</height>
-				<font>kscape_title</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>$LOCALIZE[12316]</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<onup>13</onup>
-				<ondown>19</ondown>
-				<onleft>15</onleft>
-				<onright>23</onright>
-			</control>
-			<control type="button" id="17">
-				<left>30</left>
-				<top>420</top>
-				<width>120</width>
-				<height>100</height>
-				<font>kscape_title</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>$LOCALIZE[12317]</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<onup>14</onup>
-				<ondown>20</ondown>
-				<onleft>21</onleft>
-				<onright>18</onright>
-			</control>
-			<control type="button" id="18">
-				<left>162</left>
-				<top>420</top>
-				<width>120</width>
-				<height>100</height>
-				<font>kscape_title</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>$LOCALIZE[12318]</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<onup>15</onup>
-				<ondown>10</ondown>
-				<onleft>17</onleft>
-				<onright>19</onright>
-			</control>
-			<control type="button" id="19">
-				<left>294</left>
-				<top>420</top>
-				<width>120</width>
-				<height>100</height>
-				<font>kscape_title</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>$LOCALIZE[12319]</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<onup>16</onup>
-				<ondown>22</ondown>
-				<onleft>18</onleft>
-				<onright>21</onright>
-			</control>
-			<control type="radiobutton" id="20">
-				<description>Previous field</description>
-				<left>30</left>
-				<top>532</top>
-				<width>120</width>
-				<height>100</height>
-				<font>kscape_title</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>&lt;</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<radiowidth>1</radiowidth>
-				<radioheight>1</radioheight>
-				<textureradioonfocus/>
-				<textureradioonnofocus/>
-				<textureradioofffocus/>
-				<textureradiooffnofocus/>
-				<onup>17</onup>
-				<ondown>11</ondown>
-				<onleft>21</onleft>
-				<onright>10</onright>
-			</control>
-			<control type="button" id="10">
-				<description>0 button</description>
-				<left>162</left>
-				<top>532</top>
-				<width>120</width>
-				<height>100</height>
-				<font>kscape_title</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>$LOCALIZE[12310]</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<onup>18</onup>
-				<ondown>12</ondown>
-				<onleft>20</onleft>
-				<onright>22</onright>
-			</control>
-			<control type="radiobutton" id="22">
-				<description>Next field</description>
-				<left>294</left>
-				<top>532</top>
-				<width>120</width>
-				<height>100</height>
-				<font>kscape_title</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>&gt;</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<radiowidth>1</radiowidth>
-				<radioheight>1</radioheight>
-				<textureradioonfocus/>
-				<textureradioonnofocus/>
-				<textureradioofffocus/>
-				<textureradiooffnofocus/>
-				<onup>19</onup>
-				<ondown>13</ondown>
-				<onleft>10</onleft>
-				<onright>21</onright>
-			</control>
-			<control type="button" id="23">
-				<description>Backspace</description>
-				<left>426</left>
-				<top>196</top>
-				<width>154</width>
-				<height>212</height>
-				<font>kscape_small</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>$LOCALIZE[20181]</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<onup>21</onup>
-				<ondown>21</ondown>
-				<onleft>13</onleft>
-				<onright>11</onright>
-			</control>
-			<control type="button" id="21">
-				<description>Done</description>
-				<left>426</left>
-				<top>420</top>
-				<width>154</width>
-				<height>212</height>
-				<font>kscape_info_label</font>
-				<align>center</align>
-				<aligny>center</aligny>
-				<textcolor>kscape_text</textcolor>
-				<focusedcolor>white</focusedcolor>
-				<disabledcolor>kscape_text_off</disabledcolor>
-				<label>$LOCALIZE[20177]</label>
-				<texturefocus colordiffuse="kscape_blue_focus">white.png</texturefocus>
-				<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
-				<onup>23</onup>
-				<ondown>23</ondown>
-				<onleft>19</onleft>
-				<onright>17</onright>
-			</control>
+	
 		</control>
 	</controls>
 </window>

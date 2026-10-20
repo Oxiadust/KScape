@@ -263,6 +263,7 @@ class Engine:
         self.session = None
         self.expect_stop = False
         self.own_seek = 0.0
+        self.stopping = False
         for p in PROPS:
             HOME.clearProperty(f'kscape.demo.{p}')
         recover()
@@ -461,7 +462,7 @@ class Engine:
     # ---- the scene clock -------------------------------------------------------------------------
 
     def _worker(self):
-        while not self.monitor.abortRequested():
+        while not self.monitor.abortRequested() and not self.stopping:
             delay = self._tick()
             self.wake.wait(delay)
             self.wake.clear()
@@ -674,6 +675,9 @@ class Engine:
             self._restore_soon(todo, then=forget)
 
     def shutdown(self):
+        """Kodi is closing: let the worker go at once (Kodi waits for every service thread)."""
+        self.stopping = True
+        self.wake.set()
         with self.lock:
             if self.session:
                 self._end_session(restore_all=False, stop=False)   # restored on the next start

@@ -25,7 +25,8 @@ ROOT = os.path.join(os.path.dirname(__file__), '..', 'script.kscape.wall')
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from resources.lib import listmodel as L  # noqa: E402
-import np_chip  # noqa: E402
+import np_chip
+import wrap_display  # noqa: E402
 
 W, H = 1920, 1080
 # Rows are laid out wider than the screen: Kodi skips layout controls that start outside the
@@ -358,7 +359,7 @@ def main():
     for spec in L.SPECS.values():
         out = os.path.join(ROOT, 'resources', 'skins', 'Default', '1080i', spec.xml)
         with open(out, 'w') as f:
-            f.write(build(spec))
+            f.write(wrap_display.wrap(build(spec)))   # display & aspect ratio root
         print(f'wrote {out}')
 
 

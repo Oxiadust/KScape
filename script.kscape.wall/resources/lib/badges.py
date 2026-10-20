@@ -8,6 +8,8 @@ IMAGES = {
     '1080p': ('kscape-badge-1080p.png', 69),
     '720p': ('kscape-badge-720p.png', 59),
     'SD': ('kscape-badge-sd.png', 43),
+    '3D': ('kscape-badge-3d.png', 41),
+    'DVD': ('kscape-badge-dvd.png', 56),
     'sdr': ('kscape-badge-sdr.png', 56),
     'hdr10': ('kscape-badge-hdr10.png', 77),
     'hdr10plus': ('kscape-badge-hdr10plus.png', 88),

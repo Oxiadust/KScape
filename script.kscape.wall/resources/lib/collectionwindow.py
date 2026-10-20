@@ -527,7 +527,7 @@ class CollectionsWindow(xbmcgui.WindowXML):
                 self._start_reload()
                 return
             if self.kind.has_extra:
-                item = self.kind.with_extra(item, {key: current.cast})
+                item = self.kind.carry(item, current)
             self.all_movies = [item if m.key == key else m for m in self.all_movies]
             if self.moving is None:
                 self._refresh()
@@ -550,8 +550,8 @@ class CollectionsWindow(xbmcgui.WindowXML):
             self.loading = False
             if self.closing:
                 return
-            cast = {m.key: m.cast for m in self.all_movies} if self.kind.has_extra else {}
-            self.all_movies = [self.kind.with_extra(m, cast) for m in items] if cast else items
+            old = {m.key: m for m in self.all_movies} if self.kind.has_extra else {}
+            self.all_movies = [self.kind.carry(m, old.get(m.key)) for m in items] if old else items
             if self.moving is None:
                 self._refresh()
         if items:

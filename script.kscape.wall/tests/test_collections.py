@@ -17,7 +17,7 @@ NOW = datetime(2026, 10, 18, 12, 0, 0)
 def movie(i, title, year=2000, added='', played='', playcount=0, resume=0.0, file=None):
     return Movie(i, title, title.lower(), year, frozenset(), frozenset(), (), 0, frozenset(), f'p{i}', '', 6000,
                  resume, file=file if file is not None else f'/m/{i}.mkv', dateadded=added, lastplayed=played,
-                 playcount=playcount)
+                 playcount=playcount, uid=f'tmdb:{title.lower()}{year}')
 
 
 class BuiltinTest(unittest.TestCase):

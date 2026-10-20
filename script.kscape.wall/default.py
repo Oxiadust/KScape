@@ -7,6 +7,9 @@ RunScript(script.kscape.wall,<kind>,collections) that library's Collections view
 RunScript(script.kscape.wall,music,nowplaying)   Now Playing
 RunScript(script.kscape.wall,switchskin)         choose another installed skin and switch to it
 RunScript(script.kscape.wall,colours,<part>)     part: main or highlight - pick a theme colour
+RunScript(script.kscape.wall,display,<setting>)  aspect, rows, voffset, hoffset, safe, preview:
+                                                 Skin settings → Display & aspect ratio
+RunScript(script.kscape.wall,versions,preference) Skin settings → Movie versions: preferred version
 RunScript(script.kscape.wall,scene,mark)         playback controls: mark a scene's start, then end
 RunScript(script.kscape.wall,demo,<cmd>)         cmd: next, prev, exit (keep watching) or stop -
                                                  passed to the scene playback service
@@ -63,6 +66,14 @@ def main(args):
     if args[:1] == ['demo'] and len(args) > 1:
         from resources.lib.demoservice import request
         request(args[1])
+        return
+    if args[:1] == ['display']:
+        from resources.lib import displayui
+        displayui.run(args[1:])
+        return
+    if args[:1] == ['versions']:
+        from resources.lib import versionsui
+        versionsui.run(args[1:])
         return
     if args[:1] == ['colours']:
         from resources.lib import colours

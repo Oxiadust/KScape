@@ -26,7 +26,8 @@ import sys
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(TOOLS, '..', 'script.kscape.wall')
 sys.path.insert(0, TOOLS)
-import np_chip  # noqa: E402
+import np_chip
+import wrap_display  # noqa: E402
 
 W, H = 1920, 1080
 BG = 'kscape_bg'
@@ -218,7 +219,7 @@ def main():
     for square, name in ((False, 'script-kscape-collections.xml'), (True, 'script-kscape-collections-square.xml')):
         out = os.path.join(ROOT, 'resources', 'skins', 'Default', '1080i', name)
         with open(out, 'w') as f:
-            f.write(build(square))
+            f.write(wrap_display.wrap(build(square)))   # display & aspect ratio root
         print(f'wrote {out}')
 
 

@@ -48,9 +48,18 @@ class Kind:
     def with_extra(self, item, extra):
         return item
 
+    def carry(self, item, old):
+        """`item` re-read from the library, keeping what the slower second query filled into
+        `old` (the same item as it was)."""
+        return item
+
     def panel(self, item):
         """(title, body) of the synopsis panel beside the focused cover."""
         return item.title, getattr(item, 'plot', '')
+
+    def cover_badge(self, item, show=True):
+        """Badge text on a cover ('' for none)."""
+        return item.badge if show else ''
 
     def fallback(self, item):
         """Text drawn on a cover that has no artwork."""
@@ -91,11 +100,30 @@ class Movies(Kind):
         return lib.fetch_movie(key)
 
     def fetch_extra(self):
-        return lib.fetch_cast()
+        """{movieid: (cast, versions)}: the top-billed cast, and Kodi's versions of movies that
+        have two or more (library.fetch_versions)."""
+        cast = lib.fetch_cast()
+        try:
+            versions = lib.fetch_versions()
+        except Exception as e:                      # never lose the cast over a version listing
+            xbmc.log(f'kscape: listing movie versions failed: {e}', xbmc.LOGWARNING)
+            versions = {}
+        return {k: (cast.get(k, ()), versions.get(k, ())) for k in set(cast) | set(versions)}
 
     def with_extra(self, item, extra):
         from dataclasses import replace
-        return replace(item, cast=extra.get(item.movieid, ()))
+        cast, versions = extra.get(item.movieid, ((), ()))
+        return replace(item, cast=cast, versions=lib.mark_default(versions, item.file))
+
+    def cover_badge(self, item, show=True):
+        """Every format the movie is available in: '4K · 1080p · 3D' (Skin settings can hide them)."""
+        return ' · '.join(item.formats) if show else ''
+
+    def carry(self, item, old):
+        from dataclasses import replace
+        if old is None:
+            return item
+        return replace(item, cast=old.cast, versions=lib.mark_default(old.versions, item.file))
 
     def activate(self, item, favs, library=None, page=None, resolver=None):
         from . import modal
@@ -115,8 +143,10 @@ class Movies(Kind):
             break
         if choice in ('play', 'resume'):
             lib.play(item, resume=choice == 'resume')
+        elif choice == 'version':
+            lib.play_version(extra['version'], resume=extra['resume'])
         elif choice == 'trailer' and details and details.get('trailer'):
-            lib.play_trailer(details['trailer'])
+            lib.play_trailer(details['trailer'], details.get('title') or item.title, item.poster)
         elif choice == 'explore':
             return 'explore', extra['filter']
         return 'search' if choice == 'search' else None

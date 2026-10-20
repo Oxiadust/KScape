@@ -1,35 +1,149 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Skin settings window (WINDOW_SKIN_SETTINGS). Kodi contract: none; all ids here are KScape's own.
-     Radio buttons toggle Skin.HasSetting(ReducedMotion | HomeNoArtwork | HomeNoClock | HomeNoCaption).
-     Colours: the theme's main and highlight colour, picked by script.kscape.wall (colours.py), which
-     sets Kodi's skin colours setting (colors/*.xml, made by tools/gen_colors.py). -->
+     Categories on the left (9100), the selected one's settings on the right (9201-9205):
+     General      Skin.HasSetting(ReducedMotion)
+     Colours      the theme's main and highlight colour, picked by script.kscape.wall (colours.py), which
+                  sets Kodi's skin colours setting (colors/*.xml, made by tools/gen_colors.py)
+     Home         Skin.HasSetting(HomeNoArtwork | HomeNoClock | HomeNoCaption)
+     Movie versions  Skin.HasSetting(KScapeHideFormatBadges | KScapePrefer3D),
+                  Skin.String(KScapeVersionPreference) (versionsui.py)
+     Display & aspect ratio  Skin.String(KScapeAspect | KScapeScopeRows | KScapeVOffset | KScapeHOffset |
+                  KScapeSafeArea), chosen, previewed and confirmed by displayui.py; the *Label strings
+                  are what the rows show. -->
 <window>
-	<defaultcontrol always="true">101</defaultcontrol>
+	<defaultcontrol always="true">9100</defaultcontrol>
 	<controls>
+		<control type="group">
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
 		<include>SystemBackdrop</include>
 		<control type="group">
-			<left>360</left>
-			<top>150</top>
+			<left>210</left>
+			<top>130</top>
 			<include>WindowFade</include>
 			<include content="SystemPanel">
-				<param name="width" value="1200"/>
-				<param name="height" value="780"/>
+				<param name="width" value="1500"/>
+				<param name="height" value="820"/>
 				<param name="title" value="$LOCALIZE[20077]"/>
 			</include>
-			<control type="group" id="9000">
-				<description>Rows at fixed positions with explicit Up/Down (wrapping). A grouplist would
-				not move focus across the section headings.</description>
+			<control type="image">
+				<description>Category column</description>
+				<top>64</top>
+				<width>400</width>
+				<height>756</height>
+				<texture colordiffuse="kscape_blue_dark">white.png</texture>
+			</control>
+			<control type="list" id="9100">
+				<description>Categories</description>
 				<top>88</top>
+				<width>400</width>
+				<height>700</height>
+				<onup>9100</onup>
+				<ondown>9100</ondown>
+				<onleft>9100</onleft>
+				<onright condition="String.IsEqual(Container(9100).ListItem.Property(id),general)">9201</onright>
+				<onright condition="String.IsEqual(Container(9100).ListItem.Property(id),colours)">9202</onright>
+				<onright condition="String.IsEqual(Container(9100).ListItem.Property(id),home)">9203</onright>
+				<onright condition="String.IsEqual(Container(9100).ListItem.Property(id),versions)">9204</onright>
+				<onright condition="String.IsEqual(Container(9100).ListItem.Property(id),display)">9205</onright>
+				<scrolltime>0</scrolltime>
+				<itemlayout width="400" height="72">
+					<control type="image">
+						<description>The category whose settings show, while they have focus</description>
+						<width>400</width>
+						<height>72</height>
+						<texture colordiffuse="kscape_blue_mid">white.png</texture>
+						<visible>!Control.HasFocus(9100) + ListItem.IsSelected</visible>
+					</control>
+					<control type="label">
+						<left>30</left>
+						<width>360</width>
+						<height>72</height>
+						<aligny>center</aligny>
+						<font>kscape_menu</font>
+						<textcolor>kscape_tint_light</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+				</itemlayout>
+				<focusedlayout width="400" height="72">
+					<control type="image">
+						<width>400</width>
+						<height>72</height>
+						<texture colordiffuse="kscape_blue_light">white.png</texture>
+						<visible>Control.HasFocus(9100)</visible>
+					</control>
+					<control type="image">
+						<width>400</width>
+						<height>72</height>
+						<texture colordiffuse="kscape_blue_mid">white.png</texture>
+						<visible>!Control.HasFocus(9100)</visible>
+					</control>
+					<control type="label">
+						<left>30</left>
+						<width>360</width>
+						<height>72</height>
+						<aligny>center</aligny>
+						<font>kscape_menu</font>
+						<textcolor>white</textcolor>
+						<label>$INFO[ListItem.Label]</label>
+					</control>
+				</focusedlayout>
+				<content>
+					<item>
+						<label>$LOCALIZE[31065]</label>
+						<property name="id">general</property>
+						<onclick>SetFocus(9201)</onclick>
+					</item>
+					<item>
+						<label>$LOCALIZE[31046]</label>
+						<property name="id">colours</property>
+						<onclick>SetFocus(9202)</onclick>
+					</item>
+					<item>
+						<label>$LOCALIZE[31042]</label>
+						<property name="id">home</property>
+						<onclick>SetFocus(9203)</onclick>
+					</item>
+					<item>
+						<label>$LOCALIZE[31066]</label>
+						<property name="id">versions</property>
+						<onclick>SetFocus(9204)</onclick>
+					</item>
+					<item>
+						<label>$LOCALIZE[31067]</label>
+						<property name="id">display</property>
+						<onclick>SetFocus(9205)</onclick>
+					</item>
+				</content>
+			</control>
+			<control type="label">
+				<left>440</left>
+				<top>88</top>
+				<width>1040</width>
+				<height>110</height>
+				<font>kscape_small</font>
+				<textcolor>kscape_text_dim</textcolor>
+				<wrapmultiline>true</wrapmultiline>
+				<label>$LOCALIZE[31077]</label>
+				<visible>String.IsEqual(Container(9100).ListItem.Property(id),general)</visible>
+			</control>
+			<control type="grouplist" id="9201">
+				<left>440</left>
+				<top>206</top>
+				<width>1040</width>
+				<height>580</height>
+				<orientation>vertical</orientation>
+				<itemgap>8</itemgap>
+				<onleft>9100</onleft>
+				<onright>9100</onright>
+				<visible>String.IsEqual(Container(9100).ListItem.Property(id),general)</visible>
 				<control type="radiobutton" id="101">
-					<top>0</top>
-					<onup>104</onup>
-					<ondown>121</ondown>
 					<include content="SystemButton">
-						<param name="width" value="1200"/>
+						<param name="width" value="1040"/>
 						<param name="height" value="72"/>
 					</include>
 					<label>$LOCALIZE[31041]</label>
-					<radioposx>1106</radioposx>
+					<radioposx>950</radioposx>
 					<radioposy>21</radioposy>
 					<radiowidth>64</radiowidth>
 					<radioheight>30</radioheight>
@@ -40,76 +154,77 @@
 					<selected>Skin.HasSetting(ReducedMotion)</selected>
 					<onclick>Skin.ToggleSetting(ReducedMotion)</onclick>
 				</control>
-				<control type="label">
-					<top>72</top>
-					<description>Spacer above the section heading</description>
-					<width>1200</width>
-					<height>28</height>
-					<label></label>
-				</control>
-				<control type="label">
-					<top>100</top>
-					<left>30</left>
-					<width>1140</width>
-					<height>56</height>
-					<aligny>center</aligny>
-					<font>kscape_list_head</font>
-					<textcolor>kscape_text_dim</textcolor>
-					<label>$LOCALIZE[31046]</label>
-				</control>
+			</control>
+			<control type="label">
+				<left>440</left>
+				<top>88</top>
+				<width>1040</width>
+				<height>110</height>
+				<font>kscape_small</font>
+				<textcolor>kscape_text_dim</textcolor>
+				<wrapmultiline>true</wrapmultiline>
+				<label>$LOCALIZE[31078]</label>
+				<visible>String.IsEqual(Container(9100).ListItem.Property(id),colours)</visible>
+			</control>
+			<control type="grouplist" id="9202">
+				<left>440</left>
+				<top>206</top>
+				<width>1040</width>
+				<height>580</height>
+				<orientation>vertical</orientation>
+				<itemgap>8</itemgap>
+				<onleft>9100</onleft>
+				<onright>9100</onright>
+				<visible>String.IsEqual(Container(9100).ListItem.Property(id),colours)</visible>
 				<control type="button" id="121">
-					<top>156</top>
-					<onup>101</onup>
-					<ondown>122</ondown>
 					<include content="SystemButton">
-						<param name="width" value="1200"/>
+						<param name="width" value="1040"/>
 						<param name="height" value="72"/>
 					</include>
+					<textcolor>kscape_text</textcolor>
 					<label>$LOCALIZE[31047]</label>
 					<label2>$VAR[KScapeColourMainLabel]</label2>
-					<textoffsetx>30</textoffsetx>
 					<onclick>RunScript(script.kscape.wall,colours,main)</onclick>
 				</control>
 				<control type="button" id="122">
-					<top>228</top>
-					<onup>121</onup>
-					<ondown>102</ondown>
 					<include content="SystemButton">
-						<param name="width" value="1200"/>
+						<param name="width" value="1040"/>
 						<param name="height" value="72"/>
 					</include>
+					<textcolor>kscape_text</textcolor>
 					<label>$LOCALIZE[31048]</label>
 					<label2>$VAR[KScapeColourHighlightLabel]</label2>
-					<textoffsetx>30</textoffsetx>
 					<onclick>RunScript(script.kscape.wall,colours,highlight)</onclick>
 				</control>
-				<control type="label">
-					<top>300</top>
-					<description>Spacer above the section heading</description>
-					<width>1200</width>
-					<height>28</height>
-					<label></label>
-				</control>
-				<control type="label">
-					<top>328</top>
-					<left>30</left>
-					<width>1140</width>
-					<height>56</height>
-					<aligny>center</aligny>
-					<font>kscape_list_head</font>
-					<textcolor>kscape_text_dim</textcolor>
-					<label>$LOCALIZE[31042]</label>
-				</control>
+			</control>
+			<control type="label">
+				<left>440</left>
+				<top>88</top>
+				<width>1040</width>
+				<height>110</height>
+				<font>kscape_small</font>
+				<textcolor>kscape_text_dim</textcolor>
+				<wrapmultiline>true</wrapmultiline>
+				<label>$LOCALIZE[31079]</label>
+				<visible>String.IsEqual(Container(9100).ListItem.Property(id),home)</visible>
+			</control>
+			<control type="grouplist" id="9203">
+				<left>440</left>
+				<top>206</top>
+				<width>1040</width>
+				<height>580</height>
+				<orientation>vertical</orientation>
+				<itemgap>8</itemgap>
+				<onleft>9100</onleft>
+				<onright>9100</onright>
+				<visible>String.IsEqual(Container(9100).ListItem.Property(id),home)</visible>
 				<control type="radiobutton" id="102">
-					<top>384</top>
-					<onup>122</onup>
-					<ondown>103</ondown>
 					<include content="SystemButton">
-						<param name="width" value="1200"/>
+						<param name="width" value="1040"/>
 						<param name="height" value="72"/>
 					</include>
 					<label>$LOCALIZE[31043]</label>
-					<radioposx>1106</radioposx>
+					<radioposx>950</radioposx>
 					<radioposy>21</radioposy>
 					<radiowidth>64</radiowidth>
 					<radioheight>30</radioheight>
@@ -121,15 +236,12 @@
 					<onclick>Skin.ToggleSetting(HomeNoArtwork)</onclick>
 				</control>
 				<control type="radiobutton" id="103">
-					<top>456</top>
-					<onup>102</onup>
-					<ondown>104</ondown>
 					<include content="SystemButton">
-						<param name="width" value="1200"/>
+						<param name="width" value="1040"/>
 						<param name="height" value="72"/>
 					</include>
 					<label>$LOCALIZE[31044]</label>
-					<radioposx>1106</radioposx>
+					<radioposx>950</radioposx>
 					<radioposy>21</radioposy>
 					<radiowidth>64</radiowidth>
 					<radioheight>30</radioheight>
@@ -141,15 +253,12 @@
 					<onclick>Skin.ToggleSetting(HomeNoClock)</onclick>
 				</control>
 				<control type="radiobutton" id="104">
-					<top>528</top>
-					<onup>103</onup>
-					<ondown>101</ondown>
 					<include content="SystemButton">
-						<param name="width" value="1200"/>
+						<param name="width" value="1040"/>
 						<param name="height" value="72"/>
 					</include>
 					<label>$LOCALIZE[31045]</label>
-					<radioposx>1106</radioposx>
+					<radioposx>950</radioposx>
 					<radioposy>21</radioposy>
 					<radiowidth>64</radiowidth>
 					<radioheight>30</radioheight>
@@ -161,6 +270,154 @@
 					<onclick>Skin.ToggleSetting(HomeNoCaption)</onclick>
 				</control>
 			</control>
+			<control type="label">
+				<left>440</left>
+				<top>88</top>
+				<width>1040</width>
+				<height>110</height>
+				<font>kscape_small</font>
+				<textcolor>kscape_text_dim</textcolor>
+				<wrapmultiline>true</wrapmultiline>
+				<label>$LOCALIZE[31080]</label>
+				<visible>String.IsEqual(Container(9100).ListItem.Property(id),versions)</visible>
+			</control>
+			<control type="grouplist" id="9204">
+				<left>440</left>
+				<top>206</top>
+				<width>1040</width>
+				<height>580</height>
+				<orientation>vertical</orientation>
+				<itemgap>8</itemgap>
+				<onleft>9100</onleft>
+				<onright>9100</onright>
+				<visible>String.IsEqual(Container(9100).ListItem.Property(id),versions)</visible>
+				<control type="radiobutton" id="131">
+					<include content="SystemButton">
+						<param name="width" value="1040"/>
+						<param name="height" value="72"/>
+					</include>
+					<label>$LOCALIZE[31068]</label>
+					<radioposx>950</radioposx>
+					<radioposy>21</radioposy>
+					<radiowidth>64</radiowidth>
+					<radioheight>30</radioheight>
+					<textureradioonfocus colordiffuse="kscape_amber">white.png</textureradioonfocus>
+					<textureradioonnofocus colordiffuse="kscape_amber">white.png</textureradioonnofocus>
+					<textureradioofffocus colordiffuse="kscape_text_off">white.png</textureradioofffocus>
+					<textureradiooffnofocus colordiffuse="kscape_text_off">white.png</textureradiooffnofocus>
+					<selected>!Skin.HasSetting(KScapeHideFormatBadges)</selected>
+					<onclick>Skin.ToggleSetting(KScapeHideFormatBadges)</onclick>
+				</control>
+				<control type="button" id="132">
+					<include content="SystemButton">
+						<param name="width" value="1040"/>
+						<param name="height" value="72"/>
+					</include>
+					<textcolor>kscape_text</textcolor>
+					<label>$LOCALIZE[31069]</label>
+					<label2>$INFO[Skin.String(KScapeVersionPreferenceLabel)]</label2>
+					<onclick>RunScript(script.kscape.wall,versions,preference)</onclick>
+				</control>
+				<control type="radiobutton" id="133">
+					<include content="SystemButton">
+						<param name="width" value="1040"/>
+						<param name="height" value="72"/>
+					</include>
+					<label>$LOCALIZE[31070]</label>
+					<radioposx>950</radioposx>
+					<radioposy>21</radioposy>
+					<radiowidth>64</radiowidth>
+					<radioheight>30</radioheight>
+					<textureradioonfocus colordiffuse="kscape_amber">white.png</textureradioonfocus>
+					<textureradioonnofocus colordiffuse="kscape_amber">white.png</textureradioonnofocus>
+					<textureradioofffocus colordiffuse="kscape_text_off">white.png</textureradioofffocus>
+					<textureradiooffnofocus colordiffuse="kscape_text_off">white.png</textureradiooffnofocus>
+					<selected>Skin.HasSetting(KScapePrefer3D)</selected>
+					<onclick>Skin.ToggleSetting(KScapePrefer3D)</onclick>
+				</control>
+			</control>
+			<control type="label">
+				<left>440</left>
+				<top>88</top>
+				<width>1040</width>
+				<height>110</height>
+				<font>kscape_small</font>
+				<textcolor>kscape_text_dim</textcolor>
+				<wrapmultiline>true</wrapmultiline>
+				<label>$LOCALIZE[31081]</label>
+				<visible>String.IsEqual(Container(9100).ListItem.Property(id),display)</visible>
+			</control>
+			<control type="grouplist" id="9205">
+				<left>440</left>
+				<top>206</top>
+				<width>1040</width>
+				<height>580</height>
+				<orientation>vertical</orientation>
+				<itemgap>8</itemgap>
+				<onleft>9100</onleft>
+				<onright>9100</onright>
+				<visible>String.IsEqual(Container(9100).ListItem.Property(id),display)</visible>
+				<control type="button" id="141">
+					<include content="SystemButton">
+						<param name="width" value="1040"/>
+						<param name="height" value="72"/>
+					</include>
+					<textcolor>kscape_text</textcolor>
+					<label>$LOCALIZE[31071]</label>
+					<label2>$INFO[Skin.String(KScapeAspectLabel)]</label2>
+					<onclick>RunScript(script.kscape.wall,display,aspect)</onclick>
+				</control>
+				<control type="button" id="142">
+					<include content="SystemButton">
+						<param name="width" value="1040"/>
+						<param name="height" value="72"/>
+					</include>
+					<textcolor>kscape_text</textcolor>
+					<label>$LOCALIZE[31072]</label>
+					<label2>$INFO[Skin.String(KScapeScopeRowsLabel)]</label2>
+					<onclick>RunScript(script.kscape.wall,display,rows)</onclick>
+				</control>
+				<control type="button" id="143">
+					<include content="SystemButton">
+						<param name="width" value="1040"/>
+						<param name="height" value="72"/>
+					</include>
+					<textcolor>kscape_text</textcolor>
+					<label>$LOCALIZE[31073]</label>
+					<label2>$INFO[Skin.String(KScapeVOffsetLabel)]</label2>
+					<onclick>RunScript(script.kscape.wall,display,voffset)</onclick>
+				</control>
+				<control type="button" id="144">
+					<include content="SystemButton">
+						<param name="width" value="1040"/>
+						<param name="height" value="72"/>
+					</include>
+					<textcolor>kscape_text</textcolor>
+					<label>$LOCALIZE[31074]</label>
+					<label2>$INFO[Skin.String(KScapeHOffsetLabel)]</label2>
+					<onclick>RunScript(script.kscape.wall,display,hoffset)</onclick>
+				</control>
+				<control type="button" id="145">
+					<include content="SystemButton">
+						<param name="width" value="1040"/>
+						<param name="height" value="72"/>
+					</include>
+					<textcolor>kscape_text</textcolor>
+					<label>$LOCALIZE[31075]</label>
+					<label2>$INFO[Skin.String(KScapeSafeAreaLabel)]</label2>
+					<onclick>RunScript(script.kscape.wall,display,safe)</onclick>
+				</control>
+				<control type="button" id="146">
+					<include content="SystemButton">
+						<param name="width" value="1040"/>
+						<param name="height" value="72"/>
+					</include>
+					<textcolor>kscape_text</textcolor>
+					<label>$LOCALIZE[31076]</label>
+					<onclick>RunScript(script.kscape.wall,display,preview)</onclick>
+				</control>
+			</control>
+		</control>
 		</control>
 	</controls>
 </window>

@@ -68,14 +68,30 @@ class BadgeTest(unittest.TestCase):
 
 
 class DuplicatesTest(unittest.TestCase):
-    def copy(self, i, title, year=2017, resume=0.0, badge='', poster=True):
+    def copy(self, i, title, year=2017, resume=0.0, badge='', poster=True, uid=None, file=''):
+        uid = f'tmdb:{title.casefold().replace(" ", "")}{year}' if uid is None else uid
         return Movie(i, title, title.lower(), year, frozenset(), frozenset(), (), 0, frozenset(),
-                     f'p{i}' if poster else '', '', 6000, resume, badge)
+                     f'p{i}' if poster else '', '', 6000, resume, badge, file=file, uid=uid)
 
-    def test_keeps_one_per_title_and_year_in_order(self):
-        a, b, c = self.copy(1, 'Alien'), self.copy(2, 'Wonder Woman'), self.copy(3, 'wonder  woman')
+    def test_keeps_one_per_film_in_order(self):
+        a, b, c = self.copy(1, 'Alien'), self.copy(2, 'Wonder Woman'), self.copy(3, 'wonder  woman', uid='tmdb:wonderwoman2017')
         d = self.copy(4, 'Wonder Woman', year=1974)
         self.assertEqual([m.movieid for m in merge_duplicates([a, b, c, d])], [1, 2, 4])
+
+    def test_titles_alone_never_merge(self):
+        """Same title and year but no stable id (or different ids): two films, two covers."""
+        a, b = self.copy(1, 'The Thing', 1982, uid=''), self.copy(2, 'The Thing', 1982, uid='')
+        c, d = self.copy(3, 'Heat', 1995, uid='tmdb:949'), self.copy(4, 'Heat', 1995, uid='tmdb:1')
+        self.assertEqual([m.movieid for m in merge_duplicates([a, b, c, d])], [1, 2, 3, 4])
+
+    def test_editions_stay_apart_and_copies_become_versions(self):
+        cut = self.copy(1, 'Blade Runner', 1982, file='/m/Blade Runner (1982) Directors Cut.mkv')
+        final = self.copy(2, 'Blade Runner', 1982, file='/m/Blade Runner (1982) The Final Cut.mkv')
+        uhd = self.copy(3, 'Blade Runner', 1982, file='/m/Blade Runner (1982) Directors Cut 2160p.mkv', badge='UHD')
+        out = merge_duplicates([cut, final, uhd])
+        self.assertEqual([m.movieid for m in out], [3, 2])          # the two director's cuts are one film
+        self.assertEqual(sorted(v.movieid for v in out[0].versions), [1, 3])
+        self.assertEqual(out[1].versions, ())
 
     def test_prefers_resume_then_quality_then_poster(self):
         plain, uhd, hdr = self.copy(1, 'X'), self.copy(2, 'X', badge='UHD'), self.copy(3, 'X', badge='HDR')

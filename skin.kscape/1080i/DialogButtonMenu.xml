@@ -6,185 +6,190 @@
 	<defaultcontrol always="true">90000</defaultcontrol>
 	<depth>DepthDialog</depth>
 	<controls>
-		<include>DialogDim</include>
 		<control type="group">
-			<description>Positioned for 13 rows; slid down by half a row per missing row</description>
-			<left>600</left>
-			<top>92</top>
-			<animation effect="slide" start="0,0" end="0,384" time="0" condition="Integer.IsEqual(Container(90000).NumItems,1)">Conditional</animation>
-			<animation effect="slide" start="0,0" end="0,352" time="0" condition="Integer.IsEqual(Container(90000).NumItems,2)">Conditional</animation>
-			<animation effect="slide" start="0,0" end="0,320" time="0" condition="Integer.IsEqual(Container(90000).NumItems,3)">Conditional</animation>
-			<animation effect="slide" start="0,0" end="0,288" time="0" condition="Integer.IsEqual(Container(90000).NumItems,4)">Conditional</animation>
-			<animation effect="slide" start="0,0" end="0,256" time="0" condition="Integer.IsEqual(Container(90000).NumItems,5)">Conditional</animation>
-			<animation effect="slide" start="0,0" end="0,224" time="0" condition="Integer.IsEqual(Container(90000).NumItems,6)">Conditional</animation>
-			<animation effect="slide" start="0,0" end="0,192" time="0" condition="Integer.IsEqual(Container(90000).NumItems,7)">Conditional</animation>
-			<animation effect="slide" start="0,0" end="0,160" time="0" condition="Integer.IsEqual(Container(90000).NumItems,8)">Conditional</animation>
-			<animation effect="slide" start="0,0" end="0,128" time="0" condition="Integer.IsEqual(Container(90000).NumItems,9)">Conditional</animation>
-			<animation effect="slide" start="0,0" end="0,96" time="0" condition="Integer.IsEqual(Container(90000).NumItems,10)">Conditional</animation>
-			<animation effect="slide" start="0,0" end="0,64" time="0" condition="Integer.IsEqual(Container(90000).NumItems,11)">Conditional</animation>
-			<animation effect="slide" start="0,0" end="0,32" time="0" condition="Integer.IsEqual(Container(90000).NumItems,12)">Conditional</animation>
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>DialogDim</include>
 			<control type="group">
-				<include>PanelOpenClose</include>
-				<include content="SystemPanel">
-					<param name="width" value="720"/>
-					<param name="height" value="64"/>
-					<param name="title" value="$LOCALIZE[33060]"/>
-				</include>
-				<control type="panel" id="90000">
-					<top>64</top>
-					<width>720</width>
-					<height>832</height>
-					<onup>90000</onup>
-					<ondown>90000</ondown>
-					<onleft>90000</onleft>
-					<onright>90000</onright>
-					<orientation>vertical</orientation>
-					<scrolltime>0</scrolltime>
-					<itemlayout width="720" height="64" infoupdate="5000">
-						<control type="image">
-							<width>720</width>
-							<height>64</height>
-							<texture colordiffuse="kscape_blue">white.png</texture>
-						</control>
-						<control type="label">
-							<left>30</left>
-							<width>660</width>
-							<height>64</height>
-							<aligny>center</aligny>
-							<font>kscape_menu</font>
-							<textcolor>kscape_text</textcolor>
-							<label>$INFO[ListItem.Label]</label>
-						</control>
-						<control type="label">
-							<left>30</left>
-							<width>660</width>
-							<height>64</height>
-							<align>right</align>
-							<aligny>center</aligny>
-							<font>kscape_small</font>
-							<textcolor>kscape_text_dim</textcolor>
-							<label>$INFO[ListItem.Label2]</label>
-						</control>
-					</itemlayout>
-					<focusedlayout width="720" height="64" infoupdate="5000">
-						<control type="image">
-							<width>720</width>
-							<height>64</height>
-							<texture colordiffuse="kscape_blue">white.png</texture>
-						</control>
-						<control type="image">
-							<width>720</width>
-							<height>64</height>
-							<texture colordiffuse="kscape_blue_focus">white.png</texture>
-							<visible>Control.HasFocus(90000)</visible>
-						</control>
-						<control type="label">
-							<left>30</left>
-							<width>660</width>
-							<height>64</height>
-							<aligny>center</aligny>
-							<font>kscape_menu</font>
-							<textcolor>white</textcolor>
-							<scroll>false</scroll>
-							<label>$INFO[ListItem.Label]</label>
-						</control>
-						<control type="label">
-							<left>30</left>
-							<width>660</width>
-							<height>64</height>
-							<align>right</align>
-							<aligny>center</aligny>
-							<font>kscape_small</font>
-							<textcolor>white</textcolor>
-							<scroll>false</scroll>
-							<label>$INFO[ListItem.Label2]</label>
-						</control>
-					</focusedlayout>
-					<content>
-						<item>
-							<label>$LOCALIZE[13012]</label>
-							<onclick>Quit()</onclick>
-							<visible>System.ShowExitButton</visible>
-						</item>
-						<item>
-							<label>$LOCALIZE[13016]</label>
-							<onclick>Powerdown()</onclick>
-							<visible>System.CanPowerDown</visible>
-						</item>
-						<item>
-							<label>$LOCALIZE[20150]</label>
-							<onclick>AlarmClock(shutdowntimer,Shutdown())</onclick>
-							<visible>!System.HasAlarm(shutdowntimer) + [System.CanPowerDown | System.CanSuspend | System.CanHibernate]</visible>
-						</item>
-						<item>
-							<label>$LOCALIZE[20151]</label>
-							<label2>$INFO[System.Alarmpos, (,)]</label2>
-							<onclick>CancelAlarm(shutdowntimer)</onclick>
-							<visible>System.HasAlarm(shutdowntimer)</visible>
-						</item>
-						<item>
-							<label>$LOCALIZE[13011]</label>
-							<onclick>Suspend()</onclick>
-							<visible>System.CanSuspend</visible>
-						</item>
-						<item>
-							<label>$LOCALIZE[13010]</label>
-							<onclick>Hibernate()</onclick>
-							<visible>System.CanHibernate</visible>
-						</item>
-						<item>
-							<label>$LOCALIZE[13013]</label>
-							<onclick>Reset()</onclick>
-							<visible>System.CanReboot</visible>
-						</item>
-						<item>
-							<label>$LOCALIZE[20126]</label>
-							<label2>$INFO[System.ProfileName]</label2>
-							<onclick>System.LogOff</onclick>
-							<visible>[System.HasLoginScreen | Integer.IsGreater(System.ProfileCount,1)] + System.Loggedon</visible>
-						</item>
-						<item>
-							<label>$LOCALIZE[20046]</label>
-							<onclick>Mastermode</onclick>
-							<visible>System.HasLocks + System.IsMaster</visible>
-						</item>
-						<item>
-							<label>$LOCALIZE[20045]</label>
-							<onclick>Mastermode</onclick>
-							<visible>System.HasLocks + !System.IsMaster</visible>
-						</item>
-						<item>
-							<label>$LOCALIZE[13017]</label>
-							<onclick>InhibitIdleShutdown(true)</onclick>
-							<visible>System.HasShutdown + !System.IsInhibit</visible>
-						</item>
-						<item>
-							<label>$LOCALIZE[13018]</label>
-							<onclick>InhibitIdleShutdown(false)</onclick>
-							<visible>System.HasShutdown + System.IsInhibit</visible>
-						</item>
-						<item>
-							<label>$LOCALIZE[1036]</label>
-							<onclick>Dialog.Close(all,true)</onclick>
-							<onclick>ActivateWindow(favouritesbrowser)</onclick>
-						</item>
-						<item>
-							<label>$LOCALIZE[20183]</label>
-							<onclick>ReloadSkin()</onclick>
-						</item>
-						<item>
-							<label>$LOCALIZE[20077]</label>
-							<onclick>Dialog.Close(all,true)</onclick>
-							<onclick>ActivateWindow(skinsettings)</onclick>
-						</item>
-						<item>
-							<label>$LOCALIZE[5]</label>
-							<onclick>Dialog.Close(all,true)</onclick>
-							<onclick>ActivateWindow(settings)</onclick>
-						</item>
-					</content>
+				<description>Positioned for 13 rows; slid down by half a row per missing row</description>
+				<left>600</left>
+				<top>92</top>
+				<animation effect="slide" start="0,0" end="0,384" time="0" condition="Integer.IsEqual(Container(90000).NumItems,1)">Conditional</animation>
+				<animation effect="slide" start="0,0" end="0,352" time="0" condition="Integer.IsEqual(Container(90000).NumItems,2)">Conditional</animation>
+				<animation effect="slide" start="0,0" end="0,320" time="0" condition="Integer.IsEqual(Container(90000).NumItems,3)">Conditional</animation>
+				<animation effect="slide" start="0,0" end="0,288" time="0" condition="Integer.IsEqual(Container(90000).NumItems,4)">Conditional</animation>
+				<animation effect="slide" start="0,0" end="0,256" time="0" condition="Integer.IsEqual(Container(90000).NumItems,5)">Conditional</animation>
+				<animation effect="slide" start="0,0" end="0,224" time="0" condition="Integer.IsEqual(Container(90000).NumItems,6)">Conditional</animation>
+				<animation effect="slide" start="0,0" end="0,192" time="0" condition="Integer.IsEqual(Container(90000).NumItems,7)">Conditional</animation>
+				<animation effect="slide" start="0,0" end="0,160" time="0" condition="Integer.IsEqual(Container(90000).NumItems,8)">Conditional</animation>
+				<animation effect="slide" start="0,0" end="0,128" time="0" condition="Integer.IsEqual(Container(90000).NumItems,9)">Conditional</animation>
+				<animation effect="slide" start="0,0" end="0,96" time="0" condition="Integer.IsEqual(Container(90000).NumItems,10)">Conditional</animation>
+				<animation effect="slide" start="0,0" end="0,64" time="0" condition="Integer.IsEqual(Container(90000).NumItems,11)">Conditional</animation>
+				<animation effect="slide" start="0,0" end="0,32" time="0" condition="Integer.IsEqual(Container(90000).NumItems,12)">Conditional</animation>
+				<control type="group">
+					<include>PanelOpenClose</include>
+					<include content="SystemPanel">
+						<param name="width" value="720"/>
+						<param name="height" value="64"/>
+						<param name="title" value="$LOCALIZE[33060]"/>
+					</include>
+					<control type="panel" id="90000">
+						<top>64</top>
+						<width>720</width>
+						<height>832</height>
+						<onup>90000</onup>
+						<ondown>90000</ondown>
+						<onleft>90000</onleft>
+						<onright>90000</onright>
+						<orientation>vertical</orientation>
+						<scrolltime>0</scrolltime>
+						<itemlayout width="720" height="64" infoupdate="5000">
+							<control type="image">
+								<width>720</width>
+								<height>64</height>
+								<texture colordiffuse="kscape_blue">white.png</texture>
+							</control>
+							<control type="label">
+								<left>30</left>
+								<width>660</width>
+								<height>64</height>
+								<aligny>center</aligny>
+								<font>kscape_menu</font>
+								<textcolor>kscape_text</textcolor>
+								<label>$INFO[ListItem.Label]</label>
+							</control>
+							<control type="label">
+								<left>30</left>
+								<width>660</width>
+								<height>64</height>
+								<align>right</align>
+								<aligny>center</aligny>
+								<font>kscape_small</font>
+								<textcolor>kscape_text_dim</textcolor>
+								<label>$INFO[ListItem.Label2]</label>
+							</control>
+						</itemlayout>
+						<focusedlayout width="720" height="64" infoupdate="5000">
+							<control type="image">
+								<width>720</width>
+								<height>64</height>
+								<texture colordiffuse="kscape_blue">white.png</texture>
+							</control>
+							<control type="image">
+								<width>720</width>
+								<height>64</height>
+								<texture colordiffuse="kscape_blue_focus">white.png</texture>
+								<visible>Control.HasFocus(90000)</visible>
+							</control>
+							<control type="label">
+								<left>30</left>
+								<width>660</width>
+								<height>64</height>
+								<aligny>center</aligny>
+								<font>kscape_menu</font>
+								<textcolor>white</textcolor>
+								<scroll>false</scroll>
+								<label>$INFO[ListItem.Label]</label>
+							</control>
+							<control type="label">
+								<left>30</left>
+								<width>660</width>
+								<height>64</height>
+								<align>right</align>
+								<aligny>center</aligny>
+								<font>kscape_small</font>
+								<textcolor>white</textcolor>
+								<scroll>false</scroll>
+								<label>$INFO[ListItem.Label2]</label>
+							</control>
+						</focusedlayout>
+						<content>
+							<item>
+								<label>$LOCALIZE[13012]</label>
+								<onclick>Quit()</onclick>
+								<visible>System.ShowExitButton</visible>
+							</item>
+							<item>
+								<label>$LOCALIZE[13016]</label>
+								<onclick>Powerdown()</onclick>
+								<visible>System.CanPowerDown</visible>
+							</item>
+							<item>
+								<label>$LOCALIZE[20150]</label>
+								<onclick>AlarmClock(shutdowntimer,Shutdown())</onclick>
+								<visible>!System.HasAlarm(shutdowntimer) + [System.CanPowerDown | System.CanSuspend | System.CanHibernate]</visible>
+							</item>
+							<item>
+								<label>$LOCALIZE[20151]</label>
+								<label2>$INFO[System.Alarmpos, (,)]</label2>
+								<onclick>CancelAlarm(shutdowntimer)</onclick>
+								<visible>System.HasAlarm(shutdowntimer)</visible>
+							</item>
+							<item>
+								<label>$LOCALIZE[13011]</label>
+								<onclick>Suspend()</onclick>
+								<visible>System.CanSuspend</visible>
+							</item>
+							<item>
+								<label>$LOCALIZE[13010]</label>
+								<onclick>Hibernate()</onclick>
+								<visible>System.CanHibernate</visible>
+							</item>
+							<item>
+								<label>$LOCALIZE[13013]</label>
+								<onclick>Reset()</onclick>
+								<visible>System.CanReboot</visible>
+							</item>
+							<item>
+								<label>$LOCALIZE[20126]</label>
+								<label2>$INFO[System.ProfileName]</label2>
+								<onclick>System.LogOff</onclick>
+								<visible>[System.HasLoginScreen | Integer.IsGreater(System.ProfileCount,1)] + System.Loggedon</visible>
+							</item>
+							<item>
+								<label>$LOCALIZE[20046]</label>
+								<onclick>Mastermode</onclick>
+								<visible>System.HasLocks + System.IsMaster</visible>
+							</item>
+							<item>
+								<label>$LOCALIZE[20045]</label>
+								<onclick>Mastermode</onclick>
+								<visible>System.HasLocks + !System.IsMaster</visible>
+							</item>
+							<item>
+								<label>$LOCALIZE[13017]</label>
+								<onclick>InhibitIdleShutdown(true)</onclick>
+								<visible>System.HasShutdown + !System.IsInhibit</visible>
+							</item>
+							<item>
+								<label>$LOCALIZE[13018]</label>
+								<onclick>InhibitIdleShutdown(false)</onclick>
+								<visible>System.HasShutdown + System.IsInhibit</visible>
+							</item>
+							<item>
+								<label>$LOCALIZE[1036]</label>
+								<onclick>Dialog.Close(all,true)</onclick>
+								<onclick>ActivateWindow(favouritesbrowser)</onclick>
+							</item>
+							<item>
+								<label>$LOCALIZE[20183]</label>
+								<onclick>ReloadSkin()</onclick>
+							</item>
+							<item>
+								<label>$LOCALIZE[20077]</label>
+								<onclick>Dialog.Close(all,true)</onclick>
+								<onclick>ActivateWindow(skinsettings)</onclick>
+							</item>
+							<item>
+								<label>$LOCALIZE[5]</label>
+								<onclick>Dialog.Close(all,true)</onclick>
+								<onclick>ActivateWindow(settings)</onclick>
+							</item>
+						</content>
+					</control>
 				</control>
 			</control>
+	
 		</control>
 	</controls>
 </window>

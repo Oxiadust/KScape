@@ -5,328 +5,333 @@
 <window>
 	<defaultcontrol always="true">20</defaultcontrol>
 	<controls>
-		<include>SystemBackdrop</include>
 		<control type="group">
-			<left>96</left>
-			<top>48</top>
-			<include>WindowFade</include>
-			<include content="SystemPanel">
-				<param name="width" value="1728"/>
-				<param name="height" value="984"/>
-				<param name="title" value="$LOCALIZE[7]"/>
-			</include>
-			<control type="image">
-				<left>36</left>
-				<top>132</top>
-				<width>816</width>
-				<height>800</height>
-				<texture colordiffuse="kscape_blue_dark">white.png</texture>
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>SystemBackdrop</include>
+			<control type="group">
+				<left>96</left>
+				<top>48</top>
+				<include>WindowFade</include>
+				<include content="SystemPanel">
+					<param name="width" value="1728"/>
+					<param name="height" value="984"/>
+					<param name="title" value="$LOCALIZE[7]"/>
+				</include>
+				<control type="image">
+					<left>36</left>
+					<top>132</top>
+					<width>816</width>
+					<height>800</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+				</control>
+				<control type="label" id="101">
+					<description>Left path, set by Kodi</description>
+					<left>46</left>
+					<top>72</top>
+					<width>590</width>
+					<height>56</height>
+					<aligny>center</aligny>
+					<font>kscape_info_label</font>
+					<textcolor>white</textcolor>
+					<haspath>true</haspath>
+				</control>
+				<control type="label">
+					<left>646</left>
+					<top>72</top>
+					<width>196</width>
+					<height>56</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text_dim</textcolor>
+					<label>$INFO[Container(20).CurrentItem,, / ]$INFO[Container(20).NumItems]</label>
+				</control>
+				<control type="list" id="20">
+					<left>46</left>
+					<top>142</top>
+					<width>796</width>
+					<height>780</height>
+					<onleft>60</onleft>
+					<onright>21</onright>
+					<onup>20</onup>
+					<ondown>20</ondown>
+					<pagecontrol>60</pagecontrol>
+					<scrolltime>200</scrolltime>
+					<itemlayout width="796" height="65">
+						<control type="image">
+							<description>Amber marker on items selected for copy/move/delete</description>
+							<width>8</width>
+							<height>65</height>
+							<texture colordiffuse="kscape_amber">white.png</texture>
+							<visible>ListItem.IsSelected</visible>
+						</control>
+						<control type="image">
+							<left>20</left>
+							<top>10</top>
+							<width>45</width>
+							<height>45</height>
+							<aspectratio>keep</aspectratio>
+							<texture>$INFO[ListItem.Icon]</texture>
+						</control>
+						<control type="label">
+							<left>82</left>
+							<width>520</width>
+							<height>65</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>kscape_text</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+							<visible>!ListItem.IsSelected</visible>
+						</control>
+						<control type="label">
+							<left>82</left>
+							<width>520</width>
+							<height>65</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>kscape_amber</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+							<visible>ListItem.IsSelected</visible>
+						</control>
+						<control type="label">
+							<left>612</left>
+							<width>164</width>
+							<height>65</height>
+							<align>right</align>
+							<aligny>center</aligny>
+							<font>kscape_small</font>
+							<textcolor>kscape_text_dim</textcolor>
+							<label>$INFO[ListItem.Label2]</label>
+						</control>
+					</itemlayout>
+					<focusedlayout width="796" height="65">
+						<control type="image">
+							<width>796</width>
+							<height>65</height>
+							<texture colordiffuse="kscape_blue_focus">white.png</texture>
+							<visible>Control.HasFocus(20)</visible>
+						</control>
+						<control type="image">
+							<description>Amber marker on items selected for copy/move/delete</description>
+							<width>8</width>
+							<height>65</height>
+							<texture colordiffuse="kscape_amber">white.png</texture>
+							<visible>ListItem.IsSelected</visible>
+						</control>
+						<control type="image">
+							<left>20</left>
+							<top>10</top>
+							<width>45</width>
+							<height>45</height>
+							<aspectratio>keep</aspectratio>
+							<texture>$INFO[ListItem.Icon]</texture>
+						</control>
+						<control type="label">
+							<left>82</left>
+							<width>520</width>
+							<height>65</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>white</textcolor>
+							<scroll>true</scroll>
+							<label>$INFO[ListItem.Label]</label>
+							<visible>Control.HasFocus(20) | !ListItem.IsSelected</visible>
+						</control>
+						<control type="label">
+							<left>82</left>
+							<width>520</width>
+							<height>65</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>kscape_amber</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+							<visible>!Control.HasFocus(20) + ListItem.IsSelected</visible>
+						</control>
+						<control type="label">
+							<left>612</left>
+							<width>164</width>
+							<height>65</height>
+							<align>right</align>
+							<aligny>center</aligny>
+							<font>kscape_small</font>
+							<textcolor>white</textcolor>
+							<label>$INFO[ListItem.Label2]</label>
+						</control>
+					</focusedlayout>
+				</control>
+				<control type="scrollbar" id="60">
+					<left>14</left>
+					<top>142</top>
+					<width>12</width>
+					<height>780</height>
+					<orientation>vertical</orientation>
+					<onleft>20</onleft>
+					<onright>20</onright>
+					<texturesliderbackground colordiffuse="kscape_blue_dark">white.png</texturesliderbackground>
+					<texturesliderbar colordiffuse="kscape_text_dim">white.png</texturesliderbar>
+					<texturesliderbarfocus colordiffuse="white">white.png</texturesliderbarfocus>
+					<textureslidernib/>
+					<textureslidernibfocus/>
+				</control>
+				<control type="image">
+					<left>876</left>
+					<top>132</top>
+					<width>816</width>
+					<height>800</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+				</control>
+				<control type="label" id="102">
+					<description>Right path, set by Kodi</description>
+					<left>886</left>
+					<top>72</top>
+					<width>590</width>
+					<height>56</height>
+					<aligny>center</aligny>
+					<font>kscape_info_label</font>
+					<textcolor>white</textcolor>
+					<haspath>true</haspath>
+				</control>
+				<control type="label">
+					<left>1486</left>
+					<top>72</top>
+					<width>196</width>
+					<height>56</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text_dim</textcolor>
+					<label>$INFO[Container(21).CurrentItem,, / ]$INFO[Container(21).NumItems]</label>
+				</control>
+				<control type="list" id="21">
+					<left>886</left>
+					<top>142</top>
+					<width>796</width>
+					<height>780</height>
+					<onleft>20</onleft>
+					<onright>61</onright>
+					<onup>21</onup>
+					<ondown>21</ondown>
+					<pagecontrol>61</pagecontrol>
+					<scrolltime>200</scrolltime>
+					<itemlayout width="796" height="65">
+						<control type="image">
+							<description>Amber marker on items selected for copy/move/delete</description>
+							<width>8</width>
+							<height>65</height>
+							<texture colordiffuse="kscape_amber">white.png</texture>
+							<visible>ListItem.IsSelected</visible>
+						</control>
+						<control type="image">
+							<left>20</left>
+							<top>10</top>
+							<width>45</width>
+							<height>45</height>
+							<aspectratio>keep</aspectratio>
+							<texture>$INFO[ListItem.Icon]</texture>
+						</control>
+						<control type="label">
+							<left>82</left>
+							<width>520</width>
+							<height>65</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>kscape_text</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+							<visible>!ListItem.IsSelected</visible>
+						</control>
+						<control type="label">
+							<left>82</left>
+							<width>520</width>
+							<height>65</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>kscape_amber</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+							<visible>ListItem.IsSelected</visible>
+						</control>
+						<control type="label">
+							<left>612</left>
+							<width>164</width>
+							<height>65</height>
+							<align>right</align>
+							<aligny>center</aligny>
+							<font>kscape_small</font>
+							<textcolor>kscape_text_dim</textcolor>
+							<label>$INFO[ListItem.Label2]</label>
+						</control>
+					</itemlayout>
+					<focusedlayout width="796" height="65">
+						<control type="image">
+							<width>796</width>
+							<height>65</height>
+							<texture colordiffuse="kscape_blue_focus">white.png</texture>
+							<visible>Control.HasFocus(21)</visible>
+						</control>
+						<control type="image">
+							<description>Amber marker on items selected for copy/move/delete</description>
+							<width>8</width>
+							<height>65</height>
+							<texture colordiffuse="kscape_amber">white.png</texture>
+							<visible>ListItem.IsSelected</visible>
+						</control>
+						<control type="image">
+							<left>20</left>
+							<top>10</top>
+							<width>45</width>
+							<height>45</height>
+							<aspectratio>keep</aspectratio>
+							<texture>$INFO[ListItem.Icon]</texture>
+						</control>
+						<control type="label">
+							<left>82</left>
+							<width>520</width>
+							<height>65</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>white</textcolor>
+							<scroll>true</scroll>
+							<label>$INFO[ListItem.Label]</label>
+							<visible>Control.HasFocus(21) | !ListItem.IsSelected</visible>
+						</control>
+						<control type="label">
+							<left>82</left>
+							<width>520</width>
+							<height>65</height>
+							<aligny>center</aligny>
+							<font>kscape_list_value</font>
+							<textcolor>kscape_amber</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+							<visible>!Control.HasFocus(21) + ListItem.IsSelected</visible>
+						</control>
+						<control type="label">
+							<left>612</left>
+							<width>164</width>
+							<height>65</height>
+							<align>right</align>
+							<aligny>center</aligny>
+							<font>kscape_small</font>
+							<textcolor>white</textcolor>
+							<label>$INFO[ListItem.Label2]</label>
+						</control>
+					</focusedlayout>
+				</control>
+				<control type="scrollbar" id="61">
+					<left>1702</left>
+					<top>142</top>
+					<width>12</width>
+					<height>780</height>
+					<orientation>vertical</orientation>
+					<onleft>21</onleft>
+					<onright>21</onright>
+					<texturesliderbackground colordiffuse="kscape_blue_dark">white.png</texturesliderbackground>
+					<texturesliderbar colordiffuse="kscape_text_dim">white.png</texturesliderbar>
+					<texturesliderbarfocus colordiffuse="white">white.png</texturesliderbarfocus>
+					<textureslidernib/>
+					<textureslidernibfocus/>
+				</control>
 			</control>
-			<control type="label" id="101">
-				<description>Left path, set by Kodi</description>
-				<left>46</left>
-				<top>72</top>
-				<width>590</width>
-				<height>56</height>
-				<aligny>center</aligny>
-				<font>kscape_info_label</font>
-				<textcolor>white</textcolor>
-				<haspath>true</haspath>
-			</control>
-			<control type="label">
-				<left>646</left>
-				<top>72</top>
-				<width>196</width>
-				<height>56</height>
-				<align>right</align>
-				<aligny>center</aligny>
-				<font>kscape_list_value</font>
-				<textcolor>kscape_text_dim</textcolor>
-				<label>$INFO[Container(20).CurrentItem,, / ]$INFO[Container(20).NumItems]</label>
-			</control>
-			<control type="list" id="20">
-				<left>46</left>
-				<top>142</top>
-				<width>796</width>
-				<height>780</height>
-				<onleft>60</onleft>
-				<onright>21</onright>
-				<onup>20</onup>
-				<ondown>20</ondown>
-				<pagecontrol>60</pagecontrol>
-				<scrolltime>200</scrolltime>
-				<itemlayout width="796" height="65">
-					<control type="image">
-						<description>Amber marker on items selected for copy/move/delete</description>
-						<width>8</width>
-						<height>65</height>
-						<texture colordiffuse="kscape_amber">white.png</texture>
-						<visible>ListItem.IsSelected</visible>
-					</control>
-					<control type="image">
-						<left>20</left>
-						<top>10</top>
-						<width>45</width>
-						<height>45</height>
-						<aspectratio>keep</aspectratio>
-						<texture>$INFO[ListItem.Icon]</texture>
-					</control>
-					<control type="label">
-						<left>82</left>
-						<width>520</width>
-						<height>65</height>
-						<aligny>center</aligny>
-						<font>kscape_list_value</font>
-						<textcolor>kscape_text</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-						<visible>!ListItem.IsSelected</visible>
-					</control>
-					<control type="label">
-						<left>82</left>
-						<width>520</width>
-						<height>65</height>
-						<aligny>center</aligny>
-						<font>kscape_list_value</font>
-						<textcolor>kscape_amber</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-						<visible>ListItem.IsSelected</visible>
-					</control>
-					<control type="label">
-						<left>612</left>
-						<width>164</width>
-						<height>65</height>
-						<align>right</align>
-						<aligny>center</aligny>
-						<font>kscape_small</font>
-						<textcolor>kscape_text_dim</textcolor>
-						<label>$INFO[ListItem.Label2]</label>
-					</control>
-				</itemlayout>
-				<focusedlayout width="796" height="65">
-					<control type="image">
-						<width>796</width>
-						<height>65</height>
-						<texture colordiffuse="kscape_blue_focus">white.png</texture>
-						<visible>Control.HasFocus(20)</visible>
-					</control>
-					<control type="image">
-						<description>Amber marker on items selected for copy/move/delete</description>
-						<width>8</width>
-						<height>65</height>
-						<texture colordiffuse="kscape_amber">white.png</texture>
-						<visible>ListItem.IsSelected</visible>
-					</control>
-					<control type="image">
-						<left>20</left>
-						<top>10</top>
-						<width>45</width>
-						<height>45</height>
-						<aspectratio>keep</aspectratio>
-						<texture>$INFO[ListItem.Icon]</texture>
-					</control>
-					<control type="label">
-						<left>82</left>
-						<width>520</width>
-						<height>65</height>
-						<aligny>center</aligny>
-						<font>kscape_list_value</font>
-						<textcolor>white</textcolor>
-						<scroll>true</scroll>
-						<label>$INFO[ListItem.Label]</label>
-						<visible>Control.HasFocus(20) | !ListItem.IsSelected</visible>
-					</control>
-					<control type="label">
-						<left>82</left>
-						<width>520</width>
-						<height>65</height>
-						<aligny>center</aligny>
-						<font>kscape_list_value</font>
-						<textcolor>kscape_amber</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-						<visible>!Control.HasFocus(20) + ListItem.IsSelected</visible>
-					</control>
-					<control type="label">
-						<left>612</left>
-						<width>164</width>
-						<height>65</height>
-						<align>right</align>
-						<aligny>center</aligny>
-						<font>kscape_small</font>
-						<textcolor>white</textcolor>
-						<label>$INFO[ListItem.Label2]</label>
-					</control>
-				</focusedlayout>
-			</control>
-			<control type="scrollbar" id="60">
-				<left>14</left>
-				<top>142</top>
-				<width>12</width>
-				<height>780</height>
-				<orientation>vertical</orientation>
-				<onleft>20</onleft>
-				<onright>20</onright>
-				<texturesliderbackground colordiffuse="kscape_blue_dark">white.png</texturesliderbackground>
-				<texturesliderbar colordiffuse="kscape_text_dim">white.png</texturesliderbar>
-				<texturesliderbarfocus colordiffuse="white">white.png</texturesliderbarfocus>
-				<textureslidernib/>
-				<textureslidernibfocus/>
-			</control>
-			<control type="image">
-				<left>876</left>
-				<top>132</top>
-				<width>816</width>
-				<height>800</height>
-				<texture colordiffuse="kscape_blue_dark">white.png</texture>
-			</control>
-			<control type="label" id="102">
-				<description>Right path, set by Kodi</description>
-				<left>886</left>
-				<top>72</top>
-				<width>590</width>
-				<height>56</height>
-				<aligny>center</aligny>
-				<font>kscape_info_label</font>
-				<textcolor>white</textcolor>
-				<haspath>true</haspath>
-			</control>
-			<control type="label">
-				<left>1486</left>
-				<top>72</top>
-				<width>196</width>
-				<height>56</height>
-				<align>right</align>
-				<aligny>center</aligny>
-				<font>kscape_list_value</font>
-				<textcolor>kscape_text_dim</textcolor>
-				<label>$INFO[Container(21).CurrentItem,, / ]$INFO[Container(21).NumItems]</label>
-			</control>
-			<control type="list" id="21">
-				<left>886</left>
-				<top>142</top>
-				<width>796</width>
-				<height>780</height>
-				<onleft>20</onleft>
-				<onright>61</onright>
-				<onup>21</onup>
-				<ondown>21</ondown>
-				<pagecontrol>61</pagecontrol>
-				<scrolltime>200</scrolltime>
-				<itemlayout width="796" height="65">
-					<control type="image">
-						<description>Amber marker on items selected for copy/move/delete</description>
-						<width>8</width>
-						<height>65</height>
-						<texture colordiffuse="kscape_amber">white.png</texture>
-						<visible>ListItem.IsSelected</visible>
-					</control>
-					<control type="image">
-						<left>20</left>
-						<top>10</top>
-						<width>45</width>
-						<height>45</height>
-						<aspectratio>keep</aspectratio>
-						<texture>$INFO[ListItem.Icon]</texture>
-					</control>
-					<control type="label">
-						<left>82</left>
-						<width>520</width>
-						<height>65</height>
-						<aligny>center</aligny>
-						<font>kscape_list_value</font>
-						<textcolor>kscape_text</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-						<visible>!ListItem.IsSelected</visible>
-					</control>
-					<control type="label">
-						<left>82</left>
-						<width>520</width>
-						<height>65</height>
-						<aligny>center</aligny>
-						<font>kscape_list_value</font>
-						<textcolor>kscape_amber</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-						<visible>ListItem.IsSelected</visible>
-					</control>
-					<control type="label">
-						<left>612</left>
-						<width>164</width>
-						<height>65</height>
-						<align>right</align>
-						<aligny>center</aligny>
-						<font>kscape_small</font>
-						<textcolor>kscape_text_dim</textcolor>
-						<label>$INFO[ListItem.Label2]</label>
-					</control>
-				</itemlayout>
-				<focusedlayout width="796" height="65">
-					<control type="image">
-						<width>796</width>
-						<height>65</height>
-						<texture colordiffuse="kscape_blue_focus">white.png</texture>
-						<visible>Control.HasFocus(21)</visible>
-					</control>
-					<control type="image">
-						<description>Amber marker on items selected for copy/move/delete</description>
-						<width>8</width>
-						<height>65</height>
-						<texture colordiffuse="kscape_amber">white.png</texture>
-						<visible>ListItem.IsSelected</visible>
-					</control>
-					<control type="image">
-						<left>20</left>
-						<top>10</top>
-						<width>45</width>
-						<height>45</height>
-						<aspectratio>keep</aspectratio>
-						<texture>$INFO[ListItem.Icon]</texture>
-					</control>
-					<control type="label">
-						<left>82</left>
-						<width>520</width>
-						<height>65</height>
-						<aligny>center</aligny>
-						<font>kscape_list_value</font>
-						<textcolor>white</textcolor>
-						<scroll>true</scroll>
-						<label>$INFO[ListItem.Label]</label>
-						<visible>Control.HasFocus(21) | !ListItem.IsSelected</visible>
-					</control>
-					<control type="label">
-						<left>82</left>
-						<width>520</width>
-						<height>65</height>
-						<aligny>center</aligny>
-						<font>kscape_list_value</font>
-						<textcolor>kscape_amber</textcolor>
-						<label>$INFO[ListItem.Label]</label>
-						<visible>!Control.HasFocus(21) + ListItem.IsSelected</visible>
-					</control>
-					<control type="label">
-						<left>612</left>
-						<width>164</width>
-						<height>65</height>
-						<align>right</align>
-						<aligny>center</aligny>
-						<font>kscape_small</font>
-						<textcolor>white</textcolor>
-						<label>$INFO[ListItem.Label2]</label>
-					</control>
-				</focusedlayout>
-			</control>
-			<control type="scrollbar" id="61">
-				<left>1702</left>
-				<top>142</top>
-				<width>12</width>
-				<height>780</height>
-				<orientation>vertical</orientation>
-				<onleft>21</onleft>
-				<onright>21</onright>
-				<texturesliderbackground colordiffuse="kscape_blue_dark">white.png</texturesliderbackground>
-				<texturesliderbar colordiffuse="kscape_text_dim">white.png</texturesliderbar>
-				<texturesliderbarfocus colordiffuse="white">white.png</texturesliderbarfocus>
-				<textureslidernib/>
-				<textureslidernibfocus/>
-			</control>
+	
 		</control>
 	</controls>
 </window>

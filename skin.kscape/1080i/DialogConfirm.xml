@@ -4,81 +4,86 @@
 <window>
 	<defaultcontrol always="true">9000</defaultcontrol>
 	<controls>
-		<include>DialogDim</include>
 		<control type="group">
-			<left>460</left>
-			<top>300</top>
-			<include>PanelOpenClose</include>
-			<include content="SystemPanel">
-				<param name="width" value="1000"/>
-				<param name="height" value="480"/>
-			</include>
-			<control type="label" id="1">
-				<left>30</left>
-				<width>940</width>
-				<height>64</height>
-				<aligny>center</aligny>
-				<font>kscape_info_head</font>
-				<textcolor>white</textcolor>
-			</control>
-			<control type="textbox" id="9">
-				<left>40</left>
-				<top>96</top>
-				<width>920</width>
-				<height>200</height>
-				<font>kscape_panel_body</font>
-				<textcolor>kscape_text</textcolor>
-			</control>
-			<control type="progress" id="20">
-				<left>40</left>
-				<top>310</top>
-				<width>920</width>
-				<height>8</height>
-				<texturebg colordiffuse="kscape_blue_dark">white.png</texturebg>
-				<midtexture colordiffuse="kscape_amber">white.png</midtexture>
-			</control>
-			<control type="image">
-				<description>Button strip</description>
-				<top>364</top>
-				<width>1000</width>
-				<height>116</height>
-				<texture colordiffuse="kscape_blue_dark">white.png</texture>
-			</control>
-			<control type="grouplist" id="9000">
-				<left>40</left>
-				<top>390</top>
-				<width>920</width>
-				<height>64</height>
-				<orientation>horizontal</orientation>
-				<align>center</align>
-				<itemgap>20</itemgap>
-				<onleft>9000</onleft>
-				<onright>9000</onright>
-				<control type="button" id="11">
-					<align>center</align>
-					<textoffsetx>0</textoffsetx>
-					<include content="SystemButton">
-						<param name="width" value="260"/>
-						<param name="height" value="64"/>
-					</include>
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>DialogDim</include>
+			<control type="group">
+				<left>460</left>
+				<top>300</top>
+				<include>PanelOpenClose</include>
+				<include content="SystemPanel">
+					<param name="width" value="1000"/>
+					<param name="height" value="480"/>
+				</include>
+				<control type="label" id="1">
+					<left>30</left>
+					<width>940</width>
+					<height>64</height>
+					<aligny>center</aligny>
+					<font>kscape_info_head</font>
+					<textcolor>white</textcolor>
 				</control>
-				<control type="button" id="10">
-					<align>center</align>
-					<textoffsetx>0</textoffsetx>
-					<include content="SystemButton">
-						<param name="width" value="260"/>
-						<param name="height" value="64"/>
-					</include>
+				<control type="textbox" id="9">
+					<left>40</left>
+					<top>96</top>
+					<width>920</width>
+					<height>200</height>
+					<font>kscape_panel_body</font>
+					<textcolor>kscape_text</textcolor>
 				</control>
-				<control type="button" id="12">
+				<control type="progress" id="20">
+					<left>40</left>
+					<top>310</top>
+					<width>920</width>
+					<height>8</height>
+					<texturebg colordiffuse="kscape_blue_dark">white.png</texturebg>
+					<midtexture colordiffuse="kscape_amber">white.png</midtexture>
+				</control>
+				<control type="image">
+					<description>Button strip</description>
+					<top>364</top>
+					<width>1000</width>
+					<height>116</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+				</control>
+				<control type="grouplist" id="9000">
+					<left>40</left>
+					<top>390</top>
+					<width>920</width>
+					<height>64</height>
+					<orientation>horizontal</orientation>
 					<align>center</align>
-					<textoffsetx>0</textoffsetx>
-					<include content="SystemButton">
-						<param name="width" value="260"/>
-						<param name="height" value="64"/>
-					</include>
+					<itemgap>20</itemgap>
+					<onleft>9000</onleft>
+					<onright>9000</onright>
+					<control type="button" id="11">
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="260"/>
+							<param name="height" value="64"/>
+						</include>
+					</control>
+					<control type="button" id="10">
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="260"/>
+							<param name="height" value="64"/>
+						</include>
+					</control>
+					<control type="button" id="12">
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="260"/>
+							<param name="height" value="64"/>
+						</include>
+					</control>
 				</control>
 			</control>
+	
 		</control>
 	</controls>
 </window>

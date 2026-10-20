@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Player process info (the O key during playback): what Kodi's video player is doing - video
+     and audio decoders, resolution, frame rate, deinterlacing, audio format, CPU, memory and cache.
+     Information only; it has no Kodi controls to drive. -->
+<window type="dialog">
+	<depth>DepthOSD</depth>
+	<visible>Player.HasMedia</visible>
+	<controls>
+		<control type="group">
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<control type="group">
+				<left>60</left>
+				<top>60</top>
+				<include>WindowFade</include>
+				<control type="image">
+					<width>1100</width>
+					<height>488</height>
+					<texture colordiffuse="kscape_bg_chip">white.png</texture>
+				</control>
+				<control type="image">
+					<width>1100</width>
+					<height>64</height>
+					<texture colordiffuse="kscape_blue">white.png</texture>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<width>1040</width>
+					<height>64</height>
+					<aligny>center</aligny>
+					<font>kscape_info_head</font>
+					<textcolor>white</textcolor>
+					<scroll>true</scroll>
+					<label>$INFO[Player.Title]</label>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<top>90</top>
+					<width>1000</width>
+					<height>44</height>
+					<aligny>center</aligny>
+					<font>kscape_info_label</font>
+					<textcolor>white</textcolor>
+					<label>$LOCALIZE[31062]</label>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<top>136</top>
+					<width>1040</width>
+					<height>40</height>
+					<aligny>center</aligny>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$INFO[Player.Process(videodecoder)]$INFO[Player.Process(pixformat), · ,]$VAR[KScapeHwDecoder]</label>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<top>178</top>
+					<width>1040</width>
+					<height>40</height>
+					<aligny>center</aligny>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$INFO[Player.Process(videowidth)]$INFO[Player.Process(videoheight), x ,]$INFO[Player.Process(videoscantype),,]$INFO[Player.Process(videofps), · , fps]$INFO[Player.Process(videodar), · ,]</label>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<top>220</top>
+					<width>1040</width>
+					<height>40</height>
+					<aligny>center</aligny>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$INFO[Player.Process(deintmethod),$LOCALIZE[16038]: ,]</label>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<top>272</top>
+					<width>1000</width>
+					<height>44</height>
+					<aligny>center</aligny>
+					<font>kscape_info_label</font>
+					<textcolor>white</textcolor>
+					<label>$LOCALIZE[31063]</label>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<top>318</top>
+					<width>1040</width>
+					<height>40</height>
+					<aligny>center</aligny>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$INFO[Player.Process(audiodecoder)]$INFO[Player.Process(audiochannels), · ,]$INFO[Player.Process(audiosamplerate), · , Hz]$INFO[Player.Process(audiobitspersample), · , bit]</label>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<top>370</top>
+					<width>1000</width>
+					<height>44</height>
+					<aligny>center</aligny>
+					<font>kscape_info_label</font>
+					<textcolor>white</textcolor>
+					<label>$LOCALIZE[31064]</label>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<top>416</top>
+					<width>1040</width>
+					<height>40</height>
+					<aligny>center</aligny>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$INFO[System.CpuUsage,CPU ,]$INFO[System.Memory(used.percent),  ·  RAM ,]$INFO[Player.CacheLevel,  ·  $LOCALIZE[439] ,%]</label>
+				</control>
+			</control>
+	
+		</control>
+	</controls>
+</window>

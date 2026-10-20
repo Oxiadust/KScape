@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Profile cards draw the name under the profile's picture, which covers it when there is one
+     (Kodi's default user icon is not bundled, so cards without a picture show the name).
+     Kodi contract (profile login screen: Power → Log off, or "Show login screen" in Profiles):
+     52 profile list (Select logs in, C edits the profile), 2 heading and 3 selected profile, set by
+     Kodi. 20 Power button (skin-side) opens the power menu, as in Estuary. -->
+<window>
+	<defaultcontrol always="true">52</defaultcontrol>
+	<controls>
+		<control type="group">
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>SystemBackdrop</include>
+			<control type="group">
+				<include>WindowFade</include>
+				<control type="label" id="2">
+					<description>Heading, set by Kodi</description>
+					<left>120</left>
+					<top>150</top>
+					<width>1680</width>
+					<height>110</height>
+					<align>center</align>
+					<aligny>center</aligny>
+					<font>kscape_title</font>
+					<textcolor>white</textcolor>
+					<wrapmultiline>true</wrapmultiline>
+				</control>
+				<control type="fixedlist" id="52">
+					<description>Profiles; the focused one centred (focus position 3 of 7 slots)</description>
+					<left>-90</left>
+					<top>330</top>
+					<width>2100</width>
+					<height>420</height>
+					<orientation>horizontal</orientation>
+					<focusposition>3</focusposition>
+					<movement>3</movement>
+					<onleft>52</onleft>
+					<onright>52</onright>
+					<onup>20</onup>
+					<ondown>20</ondown>
+					<scrolltime tween="cubic" easing="out">240</scrolltime>
+					<itemlayout width="300" height="420">
+						<control type="image">
+							<left>40</left>
+							<top>40</top>
+							<width>220</width>
+							<height>220</height>
+							<texture colordiffuse="kscape_blue_dark">white.png</texture>
+						</control>
+						<control type="label">
+							<left>40</left>
+							<top>40</top>
+							<width>220</width>
+							<height>220</height>
+							<align>center</align>
+							<aligny>center</aligny>
+							<font>kscape_title</font>
+							<textcolor>kscape_text_dim</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+						<control type="image">
+							<left>40</left>
+							<top>40</top>
+							<width>220</width>
+							<height>220</height>
+							<aspectratio>scale</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+						<control type="label">
+							<left>10</left>
+							<top>284</top>
+							<width>280</width>
+							<height>50</height>
+							<align>center</align>
+							<font>kscape_menu</font>
+							<textcolor>kscape_text_dim</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+					</itemlayout>
+					<focusedlayout width="300" height="420">
+						<control type="image">
+							<description>Highlight frame, as on the cover wall</description>
+							<left>26</left>
+							<top>26</top>
+							<width>248</width>
+							<height>248</height>
+							<texture colordiffuse="kscape_amber">white.png</texture>
+							<visible>Control.HasFocus(52)</visible>
+						</control>
+						<control type="image">
+							<left>40</left>
+							<top>40</top>
+							<width>220</width>
+							<height>220</height>
+							<texture colordiffuse="kscape_blue">white.png</texture>
+						</control>
+						<control type="label">
+							<left>40</left>
+							<top>40</top>
+							<width>220</width>
+							<height>220</height>
+							<align>center</align>
+							<aligny>center</aligny>
+							<font>kscape_title</font>
+							<textcolor>white</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+						<control type="image">
+							<left>40</left>
+							<top>40</top>
+							<width>220</width>
+							<height>220</height>
+							<aspectratio>scale</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+						<control type="label">
+							<left>10</left>
+							<top>284</top>
+							<width>280</width>
+							<height>50</height>
+							<align>center</align>
+							<font>kscape_menu</font>
+							<textcolor>white</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+					</focusedlayout>
+				</control>
+				<control type="label" id="3">
+					<description>Selected profile, set by Kodi</description>
+					<left>120</left>
+					<top>760</top>
+					<width>1680</width>
+					<height>44</height>
+					<align>center</align>
+					<font>kscape_menu</font>
+					<textcolor>kscape_text_dim</textcolor>
+				</control>
+				<control type="label">
+					<description>When the selected profile was last used</description>
+					<left>120</left>
+					<top>804</top>
+					<width>1680</width>
+					<height>40</height>
+					<align>center</align>
+					<font>kscape_small</font>
+					<textcolor>kscape_text_dim</textcolor>
+					<label>$INFO[Container(52).ListItem.Label2]</label>
+				</control>
+				<control type="button" id="20">
+					<description>Power menu</description>
+					<left>810</left>
+					<top>900</top>
+					<align>center</align>
+					<textoffsetx>0</textoffsetx>
+					<include content="SystemButton">
+						<param name="width" value="300"/>
+						<param name="height" value="70"/>
+					</include>
+					<label>$LOCALIZE[33060]</label>
+					<onclick>ActivateWindow(ShutdownMenu)</onclick>
+					<onleft>52</onleft>
+					<onright>52</onright>
+					<onup>52</onup>
+					<ondown>52</ondown>
+				</control>
+			</control>
+	
+		</control>
+	</controls>
+</window>

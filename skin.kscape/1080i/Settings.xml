@@ -5,112 +5,117 @@
 <window>
 	<defaultcontrol>9000</defaultcontrol>
 	<controls>
-		<include>SystemBackdrop</include>
 		<control type="group">
-			<left>96</left>
-			<top>48</top>
-			<include>WindowFade</include>
-			<include content="SystemPanel">
-				<param name="width" value="1728"/>
-				<param name="height" value="984"/>
-				<param name="title" value="$LOCALIZE[5]"/>
-			</include>
-			<control type="image">
-				<description>Left column</description>
-				<top>64</top>
-				<width>560</width>
-				<height>920</height>
-				<texture colordiffuse="kscape_blue_dark">white.png</texture>
-			</control>
-
-			<control type="list" id="9000">
-				<description>Setting sections</description>
-				<top>88</top>
-				<width>560</width>
-				<height>876</height>
-				<onleft>9001</onleft>
-				<onright>9001</onright>
-				<scrolltime>120</scrolltime>
-				<include content="SystemListRow">
-					<param name="id" value="9000"/>
-					<param name="width" value="560"/>
-					<param name="height" value="72"/>
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>SystemBackdrop</include>
+			<control type="group">
+				<left>96</left>
+				<top>48</top>
+				<include>WindowFade</include>
+				<include content="SystemPanel">
+					<param name="width" value="1728"/>
+					<param name="height" value="984"/>
+					<param name="title" value="$LOCALIZE[5]"/>
 				</include>
-				<content>
-					<item>
-						<label>$LOCALIZE[14200]</label>
-						<onclick>ActivateWindow(PlayerSettings)</onclick>
-					</item>
-					<item>
-						<label>$LOCALIZE[14211]</label>
-						<onclick>ActivateWindow(MediaSettings)</onclick>
-					</item>
-					<item>
-						<label>$LOCALIZE[14204]</label>
-						<onclick>ActivateWindow(PVRSettings)</onclick>
-					</item>
-					<item>
-						<label>$LOCALIZE[14036]</label>
-						<onclick>ActivateWindow(ServiceSettings)</onclick>
-					</item>
-					<item>
-						<label>$LOCALIZE[15016]</label>
-						<onclick>ActivateWindow(GameSettings)</onclick>
-						<visible>System.GetBool(gamesgeneral.enable)</visible>
-					</item>
-					<item>
-						<label>$LOCALIZE[14206]</label>
-						<onclick>ActivateWindow(InterfaceSettings)</onclick>
-					</item>
-					<item>
-						<label>$LOCALIZE[13200]</label>
-						<onclick>ActivateWindow(Profiles)</onclick>
-					</item>
-					<item>
-						<label>$LOCALIZE[13000]</label>
-						<onclick>ActivateWindow(SystemSettings)</onclick>
-					</item>
-					<item>
-						<label>LibreELEC</label>
-						<onclick>RunAddon(service.libreelec.settings)</onclick>
-						<visible>System.AddonIsEnabled(service.libreelec.settings)</visible>
-					</item>
-				</content>
-			</control>
+				<control type="image">
+					<description>Left column</description>
+					<top>64</top>
+					<width>560</width>
+					<height>920</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+				</control>
 
-			<control type="list" id="9001">
-				<description>Tools</description>
-				<left>600</left>
-				<top>88</top>
-				<width>720</width>
-				<height>876</height>
-				<onleft>9000</onleft>
-				<onright>9000</onright>
-				<scrolltime>120</scrolltime>
-				<include content="SystemListRow">
-					<param name="id" value="9001"/>
-					<param name="width" value="720"/>
-					<param name="height" value="72"/>
-				</include>
-				<content>
-					<item>
-						<label>$LOCALIZE[10003]</label>
-						<onclick>ActivateWindow(filemanager)</onclick>
-					</item>
-					<item>
-						<label>$LOCALIZE[24001]</label>
-						<onclick>ActivateWindow(addonbrowser)</onclick>
-					</item>
-					<item>
-						<label>$LOCALIZE[138]</label>
-						<onclick>ActivateWindow(systeminfo)</onclick>
-					</item>
-					<item>
-						<label>$LOCALIZE[31040]</label>
-						<onclick>ActivateWindow(eventlog)</onclick>
-					</item>
-				</content>
+				<control type="list" id="9000">
+					<description>Setting sections</description>
+					<top>88</top>
+					<width>560</width>
+					<height>876</height>
+					<onleft>9001</onleft>
+					<onright>9001</onright>
+					<scrolltime>120</scrolltime>
+					<include content="SystemListRow">
+						<param name="id" value="9000"/>
+						<param name="width" value="560"/>
+						<param name="height" value="72"/>
+					</include>
+					<content>
+						<item>
+							<label>$LOCALIZE[14200]</label>
+							<onclick>ActivateWindow(PlayerSettings)</onclick>
+						</item>
+						<item>
+							<label>$LOCALIZE[14211]</label>
+							<onclick>ActivateWindow(MediaSettings)</onclick>
+						</item>
+						<item>
+							<label>$LOCALIZE[14204]</label>
+							<onclick>ActivateWindow(PVRSettings)</onclick>
+						</item>
+						<item>
+							<label>$LOCALIZE[14036]</label>
+							<onclick>ActivateWindow(ServiceSettings)</onclick>
+						</item>
+						<item>
+							<label>$LOCALIZE[15016]</label>
+							<onclick>ActivateWindow(GameSettings)</onclick>
+							<visible>System.GetBool(gamesgeneral.enable)</visible>
+						</item>
+						<item>
+							<label>$LOCALIZE[14206]</label>
+							<onclick>ActivateWindow(InterfaceSettings)</onclick>
+						</item>
+						<item>
+							<label>$LOCALIZE[13200]</label>
+							<onclick>ActivateWindow(Profiles)</onclick>
+						</item>
+						<item>
+							<label>$LOCALIZE[13000]</label>
+							<onclick>ActivateWindow(SystemSettings)</onclick>
+						</item>
+						<item>
+							<label>LibreELEC</label>
+							<onclick>RunAddon(service.libreelec.settings)</onclick>
+							<visible>System.AddonIsEnabled(service.libreelec.settings)</visible>
+						</item>
+					</content>
+				</control>
+
+				<control type="list" id="9001">
+					<description>Tools</description>
+					<left>600</left>
+					<top>88</top>
+					<width>720</width>
+					<height>876</height>
+					<onleft>9000</onleft>
+					<onright>9000</onright>
+					<scrolltime>120</scrolltime>
+					<include content="SystemListRow">
+						<param name="id" value="9001"/>
+						<param name="width" value="720"/>
+						<param name="height" value="72"/>
+					</include>
+					<content>
+						<item>
+							<label>$LOCALIZE[10003]</label>
+							<onclick>ActivateWindow(filemanager)</onclick>
+						</item>
+						<item>
+							<label>$LOCALIZE[24001]</label>
+							<onclick>ActivateWindow(addonbrowser)</onclick>
+						</item>
+						<item>
+							<label>$LOCALIZE[138]</label>
+							<onclick>ActivateWindow(systeminfo)</onclick>
+						</item>
+						<item>
+							<label>$LOCALIZE[31040]</label>
+							<onclick>ActivateWindow(eventlog)</onclick>
+						</item>
+					</content>
+				</control>
 			</control>
+	
 		</control>
 	</controls>
 </window>

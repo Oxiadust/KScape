@@ -1,5 +1,6 @@
 """Kodi video and music library access over in-process JSON-RPC."""
 import json
+from dataclasses import replace
 
 import xbmc
 
@@ -50,6 +51,75 @@ def fetch_movie(movieid):
     return Movie.from_jsonrpc(m) if m else None
 
 
+VERSIONS_ROOT = 'videodb://movies/videoversions/'
+VERSION_PROPERTIES = ['file', 'streamdetails', 'resume']
+
+
+def fetch_versions():
+    """{movieid: (Version, ...)} for every movie with two or more versions (Kodi 21 versions).
+
+    JSON-RPC has no version API, so this reads Kodi's own library paths: the version types in use,
+    then each type's movies. A first pass asks only for ids (cheap even for a large library); the
+    second fetches files, stream details and resume points only for the types that hold a movie
+    with several versions. Nothing is read from the files themselves."""
+    from .versions import Version
+    types = rpc('Files.GetDirectory', {'directory': VERSIONS_ROOT, 'media': 'video'}).get('files', [])
+    count, types_of = {}, {}
+    for t in types:
+        listing = rpc('Files.GetDirectory', {'directory': t['file'], 'media': 'video'}).get('files', [])
+        for it in listing:
+            if it.get('type') == 'movie' and it.get('id'):
+                mid = int(it['id'])
+                count[mid] = count.get(mid, 0) + 1
+                types_of.setdefault(mid, set()).add(t['file'])
+    multi = {mid for mid, n in count.items() if n > 1}
+    if not multi:
+        return {}
+    wanted = set().union(*(types_of[m] for m in multi))
+    found = {}
+    for t in types:
+        if t['file'] not in wanted:
+            continue
+        listing = rpc('Files.GetDirectory', {'directory': t['file'], 'media': 'video',
+                                             'properties': VERSION_PROPERTIES}).get('files', [])
+        for it in listing:
+            if it.get('type') == 'movie' and it.get('id') and int(it['id']) in multi:
+                mid = int(it['id'])
+                found.setdefault(mid, []).append(Version.from_item(mid, it, t.get('label') or '', t['file']))
+    xbmc.log(f'kscape: {len(found)} movies with several versions ({len(types)} version types)', xbmc.LOGINFO)
+    return {mid: tuple(vs) for mid, vs in found.items() if len(vs) > 1}
+
+
+def fresh_resume(versions, title=''):
+    """The versions with their resume points as Kodi has them now (the cached ones may predate
+    the last viewing). Kodi keeps one per version (per file); GetMovieDetails reports only the
+    default version's, so each version type's listing is asked for this movie alone (a
+    smart-playlist filter on the title, checked against the movie id). A merged copy is its own
+    library entry: GetMovieDetails."""
+    import urllib.parse
+    resume = {}
+    xsp = json.dumps({'rules': {'and': [{'field': 'title', 'operator': 'is', 'value': [title]}]}, 'type': 'movies'})
+    for vtype in {v.vtype for v in versions if v.vtype}:
+        listing = rpc('Files.GetDirectory', {'directory': f'{vtype}?xsp={urllib.parse.quote(xsp)}', 'media': 'video',
+                                             'properties': ['file', 'resume']}).get('files', [])
+        for it in listing:
+            resume[(int(it.get('id') or 0), it.get('file'))] = float((it.get('resume') or {}).get('position') or 0)
+    out = []
+    for v in versions:
+        if v.vtype:
+            pos = resume.get((v.movieid, v.file), v.resume)
+        else:
+            d = rpc('VideoLibrary.GetMovieDetails', {'movieid': v.movieid, 'properties': ['resume']})
+            pos = float(((d.get('moviedetails') or {}).get('resume') or {}).get('position') or 0)
+        out.append(v._replace(resume=pos))
+    return tuple(out)
+
+
+def mark_default(versions, default_file):
+    """The versions with Kodi's default one (the file the movie lists) marked."""
+    return tuple(v._replace(default=v.file == default_file) for v in versions)
+
+
 def fetch_details(movieid):
     """Everything the info screen shows, as Kodi returns it, or None if the movie is gone."""
     details = rpc('VideoLibrary.GetMovieDetails', {'movieid': movieid,
@@ -57,9 +127,36 @@ def fetch_details(movieid):
     return details.get('moviedetails')
 
 
+def version_settings():
+    """(preferred resolution, prefer 3D) from KScape's skin settings (Skin settings → Movie
+    versions): the preference is one of versions.PREFERENCES, '4K' when unset."""
+    from .versions import PREFERENCES
+    pref = xbmc.getInfoLabel('Skin.String(KScapeVersionPreference)') or '4K'
+    return (pref if pref in PREFERENCES else '4K'), xbmc.getCondVisibility('Skin.HasSetting(KScapePrefer3D)')
+
+
+def play_version(version, resume=False):
+    """Play one version by its file: Kodi recognises it as that movie and version, and keeps its
+    resume point apart from the other versions'."""
+    rpc('Player.Open', {'item': {'file': version.file}, 'options': {'resume': bool(resume)}})
+
+
 def play(movie, resume=None):
     """Play through Kodi's player. By default resumes from the saved bookmark if there is one
-    (asked of Kodi, since a view's copy of the movie may predate the last viewing)."""
+    (asked of Kodi, since a view's copy of the movie may predate the last viewing). A movie with
+    several versions plays the one the version settings pick (versions.choose) - for Resume, the
+    one with a resume point."""
+    if getattr(movie, 'versions', ()):
+        from .versions import choose
+        pref, prefer_3d = version_settings()
+        movie = replace(movie, versions=fresh_resume(movie.versions, movie.title))
+        if resume is None:
+            v = choose(movie.versions, pref, prefer_3d, resume=True)
+            resume = v.resume > 0
+        else:
+            v = choose(movie.versions, pref, prefer_3d, resume=bool(resume))
+        play_version(v, resume=bool(resume) and v.resume > 0)
+        return
     if resume is None:
         details = rpc('VideoLibrary.GetMovieDetails', {'movieid': movie.movieid,
                                                        'properties': ['resume']})
@@ -67,8 +164,43 @@ def play(movie, resume=None):
     rpc('Player.Open', {'item': {'movieid': movie.movieid}, 'options': {'resume': bool(resume)}})
 
 
-def play_trailer(url):
-    xbmc.executebuiltin(f'PlayMedia("{url}")')
+TRAILER_WAIT_S = 30.0
+
+
+def play_trailer(url, title='', poster=''):
+    """Play a movie's trailer as Kodi's own info dialog does: through the player, with a list
+    item (so the OSD names it), once the info screen has finished closing - opening playback while
+    a dialog still plays its close animation can leave Kodi waiting on it. Trailers are often
+    YouTube add-on links, which resolve over the network; if nothing plays within TRAILER_WAIT_S
+    (and the add-on is not asking something), a notification says so instead of a silent wait."""
+    import threading
+    import xbmcaddon
+    import xbmcgui
+    from .menu import wait_for_dialogs
+    wait_for_dialogs()
+    li = xbmcgui.ListItem(title or url, offscreen=True)
+    if title:
+        li.getVideoInfoTag().setTitle(title)
+    if poster:
+        li.setArt({'thumb': poster, 'poster': poster})
+    xbmc.Player().play(url, li)
+
+    def watch():
+        mon = xbmc.Monitor()
+        waited = 0.0
+        while waited < TRAILER_WAIT_S:
+            if mon.waitForAbort(0.5):
+                return
+            waited += 0.5
+            if xbmc.getCondVisibility('Player.HasVideo'):
+                return
+            if xbmc.getCondVisibility('Window.IsActive(yesnodialog) | Window.IsActive(okdialog) | '
+                                      'Window.IsActive(selectdialog) | Window.IsActive(virtualkeyboard)'):
+                waited = 0.0                          # the add-on is asking the user something
+        addon = xbmcaddon.Addon('script.kscape.wall')
+        xbmc.log(f'kscape: trailer did not start within {TRAILER_WAIT_S:.0f} s: {url}', xbmc.LOGWARNING)
+        xbmcgui.Dialog().notification('KScape', addon.getLocalizedString(32365), xbmcgui.NOTIFICATION_WARNING, 6000)
+    threading.Thread(target=watch, daemon=True).start()
 
 
 # ---- music library -------------------------------------------------------------------------

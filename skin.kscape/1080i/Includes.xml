@@ -3,6 +3,7 @@
 	<include file="Variables.xml"/>
 	<include file="Includes_System.xml"/>
 	<include file="Includes_Home.xml"/>
+	<include file="Includes_Display.xml"/>
 
 	<!-- Wall geometry (literal values; Kodi does not expand constants in attributes):
 	     160x240 poster (2:3) in a 170x250 cell, 11 columns x 4 rows. -->

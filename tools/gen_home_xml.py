@@ -16,7 +16,8 @@ library:
 
 Left/Right on a card switch to the next Home category with its cards (or submenu) still open:
 the bar moves (Control.Move) and focus goes through an off-screen router button (9030) whose
-onfocus picks the new category's cards or submenu.
+onfocus picks the new category's cards or submenu. A column is always entered on its bottom card,
+the one nearest the bar (Home.xml's Up does the same).
 
 Kodi clips a container's items to the container, so covers could only bleed off the right and
 bottom edges of a panel container. Instead each cover is its own image control whose artwork
@@ -595,9 +596,9 @@ def main():
 			<texturefocus/>
 			<texturenofocus/>
 			<onfocus condition="String.IsEqual(Container(9000).ListItem.Property(hassub),true)">SetFocus(9010)</onfocus>
-			<onfocus condition="String.IsEqual(Container(9000).ListItem.Property(id),movies) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9021)</onfocus>
-			<onfocus condition="String.IsEqual(Container(9000).ListItem.Property(id),music) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9022)</onfocus>
-			<onfocus condition="String.IsEqual(Container(9000).ListItem.Property(id),tv) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9023)</onfocus>
+			<onfocus condition="String.IsEqual(Container(9000).ListItem.Property(id),movies) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9021,2,absolute)</onfocus>
+			<onfocus condition="String.IsEqual(Container(9000).ListItem.Property(id),music) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9022,3,absolute)</onfocus>
+			<onfocus condition="String.IsEqual(Container(9000).ListItem.Property(id),tv) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9023,2,absolute)</onfocus>
 			<onfocus condition="!System.AddonIsEnabled(script.kscape.wall) + !String.IsEqual(Container(9000).ListItem.Property(hassub),true)">SetFocus(9000)</onfocus>
 		</control>
 		</definition>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodi contract (Settings → Display → Video calibration): 8 top-left mover, 9 bottom-right mover,
+     10 subtitle position mover, 11 pixel ratio resizer, 12 reset, 2 resolution, 3 what the focused
+     control does, 4 its value (labels set by Kodi). Kodi positions the controls itself. Marks are
+     tools/gen_calibration.py's, white, in the highlight colour while focused. Without this window
+     the calibration screen opened blank, with nothing to focus. -->
+<window>
+	<defaultcontrol>8</defaultcontrol>
+	<controls>
+		<control type="image">
+			<width>1920</width>
+			<height>1080</height>
+			<texture colordiffuse="kscape_bg">white.png</texture>
+		</control>
+		<control type="mover" id="8">
+			<description>Top left</description>
+			<width>128</width>
+			<height>128</height>
+			<texturefocus colordiffuse="kscape_amber">cal-tl.png</texturefocus>
+			<texturenofocus colordiffuse="kscape_text_dim">cal-tl.png</texturenofocus>
+			<movingspeed acceleration="180" maxvelocity="300" resettimeout="200" delta="1">
+				<eventconfig type="up"/>
+				<eventconfig type="down"/>
+				<eventconfig type="left"/>
+				<eventconfig type="right"/>
+			</movingspeed>
+		</control>
+		<control type="mover" id="9">
+			<description>Bottom right</description>
+			<left>700</left>
+			<top>500</top>
+			<width>128</width>
+			<height>128</height>
+			<texturefocus colordiffuse="kscape_amber">cal-br.png</texturefocus>
+			<texturenofocus colordiffuse="kscape_text_dim">cal-br.png</texturenofocus>
+			<movingspeed acceleration="180" maxvelocity="300" resettimeout="200" delta="1">
+				<eventconfig type="up"/>
+				<eventconfig type="down"/>
+				<eventconfig type="left"/>
+				<eventconfig type="right"/>
+			</movingspeed>
+		</control>
+		<control type="resize" id="11">
+			<description>Pixel ratio: the circle must look round</description>
+			<top>390</top>
+			<width>500</width>
+			<height>500</height>
+			<texturefocus colordiffuse="kscape_amber">cal-ratio.png</texturefocus>
+			<texturenofocus colordiffuse="kscape_text_dim">cal-ratio.png</texturenofocus>
+			<movingspeed acceleration="140" maxvelocity="300" resettimeout="180" delta="1">
+				<eventconfig type="left"/>
+				<eventconfig type="right"/>
+			</movingspeed>
+		</control>
+		<control type="mover" id="10">
+			<description>Subtitle position (the image keeps 40 px clear above and below the bar)</description>
+			<left>200</left>
+			<top>500</top>
+			<width>380</width>
+			<height>90</height>
+			<texturefocus colordiffuse="kscape_amber">cal-sub.png</texturefocus>
+			<texturenofocus colordiffuse="kscape_text_dim">cal-sub.png</texturenofocus>
+			<movingspeed acceleration="180" maxvelocity="300" resettimeout="200" delta="1">
+				<eventconfig type="up"/>
+				<eventconfig type="down"/>
+			</movingspeed>
+		</control>
+		<control type="mover" id="12">
+			<description>Reset calibration</description>
+			<top>900</top>
+			<width>100</width>
+			<height>100</height>
+			<texturefocus colordiffuse="kscape_amber">cal-reset.png</texturefocus>
+			<texturenofocus colordiffuse="kscape_text_dim">cal-reset.png</texturenofocus>
+		</control>
+		<control type="label">
+			<top>20</top>
+			<width>1920</width>
+			<height>56</height>
+			<align>center</align>
+			<font>kscape_info_head</font>
+			<textcolor>white</textcolor>
+			<label>$LOCALIZE[214]</label>
+		</control>
+		<control type="label" id="2">
+			<description>Resolution</description>
+			<top>80</top>
+			<width>1920</width>
+			<height>44</height>
+			<align>center</align>
+			<font>kscape_menu</font>
+			<textcolor>kscape_text_dim</textcolor>
+		</control>
+		<control type="label" id="3">
+			<description>What the focused control does</description>
+			<top>130</top>
+			<width>1920</width>
+			<height>90</height>
+			<align>center</align>
+			<font>kscape_menu</font>
+			<textcolor>kscape_text</textcolor>
+			<wrapmultiline>true</wrapmultiline>
+		</control>
+		<control type="label" id="4">
+			<description>Its value</description>
+			<top>226</top>
+			<width>1920</width>
+			<height>44</height>
+			<align>center</align>
+			<font>kscape_menu</font>
+			<textcolor>kscape_amber</textcolor>
+		</control>
+
+	</controls>
+</window>

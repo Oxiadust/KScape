@@ -9,84 +9,89 @@
 <window type="dialog">
 	<defaultcontrol>10</defaultcontrol>
 	<controls>
-		<control type="group" id="10">
-			<animation effect="fade" start="0" end="100" time="300">WindowOpen</animation>
-			<control type="image">
-				<left>-120</left>
-				<top>-60</top>
-				<width>2160</width>
-				<height>1200</height>
-				<texture colordiffuse="FF000000">kscape-white.png</texture>
-			</control>
-			<control type="group">
-				<description>Next scene card</description>
-				<visible>!String.IsEmpty(Window.Property(title))</visible>
+		<control type="group">
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<control type="group" id="10">
+				<animation effect="fade" start="0" end="100" time="300">WindowOpen</animation>
 				<control type="image">
 					<left>-120</left>
 					<top>-60</top>
 					<width>2160</width>
 					<height>1200</height>
-					<aspectratio>scale</aspectratio>
-					<fadetime>300</fadetime>
-					<texture background="true">$INFO[Window.Property(fanart)]</texture>
-					<animation effect="zoom" start="100" end="106" center="960,540" time="9000" tween="linear" condition="true">Conditional</animation>
-				</control>
-				<control type="image">
-					<description>Darken the fanart, more towards the bottom where the text sits</description>
-					<left>-120</left>
-					<top>-60</top>
-					<width>2160</width>
-					<height>1200</height>
-					<texture colordiffuse="99000000">kscape-white.png</texture>
-				</control>
-				<control type="image">
-					<left>-120</left>
-					<top>-60</top>
-					<width>2160</width>
-					<height>1200</height>
-					<texture colordiffuse="F0000000" flipy="true">kscape-fade.png</texture>
+					<texture colordiffuse="FF000000">kscape-white.png</texture>
 				</control>
 				<control type="group">
-					<left>120</left>
-					<top>590</top>
+					<description>Next scene card</description>
+					<visible>!String.IsEmpty(Window.Property(title))</visible>
 					<control type="image">
-						<description>Poster</description>
-						<width>260</width>
-						<height>390</height>
-						<aspectratio>keep</aspectratio>
-						<aligny>bottom</aligny>
+						<left>-120</left>
+						<top>-60</top>
+						<width>2160</width>
+						<height>1200</height>
+						<aspectratio>scale</aspectratio>
 						<fadetime>300</fadetime>
-						<texture background="true">$INFO[Window.Property(poster)]</texture>
+						<texture background="true">$INFO[Window.Property(fanart)]</texture>
+						<animation effect="zoom" start="100" end="106" center="960,540" time="9000" tween="linear" condition="true">Conditional</animation>
 					</control>
-					<control type="label">
-						<left>300</left>
-						<top>214</top>
-						<width>1380</width>
-						<height>40</height>
-						<font>kscape_small</font>
-						<textcolor>kscape_amber</textcolor>
-						<label>$INFO[Window.Property(upnext)]</label>
+					<control type="image">
+						<description>Darken the fanart, more towards the bottom where the text sits</description>
+						<left>-120</left>
+						<top>-60</top>
+						<width>2160</width>
+						<height>1200</height>
+						<texture colordiffuse="99000000">kscape-white.png</texture>
 					</control>
-					<control type="label">
-						<left>300</left>
-						<top>254</top>
-						<width>1380</width>
-						<height>60</height>
-						<font>kscape_panel_title</font>
-						<textcolor>FFFFFFFF</textcolor>
-						<label>$INFO[Window.Property(title)]</label>
+					<control type="image">
+						<left>-120</left>
+						<top>-60</top>
+						<width>2160</width>
+						<height>1200</height>
+						<texture colordiffuse="F0000000" flipy="true">kscape-fade.png</texture>
 					</control>
-					<control type="label">
-						<left>300</left>
-						<top>318</top>
-						<width>1380</width>
-						<height>50</height>
-						<font>kscape_menu</font>
-						<textcolor>FFD6E2FF</textcolor>
-						<label>$INFO[Window.Property(scene)]</label>
+					<control type="group">
+						<left>120</left>
+						<top>590</top>
+						<control type="image">
+							<description>Poster</description>
+							<width>260</width>
+							<height>390</height>
+							<aspectratio>keep</aspectratio>
+							<aligny>bottom</aligny>
+							<fadetime>300</fadetime>
+							<texture background="true">$INFO[Window.Property(poster)]</texture>
+						</control>
+						<control type="label">
+							<left>300</left>
+							<top>214</top>
+							<width>1380</width>
+							<height>40</height>
+							<font>kscape_small</font>
+							<textcolor>kscape_amber</textcolor>
+							<label>$INFO[Window.Property(upnext)]</label>
+						</control>
+						<control type="label">
+							<left>300</left>
+							<top>254</top>
+							<width>1380</width>
+							<height>60</height>
+							<font>kscape_panel_title</font>
+							<textcolor>FFFFFFFF</textcolor>
+							<label>$INFO[Window.Property(title)]</label>
+						</control>
+						<control type="label">
+							<left>300</left>
+							<top>318</top>
+							<width>1380</width>
+							<height>50</height>
+							<font>kscape_menu</font>
+							<textcolor>FFD6E2FF</textcolor>
+							<label>$INFO[Window.Property(scene)]</label>
+						</control>
 					</control>
 				</control>
 			</control>
+	
 		</control>
 	</controls>
 </window>

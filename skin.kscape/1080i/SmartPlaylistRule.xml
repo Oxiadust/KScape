@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodi contract (a smart playlist rule): 2 heading, 15 field, 16 operator, 17 value (edit),
+     20 browse values, 18 OK, 19 Cancel. Field and operator show their value as Label2. -->
+<window>
+	<defaultcontrol always="true">15</defaultcontrol>
+	<depth>DepthDialog</depth>
+	<controls>
+		<control type="group">
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>DialogDim</include>
+			<control type="group">
+				<left>460</left>
+				<top>270</top>
+				<include>PanelOpenClose</include>
+				<include content="SystemPanel">
+					<param name="width" value="1000"/>
+					<param name="height" value="520"/>
+					<param name="title"></param>
+				</include>
+				<control type="label" id="2">
+					<left>30</left>
+					<width>940</width>
+					<height>64</height>
+					<aligny>center</aligny>
+					<font>kscape_info_head</font>
+					<textcolor>white</textcolor>
+					<label>$LOCALIZE[21421]</label>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<top>80</top>
+					<width>940</width>
+					<height>44</height>
+					<aligny>center</aligny>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text_dim</textcolor>
+					<label>$LOCALIZE[21422]</label>
+				</control>
+				<control type="grouplist" id="9001">
+					<left>30</left>
+					<top>134</top>
+					<width>940</width>
+					<height>220</height>
+					<orientation>vertical</orientation>
+					<itemgap>6</itemgap>
+					<onup>9000</onup>
+					<ondown>9000</ondown>
+					<control type="button" id="15">
+						<align>left</align>
+						<include content="SystemButton">
+							<param name="width" value="940"/>
+							<param name="height" value="64"/>
+						</include>
+						<font>kscape_list_value</font>
+						<label></label>
+					</control>
+					<control type="button" id="16">
+						<align>left</align>
+						<include content="SystemButton">
+							<param name="width" value="940"/>
+							<param name="height" value="64"/>
+						</include>
+						<font>kscape_list_value</font>
+						<label></label>
+					</control>
+					<control type="grouplist" id="9002">
+						<width>940</width>
+						<height>64</height>
+						<orientation>horizontal</orientation>
+						<itemgap>10</itemgap>
+						<control type="edit" id="17">
+							<description>Value: a dark box, so it shows while empty</description>
+							<texturenofocus colordiffuse="kscape_blue_dark">white.png</texturenofocus>
+							<hinttext>[COLOR kscape_text_off]$LOCALIZE[16028][/COLOR]</hinttext>
+							<include content="SystemButton">
+								<param name="width" value="700"/>
+								<param name="height" value="64"/>
+							</include>
+							<font>kscape_list_value</font>
+						</control>
+						<control type="button" id="20">
+							<align>center</align>
+							<textoffsetx>0</textoffsetx>
+							<include content="SystemButton">
+								<param name="width" value="230"/>
+								<param name="height" value="64"/>
+							</include>
+							<font>kscape_list_value</font>
+							<label>$LOCALIZE[1024]</label>
+						</control>
+					</control>
+				</control>
+				<control type="grouplist" id="9000">
+					<left>340</left>
+					<top>410</top>
+					<width>640</width>
+					<height>80</height>
+					<orientation>horizontal</orientation>
+					<itemgap>20</itemgap>
+					<onup>9002</onup>
+					<ondown>15</ondown>
+					<control type="button" id="18">
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="300"/>
+							<param name="height" value="80"/>
+						</include>
+						<label>$LOCALIZE[186]</label>
+					</control>
+					<control type="button" id="19">
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="300"/>
+							<param name="height" value="80"/>
+						</include>
+						<label>$LOCALIZE[222]</label>
+					</control>
+				</control>
+			</control>
+	
+		</control>
+	</controls>
+</window>

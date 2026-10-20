@@ -87,8 +87,9 @@ def camera_target(wall, cell):
     """Camera (wall-pixel top-left of the screen) that centres `cell`, clamped to the wall."""
     lay = wall.layout
     x, y = cell_origin(*cell, layout=lay)
-    cx = x + lay.cover_w / 2 - G.SCREEN_W / 2
-    cy = y + lay.cover_h / 2 - G.SCREEN_H / 2
+    vw, vh = G.view_size(lay)
+    cx = x + lay.cover_w / 2 - vw / 2
+    cy = y + lay.cover_h / 2 - vh / 2
     wall_w = wall.cols * lay.pitch_x - (lay.pitch_x - lay.cover_w)
     wall_h = wall.rows * lay.pitch_y - (lay.pitch_y - lay.cover_h)
     margin_x, margin_y = lay.pitch_x * 0.5, lay.pitch_y * 0.25
@@ -98,8 +99,8 @@ def camera_target(wall, cell):
             return (size - screen) / 2.0            # whole axis fits: centre it
         return max(-margin, min(size - screen + margin, v))
 
-    return (round(clamp(cx, wall_w, G.SCREEN_W, margin_x)),
-            round(clamp(cy, wall_h, G.SCREEN_H, margin_y)))
+    return (round(clamp(cx, wall_w, vw, margin_x)),
+            round(clamp(cy, wall_h, vh, margin_y)))
 
 
 def ease_out_cubic(p):

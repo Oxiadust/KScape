@@ -5,98 +5,103 @@
 <window>
 	<defaultcontrol always="true">3</defaultcontrol>
 	<controls>
-		<include>DialogDim</include>
 		<control type="group">
-			<left>560</left>
-			<top>150</top>
-			<include>PanelOpenClose</include>
-			<include content="SystemPanel">
-				<param name="width" value="800"/>
-				<param name="height" value="780"/>
-			</include>
-			<control type="label" id="1">
-				<left>30</left>
-				<width>740</width>
-				<height>64</height>
-				<aligny>center</aligny>
-				<font>kscape_info_head</font>
-				<textcolor>white</textcolor>
-			</control>
-			<control type="list" id="3">
-				<top>84</top>
-				<width>800</width>
-				<height>560</height>
-				<onup>3</onup>
-				<ondown>3</ondown>
-				<onright>9001</onright>
-				<onleft>9001</onleft>
-				<scrolltime tween="cubic" easing="out">160</scrolltime>
-				<include content="SystemListRow">
-					<param name="id" value="3"/>
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>DialogDim</include>
+			<control type="group">
+				<left>560</left>
+				<top>150</top>
+				<include>PanelOpenClose</include>
+				<include content="SystemPanel">
 					<param name="width" value="800"/>
-					<param name="height" value="70"/>
+					<param name="height" value="780"/>
 				</include>
-			</control>
-			<control type="list" id="6">
-				<description>Detailed list: same look, Label2 on the right</description>
-				<top>84</top>
-				<width>800</width>
-				<height>560</height>
-				<onup>6</onup>
-				<ondown>6</ondown>
-				<onright>9001</onright>
-				<onleft>9001</onleft>
-				<scrolltime tween="cubic" easing="out">160</scrolltime>
-				<include content="SystemListRow">
-					<param name="id" value="6"/>
-					<param name="width" value="800"/>
-					<param name="height" value="70"/>
-				</include>
-			</control>
-			<control type="image">
-				<description>Button strip</description>
-				<top>664</top>
-				<width>800</width>
-				<height>116</height>
-				<texture colordiffuse="kscape_blue_dark">white.png</texture>
-			</control>
-			<control type="grouplist" id="9001">
-				<description>Extra and cancel buttons (Kodi shows the ones it needs)</description>
-				<left>30</left>
-				<top>690</top>
-				<width>740</width>
-				<height>64</height>
-				<orientation>horizontal</orientation>
-				<align>right</align>
-				<itemgap>16</itemgap>
-				<onup>3</onup>
-				<ondown>3</ondown>
-				<control type="button" id="5">
-					<align>center</align>
-					<textoffsetx>0</textoffsetx>
-					<include content="SystemButton">
-						<param name="width" value="230"/>
-						<param name="height" value="64"/>
+				<control type="label" id="1">
+					<left>30</left>
+					<width>740</width>
+					<height>64</height>
+					<aligny>center</aligny>
+					<font>kscape_info_head</font>
+					<textcolor>white</textcolor>
+				</control>
+				<control type="list" id="3">
+					<top>84</top>
+					<width>800</width>
+					<height>560</height>
+					<onup>3</onup>
+					<ondown>3</ondown>
+					<onright>9001</onright>
+					<onleft>9001</onleft>
+					<scrolltime tween="cubic" easing="out">160</scrolltime>
+					<include content="SystemListRow">
+						<param name="id" value="3"/>
+						<param name="width" value="800"/>
+						<param name="height" value="70"/>
 					</include>
 				</control>
-				<control type="button" id="8">
-					<align>center</align>
-					<textoffsetx>0</textoffsetx>
-					<include content="SystemButton">
-						<param name="width" value="230"/>
-						<param name="height" value="64"/>
+				<control type="list" id="6">
+					<description>Detailed list: same look, Label2 on the right</description>
+					<top>84</top>
+					<width>800</width>
+					<height>560</height>
+					<onup>6</onup>
+					<ondown>6</ondown>
+					<onright>9001</onright>
+					<onleft>9001</onleft>
+					<scrolltime tween="cubic" easing="out">160</scrolltime>
+					<include content="SystemListRow">
+						<param name="id" value="6"/>
+						<param name="width" value="800"/>
+						<param name="height" value="70"/>
 					</include>
 				</control>
-				<control type="button" id="7">
-					<align>center</align>
-					<textoffsetx>0</textoffsetx>
-					<include content="SystemButton">
-						<param name="width" value="230"/>
-						<param name="height" value="64"/>
-					</include>
-					<label>222</label>
+				<control type="image">
+					<description>Button strip</description>
+					<top>664</top>
+					<width>800</width>
+					<height>116</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+				</control>
+				<control type="grouplist" id="9001">
+					<description>Extra and cancel buttons (Kodi shows the ones it needs)</description>
+					<left>30</left>
+					<top>690</top>
+					<width>740</width>
+					<height>64</height>
+					<orientation>horizontal</orientation>
+					<align>right</align>
+					<itemgap>16</itemgap>
+					<onup>3</onup>
+					<ondown>3</ondown>
+					<control type="button" id="5">
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="230"/>
+							<param name="height" value="64"/>
+						</include>
+					</control>
+					<control type="button" id="8">
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="230"/>
+							<param name="height" value="64"/>
+						</include>
+					</control>
+					<control type="button" id="7">
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<include content="SystemButton">
+							<param name="width" value="230"/>
+							<param name="height" value="64"/>
+						</include>
+						<label>222</label>
+					</control>
 				</control>
 			</control>
+	
 		</control>
 	</controls>
 </window>

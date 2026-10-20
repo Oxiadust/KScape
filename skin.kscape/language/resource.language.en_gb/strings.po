@@ -162,3 +162,103 @@ msgstr ""
 msgctxt "#31048"
 msgid "Highlight colour"
 msgstr ""
+
+msgctxt "#31058"
+msgid "No bookmarks yet. Add one while the video plays."
+msgstr ""
+
+msgctxt "#31059"
+msgid "Colour"
+msgstr ""
+
+msgctxt "#31061"
+msgid "Local subtitle available"
+msgstr ""
+
+msgctxt "#31062"
+msgid "Video"
+msgstr ""
+
+msgctxt "#31063"
+msgid "Audio"
+msgstr ""
+
+msgctxt "#31064"
+msgid "Player"
+msgstr ""
+
+msgctxt "#31065"
+msgid "General"
+msgstr ""
+
+msgctxt "#31066"
+msgid "Movie versions"
+msgstr ""
+
+msgctxt "#31067"
+msgid "Display & aspect ratio"
+msgstr ""
+
+msgctxt "#31068"
+msgid "Format badges on covers"
+msgstr ""
+
+msgctxt "#31069"
+msgid "Version Play starts"
+msgstr ""
+
+msgctxt "#31070"
+msgid "Prefer 3D versions"
+msgstr ""
+
+msgctxt "#31071"
+msgid "Interface aspect ratio"
+msgstr ""
+
+msgctxt "#31072"
+msgid "CinemaScope poster wall"
+msgstr ""
+
+msgctxt "#31073"
+msgid "Vertical UI offset"
+msgstr ""
+
+msgctxt "#31074"
+msgid "Horizontal UI offset"
+msgstr ""
+
+msgctxt "#31075"
+msgid "Safe area / overscan"
+msgstr ""
+
+msgctxt "#31076"
+msgid "Preview layout"
+msgstr ""
+
+msgctxt "#31077"
+msgid "Motion of the walls and screens."
+msgstr ""
+
+msgctxt "#31078"
+msgid "The theme colour and the highlight colour of every screen."
+msgstr ""
+
+msgctxt "#31079"
+msgid "What the Home screen shows behind its navigation bar."
+msgstr ""
+
+msgctxt "#31080"
+msgid "Movies with several versions (Kodi's Manage versions, or copies of one film) show once: which version Play starts, and the format badges."
+msgstr ""
+
+msgctxt "#31081"
+msgid "For ultrawide screens and CinemaScope projector screens. Auto adapts to the screen Kodi draws on; a 2.35, 2.39 or 2.40 screen fed a 16:9 signal must be chosen by hand."
+msgstr ""
+
+msgctxt "#31082"
+msgid "Shown"
+msgstr ""
+
+msgctxt "#31083"
+msgid "Hidden"
+msgstr ""

@@ -59,4 +59,13 @@
 		<value condition="VideoPlayer.HasSubtitles + VideoPlayer.SubtitlesEnabled">$LOCALIZE[31025]: $LOCALIZE[31028]</value>
 		<value>$LOCALIZE[31025]: $LOCALIZE[31026]</value>
 	</variable>
+	<!-- Subtitle search results: what Kodi says about a subtitle (DialogSubtitles.xml). -->
+	<variable name="KScapeSubtitleFlags">
+		<value condition="String.IsEqual(ListItem.Property(sync),true) + String.IsEqual(ListItem.Property(hearing_imp),true)">SYNC · CC</value>
+		<value condition="String.IsEqual(ListItem.Property(sync),true)">SYNC</value>
+		<value condition="String.IsEqual(ListItem.Property(hearing_imp),true)">CC</value>
+	</variable>
+	<variable name="KScapeHwDecoder">
+		<value condition="Player.Process(videohwdecoder)"> · HW</value>
+	</variable>
 </includes>

@@ -4,38 +4,43 @@
 	<depth>DepthMax</depth>
 	<controls>
 		<control type="group">
-			<left>1300</left>
-			<top>60</top>
-			<animation effect="fade" start="0" end="100" time="200">WindowOpen</animation>
-			<animation effect="fade" start="100" end="0" time="200">WindowClose</animation>
-			<control type="image">
-				<width>560</width>
-				<height>120</height>
-				<texture colordiffuse="E6141418">white.png</texture>
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<control type="group">
+				<left>1300</left>
+				<top>60</top>
+				<animation effect="fade" start="0" end="100" time="200">WindowOpen</animation>
+				<animation effect="fade" start="100" end="0" time="200">WindowClose</animation>
+				<control type="image">
+					<width>560</width>
+					<height>120</height>
+					<texture colordiffuse="E6141418">white.png</texture>
+				</control>
+				<control type="image" id="400">
+					<left>20</left>
+					<top>20</top>
+					<width>80</width>
+					<height>80</height>
+					<aspectratio>keep</aspectratio>
+				</control>
+				<control type="fadelabel" id="401">
+					<left>120</left>
+					<top>18</top>
+					<width>420</width>
+					<height>40</height>
+					<font>kscape13</font>
+					<textcolor>FFFFFFFF</textcolor>
+				</control>
+				<control type="fadelabel" id="402">
+					<left>120</left>
+					<top>62</top>
+					<width>420</width>
+					<height>40</height>
+					<font>kscape_small</font>
+					<textcolor>FFA0A0A8</textcolor>
+				</control>
 			</control>
-			<control type="image" id="400">
-				<left>20</left>
-				<top>20</top>
-				<width>80</width>
-				<height>80</height>
-				<aspectratio>keep</aspectratio>
-			</control>
-			<control type="fadelabel" id="401">
-				<left>120</left>
-				<top>18</top>
-				<width>420</width>
-				<height>40</height>
-				<font>kscape13</font>
-				<textcolor>FFFFFFFF</textcolor>
-			</control>
-			<control type="fadelabel" id="402">
-				<left>120</left>
-				<top>62</top>
-				<width>420</width>
-				<height>40</height>
-				<font>kscape_small</font>
-				<textcolor>FFA0A0A8</textcolor>
-			</control>
+	
 		</control>
 	</controls>
 </window>

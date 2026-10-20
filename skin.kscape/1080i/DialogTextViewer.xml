@@ -5,76 +5,81 @@
 	<defaultcontrol always="true">1000</defaultcontrol>
 	<depth>DepthDialog</depth>
 	<controls>
-		<include>DialogDim</include>
 		<control type="group">
-			<left>160</left>
-			<top>90</top>
-			<include>PanelOpenClose</include>
-			<include content="SystemPanel">
-				<param name="width" value="1600"/>
-				<param name="height" value="900"/>
-				<param name="title"></param>
-			</include>
-			<control type="label" id="1">
-				<description>Heading, set by Kodi</description>
-				<left>30</left>
-				<width>1300</width>
-				<height>64</height>
-				<aligny>center</aligny>
-				<font>kscape_info_head</font>
-				<textcolor>white</textcolor>
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>DialogDim</include>
+			<control type="group">
+				<left>160</left>
+				<top>90</top>
+				<include>PanelOpenClose</include>
+				<include content="SystemPanel">
+					<param name="width" value="1600"/>
+					<param name="height" value="900"/>
+					<param name="title"></param>
+				</include>
+				<control type="label" id="1">
+					<description>Heading, set by Kodi</description>
+					<left>30</left>
+					<width>1300</width>
+					<height>64</height>
+					<aligny>center</aligny>
+					<font>kscape_info_head</font>
+					<textcolor>white</textcolor>
+				</control>
+				<control type="label">
+					<description>Page n/m</description>
+					<left>1340</left>
+					<width>230</width>
+					<height>64</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$INFO[Container(5).CurrentPage]/$INFO[Container(5).NumPages]</label>
+					<visible>Integer.IsGreater(Container(5).NumPages,1)</visible>
+				</control>
+				<control type="textbox" id="5">
+					<left>40</left>
+					<top>94</top>
+					<width>1500</width>
+					<height>776</height>
+					<font>kscape_panel_body</font>
+					<textcolor>kscape_text</textcolor>
+					<pagecontrol>3000</pagecontrol>
+				</control>
+				<control type="scrollbar" id="3000">
+					<description>Position indicator; focus stays on 1000</description>
+					<left>1564</left>
+					<top>94</top>
+					<width>12</width>
+					<height>776</height>
+					<orientation>vertical</orientation>
+					<onup>3000</onup>
+					<ondown>3000</ondown>
+					<onleft>1000</onleft>
+					<onright>1000</onright>
+					<texturesliderbackground colordiffuse="kscape_blue_dark">white.png</texturesliderbackground>
+					<texturesliderbar colordiffuse="kscape_text_dim">white.png</texturesliderbar>
+					<texturesliderbarfocus colordiffuse="white">white.png</texturesliderbarfocus>
+					<textureslidernib/>
+					<textureslidernibfocus/>
+				</control>
 			</control>
-			<control type="label">
-				<description>Page n/m</description>
-				<left>1340</left>
-				<width>230</width>
-				<height>64</height>
-				<align>right</align>
-				<aligny>center</aligny>
-				<font>kscape_list_value</font>
-				<textcolor>kscape_text</textcolor>
-				<label>$INFO[Container(5).CurrentPage]/$INFO[Container(5).NumPages]</label>
-				<visible>Integer.IsGreater(Container(5).NumPages,1)</visible>
+			<control type="button" id="1000">
+				<description>Hidden focus holder</description>
+				<left>-3000</left>
+				<top>-3000</top>
+				<width>1</width>
+				<height>1</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<label></label>
+				<onclick>Action(Close)</onclick>
+				<onup>PageUp(3000)</onup>
+				<ondown>PageDown(3000)</ondown>
 			</control>
-			<control type="textbox" id="5">
-				<left>40</left>
-				<top>94</top>
-				<width>1500</width>
-				<height>776</height>
-				<font>kscape_panel_body</font>
-				<textcolor>kscape_text</textcolor>
-				<pagecontrol>3000</pagecontrol>
-			</control>
-			<control type="scrollbar" id="3000">
-				<description>Position indicator; focus stays on 1000</description>
-				<left>1564</left>
-				<top>94</top>
-				<width>12</width>
-				<height>776</height>
-				<orientation>vertical</orientation>
-				<onup>3000</onup>
-				<ondown>3000</ondown>
-				<onleft>1000</onleft>
-				<onright>1000</onright>
-				<texturesliderbackground colordiffuse="kscape_blue_dark">white.png</texturesliderbackground>
-				<texturesliderbar colordiffuse="kscape_text_dim">white.png</texturesliderbar>
-				<texturesliderbarfocus colordiffuse="white">white.png</texturesliderbarfocus>
-				<textureslidernib/>
-				<textureslidernibfocus/>
-			</control>
-		</control>
-		<control type="button" id="1000">
-			<description>Hidden focus holder</description>
-			<left>-3000</left>
-			<top>-3000</top>
-			<width>1</width>
-			<height>1</height>
-			<texturefocus/>
-			<texturenofocus/>
-			<label></label>
-			<onclick>Action(Close)</onclick>
-			<onup>PageUp(3000)</onup>
-			<ondown>PageDown(3000)</ondown>
+	
 		</control>
 	</controls>
 </window>

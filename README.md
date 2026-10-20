@@ -19,7 +19,7 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
     the focused tab, a column of cards shows the views it offers - **List**, **Covers**,
     **Collections**, and **Now Playing** for music - each the real view
     at 1/6 scale, drawn live from your own library.
-    **Up** enters the cards (the selected one gets the wall's highlight-coloured frame), **Select** opens that
+    **Up** enters the cards at the bottom one, nearest the bar (the selected one gets the wall's highlight-coloured frame), **Select** opens that
     view, **Down** past the last card or **Back** returns to the bar. **Left/Right** on a card go
     straight to the next category with its cards (or submenu) open.
   - While something plays, the top right, under the clock, shows it: a video live in a small
@@ -44,9 +44,10 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
 - **Camera follow.** The focus frame glides to the next cover with a soft overshoot
   (0.42 s), and the wall follows with a long ease-out (0.6 s) that settles gently.
 - **Synopsis panel.** About 1.1 s after you stop on a movie, a blue panel with its title and
-  synopsis opens beside it (on whichever side has room); under the synopsis, the movie's
-  resolution badge (**4K**, **1080p**, **720p**, **SD**), its TMDB score and its Rotten Tomatoes
-  Tomatometer, each only when known.
+  synopsis eases in beside it (on whichever side has room) - a fade with a short slide out from
+  the cover and a slight scale, and a quicker ease out when you move on (a plain fade with
+  Reduce motion); under the synopsis, the movie's resolution badge (**4K**, **1080p**, **720p**,
+  **SD**), its TMDB score and its Rotten Tomatoes Tomatometer, each only when known.
 - **Related-cover shuffle.** About 3.2 s after you stop, every cover flies to a new cell so the
   most related movies end up closest to the one you picked. That movie and its panel stay put;
   covers leaving the screen fly off and newcomers fly in from the edges. No cover flies across the
@@ -90,13 +91,17 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
 - **List view.** The library as a table: the focused movie sits in a tall blue band with its
   poster and up to four genres, cast members and directors; the other rows show one line per
   column. Left/Right move between the Title, Genre, Cast, Director, Year, Time, Rating and
-  Quality columns, scrolling the columns sideways. The first Up/Down in a newly focused column
+  Formats columns (Formats: every format the movie is available in, `4K · 1080p · 3D`; sorted
+  best first), scrolling the columns sideways. The first Up/Down in a newly focused column
   re-sorts the list by it, keeping the movie under the band. In title order, the letter each
   title sorts by is amber (a leading "The" is skipped, as Kodi sorts). Genre, Cast and Director
   list a movie under each of its values (cast: the four names shown); Up/Down first step
   through the movie's own values, marked ▶ and amber, regrouping the list around it, then move
   on to the next movie.
-- **Quality badges.** Covers show **HDR** or **UHD** when Kodi has stream details for the file.
+- **Format badges.** Movie covers carry one compact amber badge listing every format the movie
+  is available in - **4K**, **1080p**, **720p**, **3D**, **SD** or **DVD** - across all its
+  versions, bottom right, only when Kodi has measured the files. Skin settings → Movie versions
+  hides them. (TV show and album covers keep their own markers.)
 - **Ratings.** TMDB from Kodi's scraper. Rotten Tomatoes when the library has it (an NFO
   `tomatometerallcritics` / `rottentomatoes` rating, or a scraper that stores one). Kodi's TMDB
   scraper stores none, so the add-on settings can take your own free OMDb API key: KScape then
@@ -104,8 +109,24 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   keeps the answer for a month (`ratings.json`) and never writes it into Kodi's library.
 - **Library aware.** The wall reloads itself after a library scan or clean, keeping your place.
 - **Remembers where you were**, across Kodi restarts.
-- **One cover per movie.** Duplicate copies (same title and year) show as one cover by default;
-  the copy with a resume point, then the best quality, is the one kept and played.
+- **One cover per movie** (movie versions). A movie appears once on the wall and in the list,
+  however many versions it has:
+  - *Kodi's own versions* (Kodi 21: Manage versions → Add version, e.g. 4K, 1080p, 3D,
+    Director's Cut) are one movie in Kodi already. KScape reads them from Kodi's library (no
+    file scanning, cached with the library) and shows their formats.
+  - *Separate library entries of one film* (copies added as different movies) show as one cover
+    when they share the same TMDB or IMDb id, title, year and edition; titles alone never merge
+    two entries, and different editions (Director's Cut, Extended, Theatrical, IMAX...) named in
+    the title or file name stay apart. The copies then count as versions of that cover.
+    Optional: add-on settings → Show duplicates once.
+  - **Play** starts the version KScape prefers: the resolution chosen in Skin settings → Movie
+    versions → *Version Play starts* (4K first by default, then 1080p, 720p, SD; or Kodi's
+    default version), never a 3D version over a 2D one unless *Prefer 3D versions* is on.
+    **Resume** resumes the version you were watching: Kodi keeps a resume point per version.
+  - **Play Version** (movie info, when there are two or more) lists each version with its name,
+    resolution, 3D, dynamic range and audio - `Director's Cut — 4K Ultra HD · 2160p · Dolby
+    Vision · Dolby TrueHD` - the one Play would start first; one with a resume point asks
+    whether to resume it.
 - **Music.** The same wall with square album covers (missing artwork shows the album and artist
   on a dark card); the panel shows album and artist, and related albums (same artist, shared
   artists, genres, styles, era) shuffle around the one you pick. The list view's columns are
@@ -268,8 +289,10 @@ then set `lookandfeel.skin` to `skin.kscape` in `userdata/guisettings.xml`.
 
 KScape has its own versions of Kodi's settings screens (Settings, its category pages, System info, Profiles,
 File manager, Event log, add-on browser/information/settings, keyboard and the other dialogs they
-open), drawn in the theme colour. **Skin settings** offers: Reduce motion; **Colours**; and
-hiding the Home screen's background artwork, clock or movie title.
+open), drawn in the theme colour. **Skin settings** has five categories, chosen on the left:
+**General** (Reduce motion), **Colours**, **Home screen** (hide the background artwork, clock
+or movie title), **Movie versions** (format badges on covers, the version Play starts, prefer
+3D) and **Display & aspect ratio** (see *Ultrawide and CinemaScope*).
 
 **Colours.** KScape is drawn in two colours, and Skin settings lets you pick each:
 
@@ -295,6 +318,69 @@ default: OMDb is never contacted).
 Motion timings and easing (`FRAME_TWEEN`: `back` for one soft overshoot, or `elastic` for a
 bouncier settle), sizes and the pool size live in
 [`script.kscape.wall/resources/lib/geometry.py`](script.kscape.wall/resources/lib/geometry.py).
+
+## Ultrawide and CinemaScope
+
+Skin settings → **Display & aspect ratio**:
+
+- **Interface aspect ratio**: Auto (recommended), 16:9 Standard, 21:9 Ultrawide, 2.35:1, 2.39:1
+  or 2.40:1 CinemaScope. Auto follows the screen Kodi draws on; the list shows what it detected.
+- **CinemaScope poster wall**: automatic, two or three poster rows inside a CinemaScope band.
+- **Vertical / Horizontal UI offset** (±300 px, steps of 20): move the interface to line it up
+  with a projector screen.
+- **Safe area / overscan** (0-10 % on every side): shrink the interface so nothing is cut off.
+- **Preview layout**: an amber frame around exactly the area KScape now uses, its centre and a
+  row of sample covers.
+
+Every change applies at once and asks *Keep this layout?*; without an answer it goes back after
+15 seconds, as Kodi does after a resolution change. Settings are skin settings, so they persist.
+
+**Two situations.**
+
+- *A native ultrawide screen* (Kodi runs at, say, 2560 × 1080 or 3440 × 1440). Auto handles it:
+  the cover walls spread across the whole width with more columns, covers keeping their true
+  2:3 shape; the other screens simply get wider.
+- *A CinemaScope projector screen fed a 16:9 signal* (1920 × 1080 or 3840 × 2160, the projector
+  zoomed so that the middle band fills a 2.35 / 2.39 / 2.40 screen). Nothing in the signal says
+  so, so choose the screen's ratio by hand. KScape then draws inside that band: the cover walls
+  lay out natively across it (two or three rows, black above and below so nothing spills onto
+  the wall), every other screen - Home, menus, dialogs, the info screen, the playback controls -
+  is scaled into it, and the offsets move it to where your projector's zoom puts the band.
+  This is *interface* positioning only: KScape never changes Kodi's video output, the playing
+  video's zoom or its aspect ratio, nor the projector's zoom.
+
+**How it works in Kodi 21, and why.** Checked in the test Kodi, not assumed:
+
+- Every KScape window - the skin's and the add-on's - uses 1920 × 1080 coordinates. Estuary
+  adapts to other screens by declaring several coordinate spaces (`<res>` entries such as
+  2560 × 1080 for 21:9, sharing one XML folder written with relative positions). KScape does not:
+  the add-on's windows (cover walls, list views, info screen, Collections...) cannot use a
+  skin's coordinate spaces - Kodi only looks for their XML in the add-on, at a fixed resolution -
+  so the skin and the add-on would have needed two different corrections.
+- On a screen of another shape, Kodi stretches those coordinates to fill it but draws text and
+  artwork (images with an aspect ratio) in their true proportions. So a wide screen gets a wider
+  layout with correct text; only boxes that must keep a shape are corrected: the walls' cover
+  cells, frames and badges, the info screen's poster and badges. The cover wall builds its XML for
+  the screen when it opens (`wallxml.py`, written to the add-on's profile folder), so nothing is
+  resized control by control.
+- A CinemaScope band on a 16:9 signal: every window's controls sit in one root group carrying
+  `KScapeDisplay` (`Includes_Display.xml`, generated): zero-length conditional zoom and slide
+  animations, one per possible value, waiting for Home window properties that the KScape service
+  sets from the settings. Kodi animations cannot take values from settings, hence the steps
+  (1 % zoom, 10 px offsets). ScopeNox (Aeon Nox for CinemaScope, Kodi 21) moves its windows the
+  same way - a root group with conditional slides - because a window's `<origin>` stops working
+  after ReloadSkin and window-level animations are ignored; it lays every window out by hand
+  inside an 800-820 px band instead of scaling. KScape scales the existing layouts (so they stay
+  as they are) and adapts only the cover walls natively.
+- Video calibration and the mouse pointer are never transformed (Kodi places calibration marks on
+  the real screen edges), as in ScopeNox.
+
+**Testing.** Standard TV: Auto - the layout is unchanged (16:9, 1920 × 1080 or 3840 × 2160).
+Ultrawide monitor: run Kodi full screen at the monitor's resolution, Auto; the walls show more
+columns and covers stay 2:3. CinemaScope projector: keep Kodi at 1920 × 1080 or 3840 × 2160,
+choose 2.35 / 2.39 / 2.40, open **Preview layout** and adjust the offsets until the amber frame
+fills the screen exactly, then the safe area if an edge is cut; set the poster rows to taste.
+Back to Auto or 16:9 restores the original interface.
 
 ## How the shuffle works
 
@@ -338,21 +424,28 @@ script.kscape.wall/       The wall add-on: movies, music and TV (Python + window
                           streaminfo (resolution, HDR, audio, ratings; pure), explore (filters,
                           Related Movies; pure), exploreui (Filter menu), chapters (MKV / MP4
                           chapter reader; pure), ratings (optional OMDb Tomatometer), badges
-                          (generated badge sizes)
-  service.py              starts demoservice with Kodi (the add-on is also a service)
+                          (generated badge sizes), versions (movie versions, Play's choice;
+                          pure), versionsui, display (aspect ratio, CinemaScope band, offsets;
+                          pure), displayui (its settings and preview), wallxml (builds the
+                          cover wall's XML for any screen), npchip (the now-playing chip)
+  service.py              starts demoservice with Kodi and keeps the display properties current
   tests/                  unit tests for ranking, placement, badges, info text, list sorting,
                           albums, shows, favourites, search, collections, colour themes,
-                          scenes and Demo Scripts, stream facts, filters and chapters
+                          scenes and Demo Scripts, stream facts, filters and chapters, movie
+                          versions and display & aspect ratio
 tools/
-  gen_wall_xml.py         generates the wall window XMLs (poster, square) from geometry.py (do
+  gen_wall_xml.py         writes the 16:9 wall window XMLs (poster, square) with wallxml.py (do
                           not hand-edit the XML)
   gen_list_xml.py         generates the movie, music and TV list XMLs from listmodel.py (likewise)
   gen_collections_xml.py  generates the Collections view XML (likewise)
   gen_colors.py           generates the skin's colour themes (skin.kscape/colors/)
   gen_badges.py           generates the format badges and rating icons (needs Pillow)
+  gen_calibration.py      generates the video calibration marks (needs Pillow)
+  gen_display_xml.py      generates the display transform (skin Includes_Display.xml)
+  wrap_display.py         puts every hand-written window's controls in the display transform root
   gen_home_xml.py         generates the Home view cards (skin Includes_Home.xml) from the views'
                           geometry (likewise)
-  np_chip.py              the now-playing chip the view generators add
+  np_chip.py              re-exports the add-on's now-playing chip (npchip.py) to the generators
   make_test_media.py      a small tagged music and TV library for the test Kodi
   build_zips.sh           installable ZIPs into dist/
   kodi_smoke_test.sh      launches an isolated test Kodi (temporary HOME, JSON-RPC port 9091)
@@ -370,6 +463,9 @@ python3 tools/gen_list_xml.py                                       # after chan
 python3 tools/gen_collections_xml.py                                # the Collections view
 python3 tools/gen_colors.py                                         # after changing the palette
 python3 tools/gen_badges.py                                         # format badges, rating icons
+python3 tools/gen_calibration.py                                    # video calibration marks
+python3 tools/gen_display_xml.py                                    # after changing display.py steps
+python3 tools/wrap_display.py --check                               # every window has the display root
 python3 tools/gen_home_xml.py                                       # after any of those
 python3 tools/make_test_media.py                                    # test music + TV library
 MEDIA=1 tools/kodi_smoke_test.sh                                    # isolated Kodi, scans it too
@@ -397,7 +493,13 @@ add-on's window XML and Python are re-read each time a view opens).
   Fullscreen key and Back on Home open KScape's Now Playing instead),
   pictures, live TV/PVR, games, weather and the playback audio/subtitle settings dialogs still
   need another skin
-  (the playback controls cycle tracks instead). Kodi's default icons (folders, add-on
+  (the playback controls cycle tracks instead). The system windows Kodi opens from Settings,
+  Power and playback have KScape versions: the file and folder browser (Add media source →
+  Browse, Install from zip, every folder picker), the profile login screen (Power → Log off),
+  video calibration, the colour picker, the smart playlist editor and its rules, video
+  bookmarks, subtitle search and the player process info. The colour picker has been checked
+  against Kodi's control contract but not opened in Kodi (it is reached only from a few
+  settings). Kodi's default icons (folders, add-on
   placeholders) are not bundled, so items without their own icon show none. The slider dialog
   has not been checked in Kodi (it needs a playing video).
 - The Home submenu sits above the bar rather than below it as in SiLVO, so Up (not Down) enters
@@ -433,6 +535,24 @@ add-on's window XML and Python are re-read each time a view opens).
   scraper misidentified as the same film (for example several different films all matched to
   one title) are merged too; fix the match in Kodi (*Refresh* on the item) or turn the option off.
 - Badges depend on Kodi's stream details, which it records only after reading the files.
+- Movie versions: JSON-RPC has no version API in Kodi 21, so KScape reads Kodi's own version
+  folders (`videodb://movies/videoversions/`). Versions added or removed while a wall is open
+  appear at its next full reload (a library scan, Reload library, or after a day). A version on
+  an unreachable share fails to play as in Kodi itself (Kodi says so).
+- Ultrawide and CinemaScope: the cover walls adapt natively; other screens are scaled into a
+  CinemaScope band, so their full-width backgrounds (Home's artwork and bar) become a centred
+  16:9 block in it. Auto cannot detect a CinemaScope screen behind a 16:9 signal (nothing in the
+  signal says so). A change of screen resolution while a wall is open applies the next time a
+  wall opens. Tested in a windowed test Kodi at 1.56:1 (stretch correction) and with manual 2.39
+  bands; not on a physical ultrawide monitor or projector.
+- Kodi loads a cover's artwork once: if the download fails (a network hiccup), it stays blank.
+  The cover wall checks, while idle, which covers on screen are still missing from Kodi's
+  texture cache and asks for them again, up to six times, further apart each time. Covers in
+  Kodi's own lists (Home cards, list view) are left to Kodi.
+- Quitting Kodi while a library scan runs waits for the scan to stop: with network shares that
+  answer slowly (a server name that does not always resolve), that can take a long while and
+  looks like a freeze. It is Kodi's own behaviour, with any skin; see *Library update on
+  startup* in Kodi's media settings.
 - Tested on macOS with Kodi 21.3 at 1080p, with a real 757-movie library, a synthetic
   5,000-movie library, and the generated 30-album / 5-show test library (ranking and placement for 5,000 movies take about 55 ms on the
   development Mac). Not yet tested at 4K, on low-power devices, or on Linux/Android/Windows.
@@ -446,7 +566,6 @@ add-on's window XML and Python are re-read each time a view opens).
   genre is prepared in the background when the list opens, and recent sorts are kept.
 - The list view takes a snapshot of the library when it opens; library changes made while it is
   open appear the next time you open it.
-- The info screen offers no *Play Scene* entry: Kodi has no chapter list outside playback.
 - A key press during a camera glide may show a one-frame jump; not observed, not ruled out.
 - The reference video used to match the motion is kept out of the repository.
 
