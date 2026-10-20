@@ -13,7 +13,7 @@ scene removes it from every script; deleting a script never touches its scenes.
     {"version": 1, "next": 7,
      "scenes":  [{"id": "s1", "media": "movie", "dbid": 125, "file": "...", "title": "Heat",
                   "name": "Lobby Shootout", "start": 6270.0, "end": 6460.0, "description": "",
-                  "thumbnail": "", "created": "2026-10-18 20:15:00"}],
+                  "thumbnail": "", "favourite": false, "created": "2026-10-18 20:15:00"}],
      "scripts": [{"id": "d2", "name": "Home Theater Showcase", "description": "",
                   "scenes": ["s1"], "transition": "black", "transition_s": 2.0,
                   "loop": "once", "loop_scene": ""}]}
@@ -179,7 +179,7 @@ class Store:
         scene = {'id': self._id('s'), 'media': media, 'dbid': int(dbid), 'file': file, 'title': title,
                  'name': name, 'start': round(float(start), 2), 'end': round(float(end), 2),
                  'description': description, 'thumbnail': thumbnail, 'poster': poster,
-                 'created': time.strftime('%Y-%m-%d %H:%M:%S')}
+                 'favourite': False, 'created': time.strftime('%Y-%m-%d %H:%M:%S')}
         self.scenes.append(scene)
         self.save()
         return scene['id']
@@ -196,6 +196,8 @@ class Store:
         for k in ('name', 'description', 'thumbnail'):
             if k in fields:
                 s[k] = fields[k]
+        if 'favourite' in fields:
+            s['favourite'] = bool(fields['favourite'])
         s['start'], s['end'] = round(start, 2), round(end, 2)
         self.save()
         return True
@@ -210,6 +212,11 @@ class Store:
 
     def scenes_of(self, media, dbid):
         return [s for s in by_media(self.scenes, media) if s.get('dbid') == dbid]
+
+    def has_scene(self, media, dbid, start, end, slack=0.5):
+        """Whether that video already has a scene with these times (chapters imported twice)."""
+        return any(abs(float(s['start']) - start) <= slack and abs(float(s['end']) - end) <= slack
+                   for s in self.scenes_of(media, dbid))
 
     # scripts
 

@@ -19,7 +19,7 @@ def _path(name):
     return os.path.join(FOLDER, f'{name}-cache.json')
 
 
-VERSION = 5                       # 5: dateadded, lastplayed, playcount (collections) for every kind
+VERSION = 6                       # 6: movie country, stream facts and ratings (Explore, badges)
 MAX_AGE_S = 24 * 3600
 
 

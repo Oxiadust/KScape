@@ -12,7 +12,11 @@ Control ids (k = 0..POOL-1, POOL = the layout's pool_cols x pool_rows):
   20000+k      pool B, same offsets
   1900         info panel group; 1901 title (a label; a two-line textbox for albums);
                1902 synopsis (posters) or artist (albums), placed below the title by Python
+               1910 grouplist under the synopsis (posters): 1911 resolution badge, 1912 TMDB
+               icon + 1913 score, 1914 Rotten Tomatoes icon + 1915 Tomatometer - each shown by a
+               window property (p.res, p.tmdb, p.rt), the images sized by Python
   1950         status label (loading / empty library), outside the camera group
+  1960         filter caption along the bottom (Python shows it): 1962 the active filters
   (no id)      now-playing chip top right while something plays (tools/np_chip.py)
 
 No <visible> tags on Python-driven controls: a visibility condition overrides setVisible().
@@ -32,6 +36,8 @@ PANEL_BLUE = 'kscape_blue'
 PANEL_TEXT_H = 152            # four 37.6 px lines of kscape_panel_body; no clipped partial line
 BADGE_W, BADGE_H = 58, 28     # reference: small amber-outlined "HDR"/"UHD" tag, bottom right
 HEART_BOX, HEART = 40, 26     # favourite marker, top right of the cover
+FACT_ROW_H, BADGE_IMG_H = 34, 26   # badge and ratings row under the synopsis (badges.py widths)
+CAPTION_H = 62
 
 
 def slot(base, L):
@@ -161,7 +167,85 @@ def panel_text(L, panel_w):
 					<height>{PANEL_TEXT_H}</height>
 					<font>kscape_panel_body</font>
 					<textcolor>kscape_text</textcolor>
+				</control>
+{facts_row(L, panel_w)}'''
+
+
+def facts_row(L, panel_w):
+    """Resolution badge and ratings under the synopsis, as in the reference (posters only)."""
+    top = 88 + L.frame + PANEL_TEXT_H + 6
+    def img(cid, prop, tex, w, tint=''):
+        colour = f' colordiffuse="{tint}"' if tint else ''
+        return f'''					<control type="image" id="{cid}">
+						<top>{(FACT_ROW_H - BADGE_IMG_H) // 2}</top>
+						<width>{w}</width>
+						<height>{BADGE_IMG_H}</height>
+						<texture{colour}>{tex}</texture>
+						<visible>!String.IsEmpty(Window.Property({prop}))</visible>
+					</control>'''
+    def label(cid, prop):
+        return f'''					<control type="label" id="{cid}">
+						<width>auto</width>
+						<height>{FACT_ROW_H}</height>
+						<aligny>center</aligny>
+						<font>kscape_panel_body</font>
+						<textcolor>kscape_text</textcolor>
+						<label>$INFO[Window.Property({prop})]</label>
+						<visible>!String.IsEmpty(Window.Property({prop}))</visible>
+					</control>'''
+    def gap(w, cond):
+        return f'''					<control type="image">
+						<width>{w}</width>
+						<height>{FACT_ROW_H}</height>
+						<texture/>
+						<visible>{cond}</visible>
+					</control>'''
+    return f'''				<control type="grouplist" id="1910">
+					<left>34</left>
+					<top>{top}</top>
+					<width>{panel_w - 68}</width>
+					<height>{FACT_ROW_H}</height>
+					<orientation>horizontal</orientation>
+					<itemgap>6</itemgap>
+					<usecontrolcoords>true</usecontrolcoords>
+{img(1911, 'p.res', '$INFO[Window.Property(p.res)]', 36, AMBER)}
+{gap(14, '!String.IsEmpty(Window.Property(p.res))')}
+{img(1912, 'p.tmdb', 'kscape-tmdb.png', 50)}
+{label(1913, 'p.tmdb')}
+{gap(14, '!String.IsEmpty(Window.Property(p.tmdb))')}
+{img(1914, 'p.rt', '$INFO[Window.Property(p.rticon)]', BADGE_IMG_H)}
+{label(1915, 'p.rt')}
 				</control>'''
+
+
+def caption():
+    """The active filters, along the bottom of the wall (Explore and the Filter menu)."""
+    return f'''		<control type="group" id="1960">
+			<description>Filter caption: what the wall is filtered by and how many match</description>
+			<top>{G.SCREEN_H - CAPTION_H}</top>
+			<animation effect="fade" start="0" end="100" time="250">Visible</animation>
+			<animation effect="fade" start="100" end="0" time="150">Hidden</animation>
+			<control type="image">
+				<width>{G.SCREEN_W}</width>
+				<height>{CAPTION_H}</height>
+				<texture colordiffuse="kscape_bg_shade">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<width>{G.SCREEN_W}</width>
+				<height>3</height>
+				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+			</control>
+			<control type="label" id="1962">
+				<left>48</left>
+				<top>3</top>
+				<width>{G.SCREEN_W - 96}</width>
+				<height>{CAPTION_H - 3}</height>
+				<aligny>center</aligny>
+				<font>kscape_panel_body</font>
+				<textcolor>kscape_text</textcolor>
+			</control>
+		</control>
+'''
 
 
 def build(L):
@@ -216,7 +300,7 @@ def build(L):
 			<textcolor>FFE6E6EA</textcolor>
 			<wrapmultiline>true</wrapmultiline>
 		</control>
-{np_chip.chip()}	</controls>
+{caption()}{np_chip.chip()}	</controls>
 </window>
 '''
 

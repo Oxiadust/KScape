@@ -6,7 +6,8 @@ guessed. `tr` maps a string id to its localized format string (ADDON.getLocalize
 
 DETAILS_PROPERTIES = [
     'title', 'year', 'plot', 'tagline', 'runtime', 'mpaa', 'country', 'genre', 'director',
-    'writer', 'studio', 'cast', 'set', 'art', 'streamdetails', 'resume', 'trailer',
+    'writer', 'studio', 'cast', 'set', 'art', 'streamdetails', 'resume', 'trailer', 'ratings',
+    'uniqueid',
 ]
 
 HDR_NAMES = {'dolbyvision': 'Dolby Vision', 'hdr10': 'HDR10', 'hdr10plus': 'HDR10+', 'hlg': 'HLG'}

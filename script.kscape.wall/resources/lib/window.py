@@ -13,6 +13,11 @@ One window serves every media kind (kinds.py): movie and TV posters, or square a
 each with its own XML generated for that layout. In favourites mode it shows only the items
 in Kodi's favourites, and follows changes to them; in collection mode only the movies of one
 collection (collectionmodel.py), in the collection's order.
+
+Movie walls can be filtered (explore.py): from Explore on a movie's info screen, or C ->
+Filter…. The filters are shared with the list view opened over the wall, a caption along the
+bottom says what they are and how many movies match, and Back retraces them - back to the
+movie's Explore panel, then to the whole library - before it leaves the wall.
 """
 import json
 import random
@@ -25,7 +30,9 @@ import xbmcgui
 import xbmcvfs
 
 from . import geometry as G
-from . import cache, collectionui, menu, modal, state
+from . import badges, cache, collectionui, menu, modal, ratings, state
+from . import explore as E
+from . import exploreui as X
 from . import scenes as S
 from .favourites import Favourites
 from .info import estimate_lines
@@ -207,6 +214,12 @@ class WallWindow(xbmcgui.WindowXML):
         self.collection = kwargs.get('collection')   # collection id: show only its movies
         self.filtered = self.favourites_only or self.collection is not None
         self.start_view = kwargs.get('view')         # 'list' or 'wall' if chosen from Home
+        self.session = E.Session()                   # Explore / Filter… (movies)
+        self.resolver = X.Resolver()
+        start = kwargs.get('explore')                # (filter, movie key): a wall opened by Explore
+        self.nested = start is not None              # ...from a view without its own wall
+        if start:
+            self.session.explore(*start)
 
     # ---- lifecycle -------------------------------------------------------------------------
 
@@ -222,6 +235,8 @@ class WallWindow(xbmcgui.WindowXML):
         self.frame = self.getControl(1001)
         self.panel = self.getControl(1900)
         self.status = self.getControl(1950)
+        self.caption = self.getControl(1960)
+        self.caption.setVisible(False)
         self.front = Pool(self, 10000, self.pool_size, self.lay)
         self.back = Pool(self, 20000, self.pool_size, self.lay)
         for k in range(self.pool_size):
@@ -272,6 +287,8 @@ class WallWindow(xbmcgui.WindowXML):
         self.wall = Wall.column_major(visible, layout=self.lay)
         prop, key = remembered(self.kind)
         last = HOME.getProperty(prop) or str(state.load().get(key, ''))
+        if self.nested:
+            last = str(self.session.trail[-1][1])     # the movie explored from, if it is shown
         start = self.wall.cell_of(int(last)) if last.isdigit() else None
         self.focus = start or (0, 0)
         self._show_status()
@@ -294,8 +311,11 @@ class WallWindow(xbmcgui.WindowXML):
 
     def _show_status(self):
         """Loading done: an empty library or empty favourites says so; otherwise no status."""
+        self._show_caption()
         if self.wall.movies():
             self.status.setLabel('')
+        elif self.session and self.all_movies:
+            self.status.setLabel(X.empty_text())
         elif self.collection is not None and self.all_movies:
             self.status.setLabel(collection_empty(self.collection, self.new_days))
         elif self.favourites_only and self.all_movies:
@@ -314,6 +334,67 @@ class WallWindow(xbmcgui.WindowXML):
     def abandon(self):
         """Closed because Home asked for another view (modal.py)."""
         self._close()
+
+    # ---- Explore and filters -------------------------------------------------------------------
+
+    def _show_caption(self):
+        if self.session:
+            self.getControl(1962).setLabel(X.describe(self.session.filters, len(self.wall.movies()),
+                                                      self.all_movies))
+        self.caption.setVisible(bool(self.session))
+
+    def _library(self):
+        """What Explore and the Filter menu choose from: the library as the wall shows it."""
+        return self.kind.visible(self.all_movies, self.merge)
+
+    def _filters_changed(self, focus_key=None):
+        """Show the movies the filters now leave, on `focus_key` when it is among them."""
+        with self.lock:
+            self._apply_library(self.all_movies, focus_key=focus_key)
+
+    def _explore(self, f, origin):
+        """An Explore filter chosen on `origin`'s info screen: the wall (or the list view, when
+        it is the view in use) now shows the library's movies it matches. A favourites or
+        collection wall opens a filtered wall of the whole library over itself instead."""
+        if self.filtered:
+            skin = self._covered(lambda: open_wall(self.kind, explore=(f, origin)))
+            self._after_favourites()
+            if skin:
+                self.pending_skin = skin
+                self._close()
+            return
+        self.session.explore(f, origin)
+        self._filters_changed(origin)
+
+    def _filter_menu(self):
+        with self.lock:
+            current = self.wall.at(*self.focus)
+            library = self._library()
+            base = self._base(self.all_movies)
+        if X.edit(self.session, library, lambda: self._apply_filters(base)):
+            self._filters_changed(current.key if current else None)
+
+    def _filter_back(self):
+        """Back with filters: one step back (see explore.Session). Returns the movie whose
+        Explore panel to reopen, or None. False when there was nothing to undo (Back leaves)."""
+        if self.nested and len(self.session.trail) <= 1:
+            return False
+        step = self.session.back()
+        if step is None:
+            return False
+        origin = step[1]
+        self._filters_changed(origin)
+        if origin is None:
+            return None
+        with self.lock:
+            here = self.wall.at(*self.focus)
+        return origin if here and here.key == origin else None
+
+    def _apply_filters(self, items):
+        filters = self.session.filters
+        if not filters:
+            return items
+        return E.apply(filters, items, self.all_movies, self.resolver.resolve(filters))
 
     def _remember(self, item):
         prop, key = remembered(self.kind)
@@ -341,12 +422,20 @@ class WallWindow(xbmcgui.WindowXML):
                     self._remember(item)
                     overlay = 'play'
             elif aid in BACK:
-                self._close()                     # one press back to Home (C -> Undo shuffle undoes)
+                overlay = 'back'      # filters first; else one press back to Home (C -> Undo shuffle undoes)
             elif aid in MENU:
                 overlay = self._menu()
         # Opened outside the lock: the wall's background work waits on `paused`, not the lock.
-        if overlay == 'details':
+        if overlay == 'back':
+            origin = self._filter_back() if self.session else False
+            if origin is False:
+                self._close()
+            elif origin is not None:
+                self._open_details(page='explore')
+        elif overlay == 'details':
             self._open_details()
+        elif overlay == 'filter':
+            self._filter_menu()
         elif overlay == 'play':
             self._covered(lambda: self.kind.play(self.wall.at(*self.focus)))
         elif overlay == 'list':
@@ -365,22 +454,28 @@ class WallWindow(xbmcgui.WindowXML):
         with self.lock:
             self.paused = True
             self._hide_panel()
+            self.caption.setVisible(False)      # it would show below the info screen's edge
         try:
             return fn()
         finally:
             with self.lock:
                 self.paused = False
                 self.last_input = time.time()
+                self._show_caption()
 
-    def _open_details(self):
+    def _open_details(self, page=None):
         item = self.wall.at(*self.focus)
         if not item:
             return
         self._remember(item)
-        follow = self._covered(lambda: self.kind.activate(item, self.favs))
+        library = self._library() if self.kind.explores else None
+        follow = self._covered(lambda: self.kind.activate(item, self.favs, library=library, page=page,
+                                                          resolver=self.resolver))
         self._after_favourites()
         if follow == 'search':
             self._search()
+        elif isinstance(follow, tuple) and follow[0] == 'explore':
+            self._explore(follow[1], item.key)
 
     def _open_list(self, back_home=False):
         """The list view over the wall. Opened as the view itself (from Home), Back there goes
@@ -391,10 +486,14 @@ class WallWindow(xbmcgui.WindowXML):
         if not self.filtered:
             state.save(**{view_key(self.kind): 'list'})
         library = self.kind.visible(self.all_movies, self.merge)
+        seen = self.session.version
+        link = ExploreLink(self) if self.kind.explores else None
         result, key = self._covered(lambda: show_list(self.kind, items, current.key if current else None,
                                                       self.favs, library=library, store=self.store,
                                                       collection=self.collection, copies=self._copies,
-                                                      back='exit' if back_home else 'wall'))
+                                                      back='exit' if back_home else 'wall', explore=link))
+        if self.session.version != seen:
+            self._filters_changed(key)              # filtered in the list: the wall follows
         self._after_favourites()
         self._after_collections()
         with self.lock:
@@ -637,9 +736,30 @@ class WallWindow(xbmcgui.WindowXML):
         else:
             self.getControl(1901).setLabel(title)
         self.getControl(1902).setText(body)
+        if self.kind.explores:
+            self._panel_facts(item)
         self.panel.setVisible(True)
         self.panel_cells = tuple(cells)
         self.panel_shown = True
+
+    def _panel_facts(self, item):
+        """Resolution badge, TMDB score and Tomatometer under the synopsis (when known)."""
+        h = 26
+        self.setProperty('p.res', badges.image(item.resolution) if item.resolution else '')
+        if item.resolution:
+            self.getControl(1911).setWidth(badges.width(item.resolution, h))
+        self.setProperty('p.tmdb', f'{item.tmdb:.1f}' if item.tmdb else '')
+        self.getControl(1912).setWidth(badges.width('tmdb', h))
+
+        def found(rt):
+            with self.lock:
+                if self.panel_shown and self.wall.at(*self.focus) is item:
+                    self._panel_rt(rt)
+        self._panel_rt(ratings.lookup(item, found))
+
+    def _panel_rt(self, rt):
+        self.setProperty('p.rt', f'{rt}%' if rt else '')
+        self.setProperty('p.rticon', badges.image('rt_fresh' if rt >= 60 else 'rt_rotten') if rt else '')
 
     def _hide_panel(self):
         if self.panel_shown:
@@ -702,6 +822,10 @@ class WallWindow(xbmcgui.WindowXML):
             entries.insert(0, ('collect', tr(collectionui.S_COLLECT)))
             if self.collection is not None and self.store.get(self.collection):
                 entries.insert(1, ('uncollect', tr(32165).format(collectionui.name_of(self.collection, self.store))))
+        if self.kind.explores and self.all_movies:
+            entries.append(('filter', tr(X.S_FILTER_MENU)))
+            if self.session:
+                entries.append(('clearfilters', tr(X.S_CLEAR)))
         if not self.favourites_only:
             entries.append(('favourites', tr(32187)))
         entries += [
@@ -725,8 +849,11 @@ class WallWindow(xbmcgui.WindowXML):
             self.scene_focus = S.handle_item_choice(self.kind, item, choice, self.scenes)
             if self.scene_focus:
                 return 'scenes'
-        elif choice in ('search', 'list', 'favourites'):
+        elif choice in ('search', 'list', 'favourites', 'filter'):
             return choice
+        elif choice == 'clearfilters':
+            self.session.clear()
+            self._apply_library(self.all_movies)
         elif choice == 'shuffle':
             self._finish_shuffle()
             if not self.panel_shown:
@@ -756,8 +883,13 @@ class WallWindow(xbmcgui.WindowXML):
             self._close()
 
     def _visible(self, items):
-        """What the wall shows: in favourites mode only favourites (any copy of a merged movie
-        counts), then duplicate copies merged when that setting is on."""
+        """What the wall shows: _base() narrowed by the filters (Explore, Filter…)."""
+        return self._apply_filters(self._base(items))
+
+    def _base(self, items):
+        """The wall's items before filters: in favourites mode only favourites (any copy of a
+        merged movie counts), in collection mode the collection's, then duplicate copies merged
+        when that setting is on."""
         if self.collection is not None:
             shown = self.kind.visible(items, self.merge)
             return [m for m, _ in collectionui.members(self.collection, self.store, items, shown, self.new_days)]
@@ -862,10 +994,13 @@ class WallWindow(xbmcgui.WindowXML):
             self.front.shown = [None if k in changed else k for k in self.front.shown]
             self._rebind(self.front)
 
-    def _apply_library(self, items):
-        """Rebuild the wall from `items`, keeping the focused item when it still exists."""
+    def _apply_library(self, items, focus_key=None):
+        """Rebuild the wall from `items`, keeping the focused item (or `focus_key`) when it
+        still exists."""
         self._finish_shuffle()
         current = self.wall.at(*self.focus)
+        if focus_key is not None:
+            current = next((m for m in items if m.key == focus_key), current)
         self.all_movies = items
         visible = self._visible(items)
         self.wall = Wall.column_major(visible, layout=self.lay)
@@ -1039,6 +1174,55 @@ class WallWindow(xbmcgui.WindowXML):
             self.shuffle_until = 0.0
 
 
+class ExploreLink:
+    """What the list view opened over a movie wall uses to share its filters: the movies they
+    leave, the caption, the Filter menu, Explore and Back (window.py keeps the state)."""
+
+    def __init__(self, wall):
+        self.wall = wall
+        self.resolver = wall.resolver
+
+    @property
+    def active(self):
+        return bool(self.wall.session)
+
+    @property
+    def in_place(self):
+        """Explore filters this view (a favourites or collection view opens a library wall)."""
+        return not self.wall.filtered
+
+    def library(self):
+        return self.wall._library()
+
+    def items(self):
+        with self.wall.lock:
+            return self.wall._visible(self.wall.all_movies)
+
+    def caption(self, count):
+        s = self.wall.session
+        return X.describe(s.filters, count, self.wall.all_movies) if s else ''
+
+    def edit(self):
+        with self.wall.lock:
+            base = self.wall._base(self.wall.all_movies)
+        return X.edit(self.wall.session, self.library(), lambda: self.wall._apply_filters(base))
+
+    def explore(self, f, origin):
+        self.wall.session.explore(f, origin)
+
+    def clear(self):
+        self.wall.session.clear()
+
+    def back(self):
+        """As WallWindow._filter_back, without touching the wall (it follows when the list
+        closes): the movie key to reopen Explore on, None, or False (nothing to undo)."""
+        s = self.wall.session
+        if not s or (self.wall.nested and len(s.trail) <= 1):
+            return False
+        step = s.back()
+        return False if step is None else step[1]
+
+
 def collection_empty(cid, days):
     """Status text of an empty collection: what would put movies in it."""
     tr = ADDON.getLocalizedString
@@ -1051,10 +1235,11 @@ def collection_empty(cid, days):
     return f'{tr(32175)}[CR][COLOR FF9AA3B5]{tr(32176)}[/COLOR]'
 
 
-def open_wall(kind, view=None, favourites=False, collection=None):
-    """Run the wall for `kind`. Returns the skin the user chose to switch to, if any."""
+def open_wall(kind, view=None, favourites=False, collection=None, explore=None):
+    """Run the wall for `kind` (filtered by an Explore (filter, movie key) pair, if given).
+    Returns the skin the user chose to switch to, if any."""
     window = WallWindow(kind.wall_xml, ADDON.getAddonInfo('path'), 'Default', '1080i',
-                        kind=kind, view=view, favourites=favourites, collection=collection)
+                        kind=kind, view=view, favourites=favourites, collection=collection, explore=explore)
     modal.run(window)
     skin = window.pending_skin
     del window

@@ -14,6 +14,7 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
+from . import chapters as CH
 from . import scenemodel as SM
 from .demoservice import request
 from .library import rpc
@@ -429,3 +430,135 @@ def handle_item_choice(kind, item, choice, st):
         if s:
             add_to_scripts(st, s['id'])
     return None
+
+
+# ---- the movie info screen's Play Scenes page -------------------------------------------------------
+
+S_CHAPTER, S_NO_CHAPTERS, S_IMPORT_HEADING = 32315, 32316, 32317
+S_IMPORTED, S_IMPORTED_ONE, S_ALL_IMPORTED, S_NEW_NAME = 32318, 32319, 32360, 32359
+S_FAV_ADD, S_FAV_REMOVE = 32337, 32338
+
+
+def file_chapters(path):
+    """Chapters embedded in a video file (chapters.py), read through Kodi's file system."""
+    f = xbmcvfs.File(path)
+    try:
+        size = f.size()
+
+        def read_at(offset, n):
+            f.seek(offset, 0)
+            return bytes(f.readBytes(n))
+        return CH.read(read_at, size) if size > 0 else []
+    except Exception as e:                       # unreadable share, odd container
+        xbmc.log(f'kscape: reading chapters of {path} failed: {e}', xbmc.LOGINFO)
+        return []
+    finally:
+        f.close()
+
+
+def playing_chapters(movie):
+    """Chapter starts Kodi's player reports while this movie plays (any container it reads)."""
+    now = playing()
+    if not now or now['media'] != 'movie' or now['dbid'] != movie.movieid or not now['total']:
+        return []
+    return CH.from_percentages(xbmc.getInfoLabel('Player.Chapters'), now['total'])
+
+
+def import_chapters(st, movie, runtime):
+    """Import chapters as scenes: the file's chapters, offered in a list (all ticked) with their
+    lengths; chapters already saved as scenes are left out. Returns how many were added."""
+    found = file_chapters(movie.file) or playing_chapters(movie)
+    made = CH.scenes(found, runtime, tr(S_CHAPTER))
+    if not made:
+        xbmcgui.Dialog().ok(tr(32312), tr(S_NO_CHAPTERS))
+        return 0
+    new = [c for c in made if not st.has_scene('movie', movie.movieid, c[1], c[2])]
+    if not new:
+        xbmcgui.Dialog().ok(tr(32312), tr(S_ALL_IMPORTED))
+        return 0
+    labels = [f'{name}  ({SM.clock(start)} – {SM.clock(end)}, {SM.clock(end - start)})' for name, start, end in new]
+    chosen = xbmcgui.Dialog().multiselect(tr(S_IMPORT_HEADING).format(movie.title), labels,
+                                          preselect=list(range(len(new))))
+    if not chosen:
+        return 0
+    for i in chosen:
+        name, start, end = new[i]
+        st.add_scene('movie', movie.movieid, movie.file, movie.title, name, start, end, poster=movie.poster)
+    notify(tr(S_IMPORTED_ONE) if len(chosen) == 1 else tr(S_IMPORTED).format(len(chosen)))
+    return len(chosen)
+
+
+def create_scene(st, movie, runtime):
+    """Create a scene without playing the movie: its name, then start and end typed as H:MM:SS
+    in the scene editor (checked against the running time). Returns the new scene's id."""
+    name = xbmcgui.Dialog().input(tr(S_NEW_NAME), '', type=xbmcgui.INPUT_ALPHANUM).strip()
+    if not name:
+        return None
+    result = editor({'name': name, 'start': 0.0, 'end': 0.0, 'description': ''}, runtime, tr(32219))
+    if not result:
+        return None
+    sid = st.add_scene('movie', movie.movieid, movie.file, movie.title, result['name'], result['start'],
+                       result['end'], result['description'], poster=movie.poster)
+    notify(tr(32233).format(result['name']))
+    return sid
+
+
+def scene_menu(st, sid):
+    """C on a scene of the Play Scenes page. Returns 'play' or None (anything else is done here)."""
+    s = st.scene(sid)
+    if not s:
+        return None
+    entries = [('play', tr(32247)), ('edit', tr(32248)), ('rename', tr(32249)),
+               ('favourite', tr(S_FAV_REMOVE if s.get('favourite') else S_FAV_ADD)),
+               ('script', tr(32250)), ('delete', tr(32252))]
+    i = xbmcgui.Dialog().select(s['name'], [label for _, label in entries])
+    if i < 0:
+        return None
+    key = entries[i][0]
+    if key == 'play':
+        return 'play'
+    if key == 'edit':
+        edit_scene(st, sid)
+    elif key == 'rename':
+        rename_scene(st, sid)
+    elif key == 'favourite':
+        st.update_scene(sid, favourite=not s.get('favourite'))
+    elif key == 'script':
+        add_to_scripts(st, sid)
+    elif key == 'delete':
+        delete_scene(st, sid)
+    return None
+
+
+def play_scenes(ids):
+    """Play one scene, or several one after another (Play All Scenes): the playback service
+    opens each at its start and ends it at its end, skipping what lies between."""
+    if ids:
+        request('play', scenes=list(ids), start=0)
+
+
+def wait_for_scenes(abandoned=lambda: False):
+    """Block while scenes started by play_scenes() play. True once they are over and the player
+    has stopped (the last scene ended, or Stop): the caller goes back to the scene list. False
+    when they never started, the user chose Keep watching (the movie plays on), Kodi is
+    exiting, or `abandoned()` says KScape is closing."""
+    mon = xbmc.Monitor()
+    waited = 0.0
+    while not HOME.getProperty('kscape.demo.active'):
+        if mon.waitForAbort(0.1) or abandoned() or waited > 20:
+            return False
+        waited += 0.1
+    while HOME.getProperty('kscape.demo.active'):
+        if mon.waitForAbort(0.25) or abandoned():
+            return False
+    for _ in range(30):                          # the service stops the player just after
+        if not xbmc.Player().isPlayingVideo():
+            break
+        if mon.waitForAbort(0.1):
+            return False
+    if xbmc.Player().isPlayingVideo():
+        return False                             # Keep watching: normal playback goes on
+    for _ in range(40):                          # let full-screen video close first
+        if not xbmc.getCondVisibility('Window.IsActive(fullscreenvideo)') or mon.waitForAbort(0.05):
+            break
+    return not abandoned()

@@ -960,3 +960,259 @@ msgstr ""
 msgctxt "#32295"
 msgid "Undo shuffle"
 msgstr ""
+
+msgctxt "#32300"
+msgid "Explore"
+msgstr ""
+
+msgctxt "#32301"
+msgid "Play Scenes"
+msgstr ""
+
+msgctxt "#32302"
+msgid "RELATED"
+msgstr ""
+
+msgctxt "#32303"
+msgid "COLLECTION"
+msgstr ""
+
+msgctxt "#32304"
+msgid "DIRECTOR"
+msgstr ""
+
+msgctxt "#32305"
+msgid "CAST"
+msgstr ""
+
+msgctxt "#32306"
+msgid "GENRES"
+msgstr ""
+
+msgctxt "#32307"
+msgid "YEAR"
+msgstr ""
+
+msgctxt "#32308"
+msgid "COUNTRY"
+msgstr ""
+
+msgctxt "#32309"
+msgid "Related Movies"
+msgstr ""
+
+msgctxt "#32310"
+msgid "Play All Scenes"
+msgstr ""
+
+msgctxt "#32311"
+msgid "Create scene…"
+msgstr ""
+
+msgctxt "#32312"
+msgid "Import chapters…"
+msgstr ""
+
+msgctxt "#32313"
+msgid "No scenes for this movie yet."
+msgstr ""
+
+msgctxt "#32314"
+msgid "Create one here by typing where it starts and ends, import the chapters of the file, or mark one while the movie plays (OK → Mark scene start, then Mark scene end)."
+msgstr ""
+
+msgctxt "#32315"
+msgid "Chapter {}"
+msgstr ""
+
+msgctxt "#32316"
+msgid "No chapters were found in this file."
+msgstr ""
+
+msgctxt "#32317"
+msgid "Import chapters of “{}”"
+msgstr ""
+
+msgctxt "#32318"
+msgid "{} scenes imported"
+msgstr ""
+
+msgctxt "#32319"
+msgid "1 scene imported"
+msgstr ""
+
+msgctxt "#32320"
+msgid "Genre"
+msgstr ""
+
+msgctxt "#32321"
+msgid "Actor"
+msgstr ""
+
+msgctxt "#32322"
+msgid "Director"
+msgstr ""
+
+msgctxt "#32323"
+msgid "Year"
+msgstr ""
+
+msgctxt "#32324"
+msgid "Decade"
+msgstr ""
+
+msgctxt "#32325"
+msgid "Country"
+msgstr ""
+
+msgctxt "#32326"
+msgid "Resolution"
+msgstr ""
+
+msgctxt "#32327"
+msgid "Video format"
+msgstr ""
+
+msgctxt "#32328"
+msgid "Audio format"
+msgstr ""
+
+msgctxt "#32329"
+msgid "TMDB rating"
+msgstr ""
+
+msgctxt "#32330"
+msgid "Rotten Tomatoes"
+msgstr ""
+
+msgctxt "#32331"
+msgid "Duration"
+msgstr ""
+
+msgctxt "#32332"
+msgid "Watched status"
+msgstr ""
+
+msgctxt "#32333"
+msgid "Collection"
+msgstr ""
+
+msgctxt "#32334"
+msgid "Related movies"
+msgstr ""
+
+msgctxt "#32335"
+msgid "Related to {}"
+msgstr ""
+
+msgctxt "#32337"
+msgid "Add to favourite scenes"
+msgstr ""
+
+msgctxt "#32338"
+msgid "Remove from favourite scenes"
+msgstr ""
+
+msgctxt "#32339"
+msgid "Ratings"
+msgstr ""
+
+msgctxt "#32340"
+msgid "Short (under 1h 35m)"
+msgstr ""
+
+msgctxt "#32341"
+msgid "Medium (1h 35m to 2h 15m)"
+msgstr ""
+
+msgctxt "#32342"
+msgid "Long (over 2h 15m)"
+msgstr ""
+
+msgctxt "#32343"
+msgid "Watched"
+msgstr ""
+
+msgctxt "#32344"
+msgid "Unwatched"
+msgstr ""
+
+msgctxt "#32345"
+msgid "In progress"
+msgstr ""
+
+msgctxt "#32346"
+msgid "{}s"
+msgstr ""
+
+msgctxt "#32347"
+msgid "{} or more"
+msgstr ""
+
+msgctxt "#32348"
+msgid "{}% or more"
+msgstr ""
+
+msgctxt "#32349"
+msgid "Year range…"
+msgstr ""
+
+msgctxt "#32350"
+msgid "From year"
+msgstr ""
+
+msgctxt "#32351"
+msgid "To year"
+msgstr ""
+
+msgctxt "#32352"
+msgid "Filters"
+msgstr ""
+
+msgctxt "#32353"
+msgid "Add filter…"
+msgstr ""
+
+msgctxt "#32354"
+msgid "Remove “{}”"
+msgstr ""
+
+msgctxt "#32355"
+msgid "Clear all filters"
+msgstr ""
+
+msgctxt "#32356"
+msgid "Filter…"
+msgstr ""
+
+msgctxt "#32357"
+msgid "No movies match these filters"
+msgstr ""
+
+msgctxt "#32358"
+msgid "C → Filter… changes them; Back returns to the whole library"
+msgstr ""
+
+msgctxt "#32359"
+msgid "Name of the new scene"
+msgstr ""
+
+msgctxt "#32360"
+msgid "Every chapter of this file is already a scene."
+msgstr ""
+
+msgctxt "#32361"
+msgid "Ratings"
+msgstr ""
+
+msgctxt "#32362"
+msgid "OMDb API key, for Rotten Tomatoes scores (optional)"
+msgstr ""
+
+msgctxt "#32363"
+msgid "Movies whose library entry has no Tomatometer can ask OMDb (omdbapi.com) for one, one movie at a time, using your own free key. Answers are kept for a month. Leave empty to never contact OMDb."
+msgstr ""
+
+msgctxt "#32364"
+msgid "UP NEXT"
+msgstr ""

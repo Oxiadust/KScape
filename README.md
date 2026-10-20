@@ -44,15 +44,49 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
 - **Camera follow.** The focus frame glides to the next cover with a soft overshoot
   (0.42 s), and the wall follows with a long ease-out (0.6 s) that settles gently.
 - **Synopsis panel.** About 1.1 s after you stop on a movie, a blue panel with its title and
-  synopsis opens beside it (on whichever side has room).
+  synopsis opens beside it (on whichever side has room); under the synopsis, the movie's
+  resolution badge (**4K**, **1080p**, **720p**, **SD**), its TMDB score and its Rotten Tomatoes
+  Tomatometer, each only when known.
 - **Related-cover shuffle.** About 3.2 s after you stop, every cover flies to a new cell so the
   most related movies end up closest to the one you picked. That movie and its panel stay put;
   covers leaving the screen fly off and newcomers fly in from the edges. No cover flies across the
   selected one: paths that would are steered round its frame.
-- **Movie info.** Select on a cover slides up a large panel over the wall: poster, the
-  rating and facts line (runtime, video quality, aspect ratio, country, year), synopsis, genres,
-  cast, director and collection, with **Return / Resume Movie / Play Movie / Play Trailer**.
-  Resume and Trailer only appear when Kodi has a resume point or trailer for that movie.
+- **Movie info.** Select on a cover slides up a large panel over the wall: poster, synopsis,
+  then the facts line (runtime, aspect ratio, country, year: `2h 43m · 2.39:1 · USA · 2021`)
+  with badges for the resolution, dynamic range (SDR, HDR10, HDR10+, Dolby Vision, HLG) and the
+  best audio track (Dolby Atmos, DTS:X, Dolby TrueHD, DTS-HD MA, Dolby Digital Plus, DTS, Dolby
+  Digital, PCM, FLAC, AAC), a **Ratings** row (certificate, TMDB, Rotten Tomatoes), then genres,
+  cast, director and collection. The menu: **Return / Resume Movie / Play Movie / Play Trailer
+  / Play Scenes / Explore**. Resume and Trailer only appear when Kodi has a resume point or
+  trailer for that movie. Everything comes from Kodi's library (stream details measured from the
+  file, scraped ratings); anything missing is left out, never guessed.
+- **Explore** (movie info → Explore, Right or Select): beside the poster, **Related Movies**, the
+  movie's collection, director, cast, genres, year and country, each with how many of your
+  movies it leads to. Select one and the info screen closes on the library filtered by it, in
+  the view you were using (cover wall or list view). Related Movies are movies of your library
+  only: the same collection first, then shared genres, directors, cast and tags, most related
+  first. **Back** returns to the movie's Explore panel, then to the whole library.
+- **Filters.** **C → Filter…** on a movie wall or list view: add filters by genre, actor,
+  director, year (or a range of years), decade, country, resolution, video format, audio format,
+  TMDB rating, Rotten Tomatoes, duration (short, medium, long), watched status; they combine
+  (Sci-Fi + 4K + Dolby Vision). Only categories and values your library has are offered, each
+  with how many movies have it. The active filters and the count show along the bottom of the
+  wall (the heading of the list view), stay when you switch between the two, and each can be
+  removed, or **Clear all filters**; Back clears them too. Actor filters use Kodi's own library
+  filter, so the whole cast counts. In Favourites or a collection, filters narrow what that wall
+  shows, and Explore opens a filtered wall of the whole library over it.
+- **Play Scenes** (movie info → Play Scenes): **Play All Scenes** and the movie's scenes with
+  their lengths (favourites marked with a heart), as on Kaleidescape. Select plays a scene from
+  its start to its end in Kodi's own player, then the info screen returns to the scene list;
+  Play All Scenes plays them one after another, skipping what lies between. Pause, seek and
+  Stop work as usual (seeking out of the scene, or Keep watching in the controls, lets the movie
+  play on). **C** on a scene: Play, Edit (name, start, end, description), Rename, Add to /
+  Remove from favourite scenes, Add to Demo Script…, Delete. **Create scene…** makes one without
+  playing the movie (name, then start and end typed as H:MM:SS); **Import chapters…** reads the
+  chapters embedded in the file (MKV, MP4/MOV; or those Kodi reports while the movie plays),
+  offers them with their times, keeps the file's chapter names (numbered or timestamp names
+  become "Chapter 1", "Chapter 2"…) and skips chapters already saved. With no scenes yet, the
+  page says how to make one.
 - **List view.** The library as a table: the focused movie sits in a tall blue band with its
   poster and up to four genres, cast members and directors; the other rows show one line per
   column. Left/Right move between the Title, Genre, Cast, Director, Year, Time, Rating and
@@ -63,6 +97,11 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   through the movie's own values, marked ▶ and amber, regrouping the list around it, then move
   on to the next movie.
 - **Quality badges.** Covers show **HDR** or **UHD** when Kodi has stream details for the file.
+- **Ratings.** TMDB from Kodi's scraper. Rotten Tomatoes when the library has it (an NFO
+  `tomatometerallcritics` / `rottentomatoes` rating, or a scraper that stores one). Kodi's TMDB
+  scraper stores none, so the add-on settings can take your own free OMDb API key: KScape then
+  asks OMDb for the Tomatometer of the movie you are looking at (one at a time, by its IMDb id),
+  keeps the answer for a month (`ratings.json`) and never writes it into Kodi's library.
 - **Library aware.** The wall reloads itself after a library scan or clean, keeping your place.
 - **Remembers where you were**, across Kodi restarts.
 - **One cover per movie.** Duplicate copies (same title and year) show as one cover by default;
@@ -136,7 +175,11 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
     its length (0.5-8 s) - and **Play once**, **Loop the script** or **Loop one scene** (that
     scene repeats until you press Next).
   - *Playing a script*: KScape opens the first movie straight at the scene's start, plays to its
-    end, moves to the next movie and scene, and so on, with no input. **Play/Pause** and **Stop**
+    end, moves to the next movie and scene, and so on, with no input. While the next scene loads,
+    its artwork card fills the screen instead of black - the movie's fanart and poster (for a TV
+    episode, the show's), "Up next", the title and the scene's name - until the scene plays; with
+    Fade to black or Black pause, the card is what the transition shows. Play All Scenes on a
+    movie's info screen does the same. **Play/Pause** and **Stop**
     work as usual; the remote's **Next / Previous** (or **Next scene / Previous scene** in the
     controls) move between scenes; **Keep watching** in the controls, or seeking outside the
     scene, leaves demo mode and the movie plays on normally. The controls show the scene, the
@@ -246,6 +289,9 @@ The wall's own options are stored as add-on settings of `script.kscape.wall` and
 - **Show each movie once** (on). Off: every library entry gets its own cover.
 - **Reduce motion** (off). On: no glide or flight; covers swap in place.
 
+Add-on settings → **Ratings**: an optional **OMDb API key** for Rotten Tomatoes scores (empty by
+default: OMDb is never contacted).
+
 Motion timings and easing (`FRAME_TWEEN`: `back` for one soft overshoot, or `elastic` for a
 bouncier settle), sizes and the pool size live in
 [`script.kscape.wall/resources/lib/geometry.py`](script.kscape.wall/resources/lib/geometry.py).
@@ -288,17 +334,22 @@ script.kscape.wall/       The wall add-on: movies, music and TV (Python + window
                           open windows, closed when Home asks for another view), colours
                           (the colour theme pickers), scenemodel (pure), scenes (scene and
                           script actions), demowindow (a Demo Script's screen), demoservice
-                          (the playback service: timed scenes, transitions, metadata restore)
+                          (the playback service: timed scenes, transitions, metadata restore),
+                          streaminfo (resolution, HDR, audio, ratings; pure), explore (filters,
+                          Related Movies; pure), exploreui (Filter menu), chapters (MKV / MP4
+                          chapter reader; pure), ratings (optional OMDb Tomatometer), badges
+                          (generated badge sizes)
   service.py              starts demoservice with Kodi (the add-on is also a service)
   tests/                  unit tests for ranking, placement, badges, info text, list sorting,
                           albums, shows, favourites, search, collections, colour themes,
-                          scenes and Demo Scripts
+                          scenes and Demo Scripts, stream facts, filters and chapters
 tools/
   gen_wall_xml.py         generates the wall window XMLs (poster, square) from geometry.py (do
                           not hand-edit the XML)
   gen_list_xml.py         generates the movie, music and TV list XMLs from listmodel.py (likewise)
   gen_collections_xml.py  generates the Collections view XML (likewise)
   gen_colors.py           generates the skin's colour themes (skin.kscape/colors/)
+  gen_badges.py           generates the format badges and rating icons (needs Pillow)
   gen_home_xml.py         generates the Home view cards (skin Includes_Home.xml) from the views'
                           geometry (likewise)
   np_chip.py              the now-playing chip the view generators add
@@ -318,6 +369,7 @@ python3 tools/gen_wall_xml.py                                       # after chan
 python3 tools/gen_list_xml.py                                       # after changing listmodel.py
 python3 tools/gen_collections_xml.py                                # the Collections view
 python3 tools/gen_colors.py                                         # after changing the palette
+python3 tools/gen_badges.py                                         # format badges, rating icons
 python3 tools/gen_home_xml.py                                       # after any of those
 python3 tools/make_test_media.py                                    # test music + TV library
 MEDIA=1 tools/kodi_smoke_test.sh                                    # isolated Kodi, scans it too
@@ -332,6 +384,13 @@ Kodi keeps skin XML in memory once loaded: restart the test Kodi after editing s
 add-on's window XML and Python are re-read each time a view opens).
 
 ## Known limitations
+
+- Kodi 21 records audio as the codec underneath (TrueHD, DTS-HD MA, E-AC-3): it does not tell
+  Dolby Atmos or DTS:X apart, so those badges and filters only appear when the stream details
+  carry them (NFO files from media managers, later Kodi versions). Rotten Tomatoes needs an NFO
+  rating or the optional OMDb key. Movie records keep the top eight billed names, so the
+  Filter menu offers those actors (Explore and actor filters still find every film of a person
+  through Kodi's library).
 
 - Not every Kodi window has a KScape version: Kodi's own music file browser (only a cover grid,
   used by album favourites opened from Kodi's favourites window), the music visualisation (Kodi's

@@ -16,6 +16,7 @@ from .ranking import album_score, score, show_score
 
 class Kind:
     name = ''
+    explores = False                # movie info screens offer Explore and the views filter
     layout = G.POSTER
     wall_xml = 'script-kscape-wall.xml'
     library = 'video'               # Kodi library: 'video' or 'music' (scan/clean notifications)
@@ -58,8 +59,11 @@ class Kind:
     def from_cache(self, d):
         return self.record.from_cache(d)
 
-    def activate(self, item, favs):
-        """Select on an item. Returns 'search' if the user asked to search from there."""
+    def activate(self, item, favs, library=None, page=None, resolver=None):
+        """Select on an item. Returns 'search' if the user asked to search from there, or
+        ('explore', filter) when they chose an Explore filter on a movie's info screen.
+        `library` is what Explore filters (for its counts), `page` the info screen page to open
+        on ('explore' or 'scenes')."""
         raise NotImplementedError
 
     def play(self, item):
@@ -71,6 +75,7 @@ class Kind:
 
 class Movies(Kind):
     name = 'movies'
+    explores = True
     item_type = 'movie'
     record = Movie
     has_extra = True
@@ -92,13 +97,28 @@ class Movies(Kind):
         from dataclasses import replace
         return replace(item, cast=extra.get(item.movieid, ()))
 
-    def activate(self, item, favs):
+    def activate(self, item, favs, library=None, page=None, resolver=None):
+        from . import modal
+        from . import scenes as S
         from .details import show_details
-        choice, details = show_details(item, favs)
+        focus = None
+        while True:
+            choice, details, extra = show_details(item, favs, library=library, page=page, focus=focus,
+                                                  resolver=resolver)
+            if choice == 'scenes':
+                # Play the scenes, then come back to the movie's scene list when they are over.
+                S.play_scenes(extra['ids'])
+                if not S.wait_for_scenes(modal.abandoned):
+                    return None
+                page, focus = 'scenes', extra.get('focus')
+                continue
+            break
         if choice in ('play', 'resume'):
             lib.play(item, resume=choice == 'resume')
         elif choice == 'trailer' and details and details.get('trailer'):
             lib.play_trailer(details['trailer'])
+        elif choice == 'explore':
+            return 'explore', extra['filter']
         return 'search' if choice == 'search' else None
 
     def play(self, item):
@@ -136,7 +156,7 @@ class Music(Kind):
     def fallback(self, item):
         return f'{item.title}[CR][COLOR FF9AA3B5]{item.artist}[/COLOR]' if item.artist else item.title
 
-    def activate(self, item, favs):
+    def activate(self, item, favs, library=None, page=None, resolver=None):
         from .browse import show_album
         choice = show_album(item, favs)
         if choice and choice[0] == 'play':
@@ -170,7 +190,7 @@ class TV(Kind):
     def fetch_one(self, key):
         return lib.fetch_show(key)
 
-    def activate(self, item, favs):
+    def activate(self, item, favs, library=None, page=None, resolver=None):
         from .browse import show_tvshow
         choice = show_tvshow(item, favs)
         if choice and choice[0] == 'episode':

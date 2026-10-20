@@ -34,5 +34,17 @@
 				</setting>
 			</group>
 		</category>
+		<category id="ratings" label="32361" help="">
+			<group id="1">
+				<setting id="omdb_key" type="string" label="32362" help="32363">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string"/>
+				</setting>
+			</group>
+		</category>
 	</section>
 </settings>

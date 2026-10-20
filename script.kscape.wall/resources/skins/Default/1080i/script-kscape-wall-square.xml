@@ -10103,6 +10103,31 @@
 			<textcolor>FFE6E6EA</textcolor>
 			<wrapmultiline>true</wrapmultiline>
 		</control>
+		<control type="group" id="1960">
+			<description>Filter caption: what the wall is filtered by and how many match</description>
+			<top>1018</top>
+			<animation effect="fade" start="0" end="100" time="250">Visible</animation>
+			<animation effect="fade" start="100" end="0" time="150">Hidden</animation>
+			<control type="image">
+				<width>1920</width>
+				<height>62</height>
+				<texture colordiffuse="kscape_bg_shade">kscape-white.png</texture>
+			</control>
+			<control type="image">
+				<width>1920</width>
+				<height>3</height>
+				<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+			</control>
+			<control type="label" id="1962">
+				<left>48</left>
+				<top>3</top>
+				<width>1824</width>
+				<height>59</height>
+				<aligny>center</aligny>
+				<font>kscape_panel_body</font>
+				<textcolor>kscape_text</textcolor>
+			</control>
+		</control>
 		<control type="group">
 			<description>Now playing chip (tools/np_chip.py)</description>
 			<left>1272</left>

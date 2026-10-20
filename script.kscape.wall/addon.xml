@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.kscape.wall" version="0.6.0" name="KScape wall" provider-name="KScape contributors">
+<addon id="script.kscape.wall" version="0.7.0" name="KScape wall" provider-name="KScape contributors">
 	<requires>
 		<import addon="xbmc.python" version="3.0.1"/>
 	</requires>
@@ -9,7 +9,7 @@
 	<extension point="xbmc.service" library="service.py" start="login"/>
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en_GB">Animated cover walls for movies, music and TV with relationship-based shuffle</summary>
-		<description lang="en_GB">Browse the Kodi movie, music and TV libraries as cover walls and lists, with collections (New, Paused, Played and your own), scenes and Demo Scripts, favourites, search and Now Playing; related covers rearrange around the selected title.</description>
+		<description lang="en_GB">Browse the Kodi movie, music and TV libraries as cover walls and lists, with collections (New, Paused, Played and your own), scenes and Demo Scripts, Explore and movie filters, ratings and format badges, favourites, search and Now Playing; related covers rearrange around the selected title.</description>
 		<license>MIT</license>
 		<platform>all</platform>
 	</extension>

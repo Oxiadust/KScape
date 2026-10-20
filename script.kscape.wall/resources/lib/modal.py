@@ -37,6 +37,11 @@ def run(window):
             _stack.remove(window)
 
 
+def abandoned():
+    """True once a later request is closing every KScape window (waits should give up)."""
+    return _abandoned.is_set()
+
+
 def close_all():
     """Close every tracked window, innermost first. Windows may define abandon() to close the
     way they do on Back (remembering where they were); otherwise close() is used."""

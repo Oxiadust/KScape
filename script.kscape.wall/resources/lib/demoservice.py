@@ -14,9 +14,11 @@ then:
      LOAD_TIMEOUT_S.
   4. Ends each scene at its end time. Rather than polling, it sleeps until shortly before the end
      (re-checking at most every few seconds, and after any seek, pause or item change).
-  5. Moves on: straight cut, fade to black (a black overlay fades in over the paused picture and
-     out over the next scene) or a black pause, then the next scene, the first again if the
-     script loops, the same one if it is the looped scene, or stops at the end.
+  5. Moves on: straight cut, fade (an overlay fades in over the paused picture and out over the
+     next scene) or a pause, then the next scene, the first again if the script loops, the same
+     one if it is the looped scene, or stops at the end. While the next scene loads, the overlay
+     shows its artwork card - the movie's (or TV show's) fanart and poster, "Up next", the title
+     and the scene's name - instead of a black screen, until the scene really plays.
 
 Seeking outside the scene (or Keep watching in the controls) leaves demo mode: the video plays
 on normally. Stop ends it. Playing scenes makes Kodi save resume points and play counts for
@@ -52,6 +54,9 @@ OUTSIDE_S = 2.0                # how far before the start counts as leaving the 
 JUMPED_S = 3.0                 # how far past the end counts as a seek away, not the scene's end
 RESTORE_AFTER_S = (2.0, 6.0)   # put metadata back after Kodi saved it (twice: it may save late)
 PROPS = ('active', 'scene', 'title', 'progress', 'script')
+FADE_IN_MS = 300               # the overlay fades in as it opens (script-kscape-black.xml)
+CARD_HOLD_S = 0.4              # a cut to a scene: its artwork card stays at least this long more
+                               # (then until the scene plays)
 
 
 def tr(string_id):
@@ -134,27 +139,39 @@ def recover():
         pass
 
 
-# ---- the black overlay used by transitions ------------------------------------------------------
+# ---- the overlay used by transitions: black, or the next scene's artwork card ------------------
+
+def artwork(items):
+    """{'movie:125': {'fanart', 'poster'}} for each (media, dbid): a movie's own art, an
+    episode's show fanart and poster (its thumbnail when the show has no fanart)."""
+    out = {}
+    for media, dbid in items:
+        get, _, key, result = DETAILS[media]
+        art = (rpc(get, {key: dbid, 'properties': ['art']}).get(result) or {}).get('art') or {}
+        if media == 'episode':
+            fanart = art.get('tvshow.fanart') or art.get('fanart') or art.get('thumb') or ''
+            poster = art.get('tvshow.poster') or art.get('season.poster') or ''
+        else:
+            fanart = art.get('fanart') or ''
+            poster = art.get('poster') or art.get('thumb') or ''
+        out[f'{media}:{dbid}'] = {'fanart': fanart, 'poster': poster}
+    return out
+
 
 class Black(xbmcgui.WindowXMLDialog):
-    """Full-screen black over the video, fading in and out (script-kscape-black.xml)."""
+    """Full-screen black over the video (script-kscape-black.xml), with the next scene's artwork
+    card when it is given one.
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args)
-        self.engine = kwargs['engine']
-        self.ms = kwargs['ms']
-        self.ready = threading.Event()
+    The service's main thread sits in Monitor.waitForAbort(), so Kodi never runs this window's
+    callbacks (onInit, onAction): everything is done from the calling thread instead. The XML
+    fades it in as it opens; hide() sets the fade out."""
 
-    def onInit(self):
-        img = self.getControl(10)
-        img.setAnimations([('Visible', f'effect=fade start=0 end=100 time={self.ms}'),
-                           ('Hidden', f'effect=fade start=100 end=0 time={self.ms}')])
-        img.setVisible(True)
-        self.ready.set()
-
-    def onAction(self, action):
-        if action.getId() in (xbmcgui.ACTION_NAV_BACK, xbmcgui.ACTION_PREVIOUS_MENU, xbmcgui.ACTION_STOP):
-            self.engine.stop()
+    def show_card(self, card):
+        """card: {fanart, poster, title, scene}, or None for plain black."""
+        card = card or {}
+        for k in ('fanart', 'poster', 'title', 'scene'):
+            self.setProperty(k, card.get(k) or '')
+        self.setProperty('upnext', tr(32364) if card.get('title') else '')
 
 
 class Overlay:
@@ -162,23 +179,31 @@ class Overlay:
         self.engine = engine
         self.win = None
 
-    def show(self, fade_ms):
+    def show(self, fade_ms, card=None):
+        """Show the overlay (black, or `card`: the next scene's artwork); if it is already up,
+        switch it to `card`. It fades in over FADE_IN_MS (`fade_ms` is kept for the fade out)."""
         if self.win is not None:
+            if card:
+                self.win.show_card(card)
             return
-        self.win = Black('script-kscape-black.xml', ADDON.getAddonInfo('path'), 'Default', '1080i',
-                         engine=self.engine, ms=max(1, int(fade_ms)))
+        self.win = Black('script-kscape-black.xml', ADDON.getAddonInfo('path'), 'Default', '1080i')
+        self.win.show_card(card)
         self.win.show()
-        self.win.ready.wait(2.0)
+        time.sleep(FADE_IN_MS / 1000.0)
 
     def hide(self, fade_ms):
         win, self.win = self.win, None
         if win is None:
             return
+        ms = max(0, int(fade_ms))
         try:
-            win.getControl(10).setVisible(False)
+            group = win.getControl(10)
+            if ms:
+                group.setAnimations([('Hidden', f'effect=fade start=100 end=0 time={ms}')])
+            group.setVisible(False)
         except RuntimeError:
-            pass
-        time.sleep(max(0, fade_ms) / 1000.0)
+            ms = 0
+        time.sleep(ms / 1000.0)
         win.close()
         del win
 
@@ -283,6 +308,7 @@ class Engine:
             items = list(dict.fromkeys((s['media'], s['dbid']) for s in queue))
             snap = snapshot(items)
             save_snapshot(snap)
+            art = artwork(items)
             self.session = {
                 'queue': queue, 'index': first or 0, 'phase': 'switching', 'since': time.time(),
                 'script': script['name'] if script else '',
@@ -290,7 +316,7 @@ class Engine:
                 'secs': float((script or {}).get('transition_s', 0)),
                 'loop': (script or {}).get('loop', 'once'),
                 'loop_scene': (script or {}).get('loop_scene', ''),
-                'snapshot': snap, 'played': set(), 'restored': set(),
+                'snapshot': snap, 'played': set(), 'restored': set(), 'art': art,
             }
             pl = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
             pl.clear()
@@ -538,6 +564,16 @@ class Engine:
         if not xbmc.getCondVisibility('Player.Paused'):
             self.player.pause()
 
+    def _card(self, index):
+        """The artwork card of scene `index` of the session (None without any artwork)."""
+        s = self.session
+        scene = s['queue'][index]
+        art = s.get('art', {}).get(f'{scene["media"]}:{scene["dbid"]}') or {}
+        card = {'fanart': art.get('fanart', ''),
+                'poster': art.get('poster') or scene.get('poster') or scene.get('thumbnail') or '',
+                'title': scene.get('title') or '', 'scene': scene['name']}
+        return card if (card['fanart'] or card['poster']) else None
+
     def _go(self, index, transition=False):
         with self.lock:
             s = self.session
@@ -547,14 +583,24 @@ class Engine:
             s['phase'] = 'switching'
             s['since'] = time.time()
             s['index'] = index
+            card = self._card(index)
+        if card:
+            log(f'up next: "{card["scene"]}" of {card["title"]} (fanart: {"yes" if card["fanart"] else "no"}, '
+                f'poster: {"yes" if card["poster"] else "no"})')
+        # Kodi reopens the file for every scene (black while it loads): the next scene's artwork
+        # covers that, from the transition until the scene plays (_reveal).
         if kind == 'black' and secs > 0:
             self._pause()
-            self.overlay.show(200)
+            self.overlay.show(200, card)
             time.sleep(secs)
         elif kind == 'fade' and secs > 0:
             self._pause()
-            self.overlay.show(secs * 500)
+            self.overlay.show(secs * 500, card)
             time.sleep(secs / 2.0)
+        elif card:
+            self._pause()
+            self.overlay.show(FADE_IN_MS, card)
+            time.sleep(CARD_HOLD_S)
         with self.lock:
             if not self.session:
                 self.overlay.hide(0)
@@ -563,7 +609,7 @@ class Engine:
         self.player.playselected(index)
 
     def _reveal(self):
-        """The scene is playing: take the black overlay away (fading for a fade)."""
+        """The scene is playing: take the overlay away (fading for a fade)."""
         with self.lock:
             s = self.session
             ms = s['secs'] * 500 if s and s['transition'] == 'fade' else 200

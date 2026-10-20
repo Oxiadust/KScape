@@ -1,0 +1,132 @@
+"""Generate the format badges and rating icons of the info screen and the wall's synopsis panel.
+
+Usage: python3 tools/gen_badges.py   (needs Pillow and macOS's Arial Bold)
+
+Badges are drawn at three times their 1080p height so they stay sharp on a 4K screen, as white
+on transparent: the views tint them with the theme's colours (colordiffuse). Resolution badges
+are filled with the text cut out (amber, as in the reference); dynamic range and audio badges are
+outlined. The rating icons keep their own colours. Their widths at the 1080p height go to
+resources/lib/badges.py, which the views use to size the image controls.
+"""
+import os
+
+from PIL import Image, ImageDraw, ImageFont
+
+ROOT = os.path.join(os.path.dirname(__file__), '..', 'script.kscape.wall')
+MEDIA = os.path.join(ROOT, 'resources', 'skins', 'Default', 'media')
+OUT_PY = os.path.join(ROOT, 'resources', 'lib', 'badges.py')
+FONT = '/System/Library/Fonts/Supplemental/Arial Bold.ttf'
+SCALE = 3
+H = 30                       # 1080p height
+RADIUS = 5
+LINE = 2                     # outline, 1080p pixels
+PAD_X = 9
+
+FILLED = {'4K': '4K', '1080p': '1080p', '720p': '720p', 'SD': 'SD'}
+OUTLINED = {
+    'sdr': 'SDR', 'hdr10': 'HDR10', 'hdr10plus': 'HDR10+', 'dolbyvision': 'DOLBY VISION', 'hlg': 'HLG',
+    'atmos': 'DOLBY ATMOS', 'dtsx': 'DTS:X', 'truehd': 'DOLBY TrueHD', 'dtshdma': 'DTS-HD MA',
+    'dtshdhra': 'DTS-HD HRA', 'ddplus': 'DOLBY DIGITAL+', 'dts': 'DTS', 'dd': 'DOLBY DIGITAL',
+    'pcm': 'PCM', 'flac': 'FLAC', 'aac': 'AAC',
+}
+
+
+def font(px):
+    return ImageFont.truetype(FONT, px * SCALE)
+
+
+def badge(text, filled):
+    f = font(18)
+    box = f.getbbox(text)
+    tw = box[2] - box[0]
+    w = tw + 2 * PAD_X * SCALE
+    h = H * SCALE
+    img = Image.new('RGBA', (w, h), (255, 255, 255, 0))
+    d = ImageDraw.Draw(img)
+    r = RADIUS * SCALE
+    ty = (h - (box[3] - box[1])) // 2 - box[1]
+    if filled:
+        mask = Image.new('L', (w, h), 0)
+        md = ImageDraw.Draw(mask)
+        md.rounded_rectangle((0, 0, w - 1, h - 1), r, fill=255)
+        md.text((PAD_X * SCALE - box[0], ty), text, font=f, fill=0)
+        img.putalpha(mask)
+    else:
+        d.rounded_rectangle((0, 0, w - 1, h - 1), r, outline=(255, 255, 255, 255), width=LINE * SCALE)
+        d.text((PAD_X * SCALE - box[0], ty), text, font=f, fill=(255, 255, 255, 255))
+    return img
+
+
+def tmdb_icon():
+    """A TMDB-style mark: the name in its teal-to-blue on a dark navy rounded tag."""
+    f = font(15)
+    text = 'TMDB'
+    box = f.getbbox(text)
+    w = box[2] - box[0] + 14 * SCALE
+    h = H * SCALE
+    img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle((0, 2 * SCALE, w - 1, h - 1 - 2 * SCALE), 4 * SCALE, fill=(13, 37, 63, 255))
+    grad = Image.new('RGBA', (w, h))
+    gd = ImageDraw.Draw(grad)
+    for x in range(w):
+        t = x / max(1, w - 1)
+        c = tuple(int(a + (b - a) * t) for a, b in zip((144, 206, 161), (1, 180, 228)))
+        gd.line([(x, 0), (x, h)], fill=c + (255,))
+    mask = Image.new('L', (w, h), 0)
+    ImageDraw.Draw(mask).text(((w - (box[2] - box[0])) // 2 - box[0], (h - (box[3] - box[1])) // 2 - box[1]),
+                              text, font=f, fill=255)
+    img.paste(grad, (0, 0), mask)
+    return img
+
+
+def tomato(fresh):
+    """Rotten Tomatoes-style marks: a red tomato with a green crown (fresh, 60% and up), or a
+    green splat (rotten)."""
+    s = H * SCALE
+    img = Image.new('RGBA', (s, s), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    if fresh:
+        d.ellipse((2 * SCALE, 6 * SCALE, s - 2 * SCALE, s - 1 * SCALE), fill=(250, 50, 10, 255))
+        d.ellipse((7 * SCALE, 10 * SCALE, 13 * SCALE, 15 * SCALE), fill=(255, 140, 110, 160))
+        cx = s // 2
+        for dx, dy in ((-7, 3), (7, 3), (0, -1), (-4, 6), (4, 6)):
+            d.ellipse((cx + (dx - 4) * SCALE, (5 + dy - 3) * SCALE, cx + (dx + 4) * SCALE, (5 + dy + 2) * SCALE),
+                      fill=(0, 145, 45, 255))
+    else:
+        d.polygon([(s * x / 30.0, s * y / 30.0) for x, y in (
+            (15, 2), (18, 9), (26, 5), (22, 13), (29, 16), (21, 19), (24, 27), (16, 22), (11, 29),
+            (10, 21), (2, 23), (8, 16), (1, 10), (10, 10), (8, 3), (13, 8))], fill=(10, 175, 80, 255))
+    return img
+
+
+def save(img, name):
+    img.save(os.path.join(MEDIA, name), optimize=True)
+    return round(img.width / SCALE)
+
+
+def main():
+    widths = {}
+    for key, text in FILLED.items():
+        widths[key] = ('kscape-badge-%s.png' % key.lower(), save(badge(text, True), 'kscape-badge-%s.png' % key.lower()))
+    for key, text in OUTLINED.items():
+        widths[key] = ('kscape-badge-%s.png' % key, save(badge(text, False), 'kscape-badge-%s.png' % key))
+    widths['tmdb'] = ('kscape-tmdb.png', save(tmdb_icon(), 'kscape-tmdb.png'))
+    widths['rt_fresh'] = ('kscape-rt-fresh.png', save(tomato(True), 'kscape-rt-fresh.png'))
+    widths['rt_rotten'] = ('kscape-rt-rotten.png', save(tomato(False), 'kscape-rt-rotten.png'))
+    lines = ['"""GENERATED by tools/gen_badges.py. Do not edit by hand.', '',
+             'Badge and rating icon images and their widths at the 1080p height HEIGHT."""', '',
+             f'HEIGHT = {H}', 'IMAGES = {']
+    for key, (name, w) in widths.items():
+        lines.append(f'    {key!r}: ({name!r}, {w}),')
+    lines += ['}', '', '',
+              'def image(key):', '    return IMAGES.get(key, (\'\', 0))[0]', '', '',
+              'def width(key, height=HEIGHT):', '    """Width of the image at `height` pixels tall."""',
+              '    return int(round(IMAGES.get(key, (\'\', 0))[1] * height / HEIGHT))', '']
+    with open(OUT_PY, 'w') as f:
+        f.write('\n'.join(lines))
+    print(f'wrote {len(widths)} images and {OUT_PY}')
+
+
+if __name__ == '__main__':
+    main()

@@ -9,6 +9,10 @@ album's tracks, a show's seasons. Back returns to the cover wall.
 The same window lists search results: then a heading names the search, an empty result says so,
 and Back returns to wherever the search started.
 
+Over a movie wall it shares the wall's filters (Explore, C -> Filter…; window.ExploreLink): the
+heading names them and how many movies match, and Back retraces them before it leaves. Explore
+chosen in a list with no wall of its own (search results, a collection) opens a filtered wall.
+
 It is a full window, not a dialog, so playback started here takes over the screen and Kodi
 returns to the list when it ends.
 """
@@ -21,6 +25,7 @@ import xbmcgui
 
 from . import listmodel as L
 from . import collectionui, menu, modal
+from . import exploreui as X
 from . import scenes as S
 from .search import search
 
@@ -62,6 +67,7 @@ class ListWindow(xbmcgui.WindowXML):
         self.result = 'wall'                     # 'wall', 'exit' or 'skin' once closed
         self.back = kwargs.get('back') or 'wall'  # what Back does: 'wall', or 'exit' (to Home)
         self.focus_id = self.start_id            # key of the item under the band when closed
+        self.explore = kwargs.get('explore')     # window.ExploreLink: the wall's filters
 
     def onInit(self):
         if self.ready:
@@ -96,7 +102,10 @@ class ListWindow(xbmcgui.WindowXML):
         _set('col', getattr(self, 'col', 'title'))
         _set('off', L.scroll_for(getattr(self, 'col', 'title'), self.spec))
         _set('settled', '1' if getattr(self, 'settled', False) else '')
-        if self.query is None:
+        if self.query is None and self.explore is not None and self.explore.active:
+            _set('heading', self.explore.caption(len(self.movies)))
+            _set('empty', '' if self.movies else X.empty_text())
+        elif self.query is None:
             _set('heading', '')
             _set('empty', '')
         else:
@@ -191,7 +200,14 @@ class ListWindow(xbmcgui.WindowXML):
                 _set('col', self.col)
                 _set('off', L.scroll_for(self.col, self.spec))
             elif aid in BACK:
-                self._close(self.back if self.query is None else 'wall')
+                origin = self.explore.back() if self.query is None and self.explore else False
+                if origin is False:
+                    self._close(self.back if self.query is None else 'wall')
+                else:
+                    self._refilter(origin)
+                    row = self._current()
+                    if origin is not None and row and row.movie.key == origin:
+                        follow = ('details', row.movie)
             elif aid in MENU:
                 follow = self._menu()
             elif aid in PLAY:
@@ -200,6 +216,12 @@ class ListWindow(xbmcgui.WindowXML):
                     follow = ('play', row.movie)
         if follow == 'search':
             self._search()
+        elif follow == 'filter':
+            if self.explore.edit():
+                row = self._current()
+                self._refilter(row.movie.key if row else None)
+        elif follow and follow[0] == 'details':
+            self._activate(follow[1], page='explore')
         elif follow and follow[0] == 'play':
             self.kind.play(follow[1])
         elif follow and follow[0] == 'scenes':
@@ -236,17 +258,47 @@ class ListWindow(xbmcgui.WindowXML):
         if control_id != LIST or not self.ready:
             return
         row = self._current()
-        if not row:
-            return
-        follow = self.kind.activate(row.movie, self.favs)
+        if row:
+            self._activate(row.movie)
+
+    def _activate(self, movie, page=None):
+        """Select on a row (or Back to a movie's Explore panel, with `page`)."""
+        library = None
+        if self.kind.explores:
+            library = self.explore.library() if self.explore else self.library
+        resolver = self.explore.resolver if self.explore else None
+        follow = self.kind.activate(movie, self.favs, library=library, page=page, resolver=resolver)
         self._sync_favourites()
         if follow == 'search':
             self._search()
+        elif isinstance(follow, tuple) and follow[0] == 'explore':
+            self._explore(follow[1], movie.key)
+
+    def _explore(self, f, origin):
+        if self.explore is not None and self.query is None and self.explore.in_place:
+            self.explore.explore(f, origin)
+            self._refilter(origin)
+            return
+        from .window import open_wall                 # no wall of its own: open a filtered one
+        open_wall(self.kind, explore=(f, origin))
+        self._sync_favourites()
+
+    def _refilter(self, focus_key=None):
+        """The wall's filters changed: list what they leave now, on `focus_key` if listed."""
+        with self.lock:
+            self.movies = self.explore.items()
+            self.built, self.prebuilt = {}, None
+            self._apply_props()
+            self._load(focus_key)
 
     def _menu(self):
         tr = ADDON.getLocalizedString
         if self.query is None:
             entries = [('wall', tr(32070)), ('skin', tr(32025)), ('exit', tr(32026))]
+            if self.explore is not None and self.library:
+                entries.insert(0, ('filter', tr(X.S_FILTER_MENU)))
+                if self.explore.active:
+                    entries.insert(1, ('clearfilters', tr(X.S_CLEAR)))
         else:
             entries = [('wall', tr(32066))]                   # Return
         row = self._current()
@@ -272,8 +324,11 @@ class ListWindow(xbmcgui.WindowXML):
             focus = S.handle_item_choice(self.kind, row.movie, choice, scene_store)
             if focus:
                 return ('scenes', focus)
-        elif choice == 'search':
-            return 'search'
+        elif choice in ('search', 'filter'):
+            return choice
+        elif choice == 'clearfilters':
+            self.explore.clear()
+            self._refilter(row.movie.key if row else None)
         elif choice:
             self._close(choice)
         return None
@@ -346,14 +401,14 @@ class ListWindow(xbmcgui.WindowXML):
 
 
 def show_list(kind, movies, focus, favs=None, query=None, library=None, store=None, collection=None,
-              copies=None, back='wall'):
+              copies=None, back='wall', explore=None):
     """Run the list view for `kind` (or search results, with `query`; `library` is what a new
     search searches; `store` the movie collections, `collection` the one listed, if any).
     Returns (result, key of the item under the band)."""
     menu.wait_for_dialogs()
     window = ListWindow(kind.list_spec.xml, ADDON.getAddonInfo('path'), 'Default', '1080i',
                         kind=kind, movies=movies, focus=focus, favs=favs, query=query, library=library,
-                        store=store, collection=collection, copies=copies, back=back)
+                        store=store, collection=collection, copies=copies, back=back, explore=explore)
     modal.run(window)
     result, focus_id = window.result, window.focus_id
     del window

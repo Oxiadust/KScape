@@ -2,12 +2,14 @@
 from dataclasses import asdict, dataclass
 from typing import FrozenSet, Tuple
 
+from . import streaminfo as SI
+
 MAX_CAST = 8
 
 JSONRPC_PROPERTIES = [
     'title', 'sorttitle', 'year', 'genre', 'director', 'cast', 'set', 'setid', 'tag',
     'art', 'plot', 'runtime', 'file', 'resume', 'playcount', 'streamdetails', 'mpaa',
-    'dateadded', 'lastplayed',
+    'dateadded', 'lastplayed', 'country', 'ratings', 'uniqueid',
 ]
 # Cast is ~70% of the cost of listing a large library (28 of 41 s for 5,000 movies on the
 # development Mac) and only the shuffle ranking needs it, so it is fetched separately.
@@ -48,6 +50,16 @@ class Movie:
     dateadded: str = ''            # 'YYYY-MM-DD HH:MM:SS', as Kodi reports them (collections)
     lastplayed: str = ''
     playcount: int = 0
+    # From the stream details and ratings Kodi recorded ('' / 0 / () when it has none).
+    country: Tuple[str, ...] = ()
+    resolution: str = ''           # streaminfo.RESOLUTIONS
+    hdr: str = ''                  # streaminfo.HDR_TYPES
+    audio: Tuple[str, ...] = ()    # streaminfo.AUDIO_FORMATS, best first
+    aspect: float = 0.0
+    tmdb: float = 0.0              # out of 10
+    rt: int = 0                    # Rotten Tomatoes Tomatometer, percent
+    imdb: str = ''                 # IMDb id, for an optional ratings lookup (ratings.py)
+    setname: str = ''
 
     @property
     def key(self):
@@ -77,19 +89,30 @@ class Movie:
             dateadded=m.get('dateadded') or '',
             lastplayed=m.get('lastplayed') or '',
             playcount=int(m.get('playcount') or 0),
+            country=tuple(m.get('country') or ()),
+            resolution=SI.resolution(m.get('streamdetails')),
+            hdr=SI.hdr(m.get('streamdetails')),
+            audio=SI.audio_formats(m.get('streamdetails')),
+            aspect=SI.aspect(m.get('streamdetails')),
+            tmdb=SI.tmdb_rating(m.get('ratings')),
+            rt=SI.rt_percent(m.get('ratings')),
+            imdb=(m.get('uniqueid') or {}).get('imdb') or '',
+            setname=m.get('set') or '',
         )
 
     def to_cache(self):
         d = asdict(self)
         for key in ('genres', 'directors', 'tags'):
             d[key] = sorted(d[key])
-        d['cast'] = list(d['cast'])
+        for key in ('cast', 'country', 'audio'):
+            d[key] = list(d[key])
         return d
 
     @classmethod
     def from_cache(cls, d):
         return cls(**dict(d, genres=frozenset(d['genres']), directors=frozenset(d['directors']),
-                          tags=frozenset(d['tags']), cast=tuple(d['cast'])))
+                          tags=frozenset(d['tags']), cast=tuple(d['cast']),
+                          country=tuple(d.get('country') or ()), audio=tuple(d.get('audio') or ())))
 
     def looks_same(self, other):
         """True when the cover would render identically (cast-only changes are invisible)."""

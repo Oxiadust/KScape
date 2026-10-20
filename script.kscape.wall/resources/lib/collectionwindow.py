@@ -302,8 +302,16 @@ class CollectionsWindow(xbmcgui.WindowXML):
         elif what == 'script':
             self._open_script(arg.key)
         elif what == 'info':
-            if self.kind.activate(arg, self.favs) == 'search':
+            library = self._shown() if self.kind.explores else None
+            follow = self.kind.activate(arg, self.favs, library=library)
+            if follow == 'search':
                 self._search()
+            elif isinstance(follow, tuple) and follow[0] == 'explore':
+                from .window import open_wall              # Explore: the library, filtered
+                skin = open_wall(self.kind, explore=(follow[1], arg.key))
+                if skin:
+                    self.pending_skin = skin
+                    self._close()
         elif what == 'open':
             self._open(arg)
         elif what == 'search':
