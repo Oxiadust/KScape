@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.kscape.wall" version="0.11.0" name="KScape wall" provider-name="KScape contributors">
+<addon id="script.kscape.wall" version="0.11.1" name="KScape wall" provider-name="KScape contributors">
 	<requires>
 		<import addon="xbmc.python" version="3.0.1"/>
 	</requires>
