@@ -58,14 +58,14 @@ WALL_BG = 'FF060607'
 
 KINDS = [
     # name, tab x, layout, art, list spec, list columns -> info label, band art, extra card
-    dict(name='movies', x=120, layout=G.POSTER, art='Art(poster)', spec=L.MOVIES, title='Label',
+    dict(name='movies', x=330, layout=G.POSTER, art='Art(poster)', spec=L.MOVIES, title='Label',
          cols={'genre': 'Genre', 'cast': 'Writer', 'director': 'Director', 'year': 'Year'},
          path='videodb://movies/titles/', sort='title', body='Plot', recent='videodb://recentlyaddedmovies/'),
-    dict(name='music', x=440, layout=G.SQUARE, art='Art(thumb)', spec=L.MUSIC, title='Artist',
+    dict(name='music', x=650, layout=G.SQUARE, art='Art(thumb)', spec=L.MUSIC, title='Artist',
          cols={'album': 'Label', 'genre': 'Genre', 'year': 'Year'},
          path='musicdb://albums/', sort='artist', body='Artist', nowplaying=True,
          recent='musicdb://recentlyaddedalbums/'),
-    dict(name='tv', x=760, layout=G.POSTER, art='Art(poster)', spec=L.TV, title='Label',
+    dict(name='tv', x=970, layout=G.POSTER, art='Art(poster)', spec=L.TV, title='Label',
          cols={'genre': 'Genre', 'cast': 'Studio', 'network': 'Studio', 'year': 'Year'},
          path='videodb://tvshows/titles/', sort='title', body='Plot', recent='videodb://tvshows/titles/'),
 ]

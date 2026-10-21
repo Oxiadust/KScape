@@ -27,6 +27,7 @@ Control ids (k = 0..POOL-1, POOL = the layout's pool_cols x pool_rows):
                icon + 1913 score, 1914 Rotten Tomatoes icon + 1915 Tomatometer - each shown by a
                window property (p.res, p.tmdb, p.rt), the images sized by Python
   1950         status label (loading / empty library), outside the camera group
+  1951         KScape logo above it while Window.Property(kscape.loading) is set (its own XML condition)
   1960         filter caption along the bottom (Python shows it): 1962 the active filters
   1965         item counter bottom right (npchip.count_chip): Window.Property(kscape.count)
   1980         now-playing chip top right while something plays (npchip.py)
@@ -409,6 +410,19 @@ def _build(L):
 		</control>
 		</control>
 {masks()}
+		<control type="image" id="1951">
+			<description>KScape logo while the library loads: Python sets Window.Property(kscape.loading). Fades in after
+			450 ms so instant loads never flash it, then breathes.</description>
+			<left>760</left>
+			<top>380</top>
+			<width>400</width>
+			<height>75</height>
+			<aspectratio>keep</aspectratio>
+			<texture>kscape-logo.png</texture>
+			<visible>!String.IsEmpty(Window.Property(kscape.loading))</visible>
+			<animation effect="fade" start="0" end="100" delay="450" time="400">Visible</animation>
+			<animation effect="fade" start="100" end="35" time="900" tween="sine" easing="inout" pulse="true" condition="true">Conditional</animation>
+		</control>
 		<control type="label" id="1950">
 			<description>Status: loading, empty library, no favourites (two lines)</description>
 			<left>260</left>

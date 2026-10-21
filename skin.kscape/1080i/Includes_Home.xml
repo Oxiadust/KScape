@@ -49,7 +49,7 @@
 				<content sortby="dateadded" sortorder="descending" limit="30">videodb://recentlyaddedmovies/</content>
 			</control>
 			<control type="group">
-				<left>120</left>
+				<left>330</left>
 				<top>346</top>
 				<control type="image">
 					<left>0</left>
@@ -1133,7 +1133,7 @@
 				</control>
 			</control>
 			<control type="group">
-				<left>120</left>
+				<left>330</left>
 				<top>562</top>
 				<control type="image">
 					<left>0</left>
@@ -2299,7 +2299,7 @@
 				</control>
 			</control>
 			<control type="group">
-				<left>120</left>
+				<left>330</left>
 				<top>778</top>
 				<control type="image">
 					<left>0</left>
@@ -2585,7 +2585,7 @@
 				</control>
 			</control>
 			<control type="list" id="9021">
-				<left>106</left>
+				<left>316</left>
 				<top>332</top>
 				<width>914</width>
 				<height>676</height>
@@ -2764,7 +2764,7 @@
 				<content sortby="dateadded" sortorder="descending" limit="30">musicdb://recentlyaddedalbums/</content>
 			</control>
 			<control type="group">
-				<left>440</left>
+				<left>650</left>
 				<top>130</top>
 				<control type="image">
 					<left>0</left>
@@ -3832,7 +3832,7 @@
 				</control>
 			</control>
 			<control type="group">
-				<left>440</left>
+				<left>650</left>
 				<top>346</top>
 				<control type="image">
 					<left>0</left>
@@ -4662,7 +4662,7 @@
 				</control>
 			</control>
 			<control type="group">
-				<left>440</left>
+				<left>650</left>
 				<top>562</top>
 				<control type="image">
 					<left>0</left>
@@ -4937,7 +4937,7 @@
 				</control>
 			</control>
 			<control type="group">
-				<left>440</left>
+				<left>650</left>
 				<top>778</top>
 				<control type="image">
 					<width>320</width>
@@ -5001,7 +5001,7 @@
 				</control>
 			</control>
 			<control type="list" id="9022">
-				<left>426</left>
+				<left>636</left>
 				<top>116</top>
 				<width>914</width>
 				<height>892</height>
@@ -5184,7 +5184,7 @@
 				<content sortby="dateadded" sortorder="descending" limit="30">videodb://tvshows/titles/</content>
 			</control>
 			<control type="group">
-				<left>760</left>
+				<left>970</left>
 				<top>346</top>
 				<control type="image">
 					<left>0</left>
@@ -6493,7 +6493,7 @@
 				</control>
 			</control>
 			<control type="group">
-				<left>760</left>
+				<left>970</left>
 				<top>562</top>
 				<control type="image">
 					<left>0</left>
@@ -7659,7 +7659,7 @@
 				</control>
 			</control>
 			<control type="group">
-				<left>760</left>
+				<left>970</left>
 				<top>778</top>
 				<control type="image">
 					<left>0</left>
@@ -7945,7 +7945,7 @@
 				</control>
 			</control>
 			<control type="list" id="9023">
-				<left>746</left>
+				<left>956</left>
 				<top>332</top>
 				<width>914</width>
 				<height>676</height>

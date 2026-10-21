@@ -221,11 +221,20 @@
 				<height>96</height>
 				<texture colordiffuse="kscape_blue_bar">white.png</texture>
 			</control>
+			<control type="image">
+				<description>KScape wordmark, first element of the bar (left of the tabs; not focusable)</description>
+				<left>28</left>
+				<top>1005</top>
+				<width>288</width>
+				<height>54</height>
+				<aspectratio>keep</aspectratio>
+				<texture>kscape-logo.png</texture>
+			</control>
 			<control type="list" id="9000">
 				<description>Main menu. Left/Right wrap around, as in SiLVO.</description>
-				<left>120</left>
+				<left>330</left>
 				<top>984</top>
-				<width>1680</width>
+				<width>1590</width>
 				<height>96</height>
 				<orientation>horizontal</orientation>
 				<onleft>9000</onleft>

@@ -23084,6 +23084,19 @@
 			<height>1</height>
 			<texture colordiffuse="FF000000">kscape-white.png</texture>
 		</control>
+		<control type="image" id="1951">
+			<description>KScape logo while the library loads: Python sets Window.Property(kscape.loading). Fades in after
+			450 ms so instant loads never flash it, then breathes.</description>
+			<left>760</left>
+			<top>380</top>
+			<width>400</width>
+			<height>75</height>
+			<aspectratio>keep</aspectratio>
+			<texture>kscape-logo.png</texture>
+			<visible>!String.IsEmpty(Window.Property(kscape.loading))</visible>
+			<animation effect="fade" start="0" end="100" delay="450" time="400">Visible</animation>
+			<animation effect="fade" start="100" end="35" time="900" tween="sine" easing="inout" pulse="true" condition="true">Conditional</animation>
+		</control>
 		<control type="label" id="1950">
 			<description>Status: loading, empty library, no favourites (two lines)</description>
 			<left>260</left>

@@ -409,6 +409,7 @@ class WallWindow(xbmcgui.WindowXML):
         self.retries = {}                # poster url -> (attempts, next attempt time)
 
         self.status.setLabel(ADDON.getLocalizedString(32001))
+        self.setProperty('kscape.loading', '1')
         self.group_sets = self._can_group() and ADDON.getSettingBool('group_sets')
         self.sets = {}                   # Kodi movie sets: setid -> title, artwork, plot
         if self.given:                   # a set's wall: the library the wall beneath has loaded
@@ -463,6 +464,7 @@ class WallWindow(xbmcgui.WindowXML):
                 m.setHeight(h)
             m.setVisible(on)
         self.status.setPosition(vx + (vw - 1400) // 2, vy + (vh - 200) // 2)
+        self.getControl(1951).setPosition(vx + (vw - 400) // 2, vy + (vh - 200) // 2 - 60)
         self.caption.setPosition(vx, vy + vh - CAPTION_PX)
         for cid in (1961, 1963):
             self.getControl(cid).setWidth(vw)
@@ -475,6 +477,7 @@ class WallWindow(xbmcgui.WindowXML):
         """Loading done: an empty library or empty favourites says so; otherwise no status. The
         counter shows how many covers the wall has (of how many, when filtered)."""
         self._show_caption()
+        self.setProperty('kscape.loading', '')
         count = self.kind.counter(self.shown_total, self.base_total)   # movies, a set's each counted
         if self.movie_set is not None and count:
             count = f'{self._set_title()}  ·  {count}'

@@ -7,13 +7,16 @@
 			<include>KScapeDisplay</include>
 			<control type="group">
 				<visible>!Window.IsActive(startup)</visible>
-				<left>1820</left>
-				<top>980</top>
+				<left>760</left>
+				<top>500</top>
+				<animation effect="fade" start="0" end="100" delay="450" time="400">Visible</animation>
 				<control type="image">
-					<width>40</width>
-					<height>40</height>
-					<texture colordiffuse="80FFFFFF">pointer.png</texture>
-					<animation effect="fade" start="100" end="30" time="600" pulse="true" condition="true">Conditional</animation>
+					<description>KScape logo, breathing; fades in only if the wait outlasts 450 ms</description>
+					<width>400</width>
+					<height>75</height>
+					<aspectratio>keep</aspectratio>
+					<texture>kscape-logo.png</texture>
+					<animation effect="fade" start="100" end="35" time="900" tween="sine" easing="inout" pulse="true" condition="true">Conditional</animation>
 				</control>
 			</control>
 	
