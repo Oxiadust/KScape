@@ -48,11 +48,13 @@ def toggle(key, label_id, flag):
     return (key, tr(label_id), on_off(flag), flag)
 
 
-def favourite_entries(item, favs):
-    """Add to / Remove from Favourites for `item`, if Kodi's favourites can hold it."""
+def favourite_entries(item, favs, is_favourite=None):
+    """Add to / Remove from Favourites for `item`, if Kodi's favourites can hold it.
+    `is_favourite` overrides favs.contains(item) (the wall counts merged duplicate copies)."""
     if item is None or favs is None or not favs.supports(item):
         return []
-    return [('favourite', tr(S_REMOVE if favs.contains(item) else S_ADD))]
+    fav = favs.contains(item) if is_favourite is None else is_favourite
+    return [('favourite', tr(S_REMOVE if fav else S_ADD))]
 
 
 class MenuDialog(xbmcgui.WindowXMLDialog):

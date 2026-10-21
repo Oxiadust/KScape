@@ -41,6 +41,7 @@ from .favourites import Favourites
 from .info import estimate_lines
 from .library import rpc
 from .listwindow import show_list
+from .model import copy_groups
 from .search import search
 from .ranking import rank_related
 from .wallmodel import (Wall, camera_target, cell_origin, clip_outside, detour, ease_out_back,
@@ -390,7 +391,7 @@ class WallWindow(xbmcgui.WindowXML):
         self.new_days = collectionui.new_days()
 
         self.wall = Wall.column_major([], layout=self.lay)
-        self.all_movies = []             # every library entry; the wall may filter them
+        self.all_movies = []             # every library entry; the wall may filter or merge them
         self.history = []                # (wall, focus) before each shuffle, for Back
         self.focus = (0, 0)
         self.cam = (0, 0)
@@ -497,7 +498,7 @@ class WallWindow(xbmcgui.WindowXML):
 
     def _library(self):
         """What Explore and the Filter menu choose from: the library as the wall shows it."""
-        return self.all_movies
+        return self.kind.visible(self.all_movies)
 
     def _filters_changed(self, focus_key=None):
         """Show the movies the filters now leave, on `focus_key` when it is among them."""
@@ -636,14 +637,14 @@ class WallWindow(xbmcgui.WindowXML):
         with self.lock:
             current = self.wall.at(*self.focus)
             items = self._visible(self.all_movies)          # library order, whatever the wall's
-            library = self.all_movies
+            library = self.kind.visible(self.all_movies)
         if not self.filtered:
             state.save(**{view_key(self.kind): 'list'})
         seen = self.session.version
         link = ExploreLink(self) if self.kind.explores else None
         result, key = self._covered(lambda: show_list(self.kind, items, current.key if current else None,
                                                       self.favs, library=library, store=self.store,
-                                                      collection=self.collection,
+                                                      collection=self.collection, copies=self._copies,
                                                       back='exit' if back_home else 'wall', explore=link,
                                                       host=ListHost(self)))
         self.reduced = menu.reduced_motion()        # the list's menu may have toggled these
@@ -689,10 +690,10 @@ class WallWindow(xbmcgui.WindowXML):
         if not query:
             return
         with self.lock:
-            library = self.all_movies
+            library = self.kind.visible(self.all_movies)
         results = search(library, query)
         self._covered(lambda: show_list(self.kind, results, None, self.favs, query=query, library=library,
-                                        store=self.store))
+                                        store=self.store, copies=self._copies))
         self._after_favourites()
         self._after_collections()
 
@@ -713,8 +714,28 @@ class WallWindow(xbmcgui.WindowXML):
 
     # ---- favourites ------------------------------------------------------------------------
 
+    def _copies(self, item):
+        """The library entries a cover stands for: itself, plus merged duplicate copies."""
+        if not self.kind.merges:
+            return [item]
+        if getattr(self, '_copy_of', (None,))[0] is not self.all_movies:
+            index = {}
+            for group in copy_groups(self.all_movies):      # once per library change, not per cover
+                for m in group:
+                    index[m.key] = group
+            self._copy_of = (self.all_movies, index)
+        return self._copy_of[1].get(item.key) or [item]
+
+    def _is_favourite(self, item):
+        return any(self.favs.contains(c) for c in self._copies(item))
+
     def _toggle_favourite(self, item):
-        self.favs.toggle(item)
+        if self._is_favourite(item):
+            for c in self._copies(item):
+                if self.favs.contains(c):
+                    self.favs.toggle(c)
+        else:
+            self.favs.toggle(item)
         self._favourites_changed()
 
     def _after_collections(self):
@@ -725,12 +746,12 @@ class WallWindow(xbmcgui.WindowXML):
 
     def _collect(self, item):
         """Add to collection…: the user's collections, ticked where `item` (any copy) is."""
-        keys = collectionui.keys_of([item])
+        keys = collectionui.keys_of(self._copies(item))
         if collectionui.choose(item, keys, self.store) and self.collection is not None:
             self._apply_library(self.all_movies)
 
     def _uncollect(self, item):
-        self.store.remove(self.collection, collectionui.keys_of([item]))
+        self.store.remove(self.collection, collectionui.keys_of(self._copies(item)))
         self._apply_library(self.all_movies)
 
     def _after_favourites(self):
@@ -809,7 +830,7 @@ class WallWindow(xbmcgui.WindowXML):
         if item is None:
             pool.bind(k, cell, None)
         else:
-            pool.bind(k, cell, item, self.kind.fallback(item), self.favs.contains(item),
+            pool.bind(k, cell, item, self.kind.fallback(item), self._is_favourite(item),
                       self.kind.cover_badge(item, self.show_badges))
 
     def _rebind(self, pool, wall=None):
@@ -1008,7 +1029,7 @@ class WallWindow(xbmcgui.WindowXML):
             actions.append(('shuffle', tr(32021)))
         actions.append(('reload', tr(32024)))
         if item:
-            actions += menu.favourite_entries(item, self.favs)
+            actions += menu.favourite_entries(item, self.favs, self._is_favourite(item))
             actions.append(('collect', tr(collectionui.S_COLLECT)))
             if self.collection is not None and self.store.get(self.collection):
                 actions.append(('uncollect', tr(32165).format(collectionui.name_of(self.collection, self.store))))
@@ -1064,13 +1085,15 @@ class WallWindow(xbmcgui.WindowXML):
         return self._apply_filters(base)
 
     def _base(self, items):
-        """The wall's items before filters: in favourites mode only favourites, in collection
-        mode the collection's. Every library entry has its own cover, duplicate copies too."""
+        """The wall's items before filters: in favourites mode only favourites (any copy of a
+        merged movie counts), in collection mode the collection's; separate copies of one film
+        share a cover (kinds.visible)."""
         if self.collection is not None:
-            return [m for m, _ in collectionui.members(self.collection, self.store, items, items, self.new_days)]
+            shown = self.kind.visible(items)
+            return [m for m, _ in collectionui.members(self.collection, self.store, items, shown, self.new_days)]
         if self.favourites_only:
-            return [m for m in items if self.favs.contains(m)]
-        return items
+            items = [m for m in items if self.favs.contains(m)]
+        return self.kind.visible(items)
 
     # Library data is fetched on background threads (a large library takes tens of seconds) and
     # applied under the lock, so the wall stays responsive while it loads.
@@ -1118,7 +1141,7 @@ class WallWindow(xbmcgui.WindowXML):
             if reloaded:                     # asked for by the list view on top: apply it now
                 self.pending_library = None
                 self._apply_library(items)
-                shown, library = self._visible(self.all_movies), self.all_movies
+                shown, library = self._visible(self.all_movies), self.kind.visible(self.all_movies)
         if reloaded:
             reloaded(shown, library)
         if items:
@@ -1189,6 +1212,10 @@ class WallWindow(xbmcgui.WindowXML):
         self.history = []
         self.front.shown = [None] * self.pool_size     # artwork may have changed
         cell = self.wall.cell_of(current.key) if current else None
+        if cell is None and current and self.kind.merges:
+            # The focused copy was merged away: stay on the copy that represents that title.
+            cell = next((self.wall.cell_of(m.key) for m in self.wall.movies()
+                         if (m.title, m.year) == (current.title, current.year)), None)
         if cell is None and current and current.key in self._order:
             # Gone from favourites: stay near where it was, on the next item in library order.
             order = self._order

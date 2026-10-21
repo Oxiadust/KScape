@@ -109,11 +109,17 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   keeps the answer for a month (`ratings.json`) and never writes it into Kodi's library.
 - **Library aware.** The wall reloads itself after a library scan or clean, keeping your place.
 - **Remembers where you were**, across Kodi restarts.
-- **Movie versions.** A movie with *Kodi's own versions* (Kodi 21: Manage versions → Add
-  version, e.g. 4K, 1080p, 3D, Director's Cut) is one movie in Kodi, so it appears once on the
-  wall and in the list; KScape reads its versions from Kodi's library (no file scanning, cached
-  with the library) and shows their formats. Separate library entries of one film (copies added
-  as different movies) each have their own cover, as Kodi lists them.
+- **One cover per movie** (movie versions). A movie appears once on the wall and in the list,
+  however many versions it has:
+  - *Kodi's own versions* (Kodi 21: Manage versions → Add version, e.g. 4K, 1080p, 3D,
+    Director's Cut) are one movie in Kodi already. KScape reads them from Kodi's library (no
+    file scanning, cached with the library) and shows their formats.
+  - *Separate library entries of one film* (copies added as different movies) always show as
+    one cover when they share the same TMDB or IMDb id, title, year and edition; titles alone
+    never merge two entries, and different cuts (Director's Cut, Extended, Theatrical...) named
+    in the title or file name stay apart; IMAX, open matte and 3D copies are versions of the
+    same cover. The copies then count as versions of
+    that cover (**Play Version** on its info screen).
   - **Play** starts the version KScape prefers: the resolution chosen in Skin settings → Movie
     versions → *Version Play starts* (4K first by default, then 1080p, 720p, SD; or Kodi's
     default version), never a 3D version over a 2D one unless *Prefer 3D versions* is on.
@@ -503,7 +509,8 @@ add-on's window XML and Python are re-read each time a view opens).
 - The Home submenu sits above the bar rather than below it as in SiLVO, so Up (not Down) enters
   it. SiLVO's skinshortcuts-only "Master user" profile condition is not copied.
 - Favourites cover movies, albums and TV shows (the items the walls show), not single songs or
-  episodes. A movie is a favourite by its file, as Kodi stores it.
+  episodes. A movie is a favourite by its file, as Kodi stores it, so a favourite added for one
+  copy of a merged duplicate counts for the cover.
 - Scenes and Demo Scripts are played by a service (part of `script.kscape.wall`, starting with
   Kodi): the skin alone cannot stop a video at a given time. After installing or updating the
   add-on, restart Kodi once so the service starts.
@@ -528,6 +535,8 @@ add-on's window XML and Python are re-read each time a view opens).
   titles; movie and show titles and people, but not plots.
 - The Home Collections cards show the library's most recently added titles under the New tab,
   not your own collections (a skin cannot read them).
+- Duplicates are matched on their TMDB / IMDb id, title, year and edition. Entries the scraper
+  misidentified as the same film are merged too; fix the match in Kodi (*Refresh* on the item).
 - Badges depend on Kodi's stream details, which it records only after reading the files.
 - Movie versions: JSON-RPC has no version API in Kodi 21, so KScape reads Kodi's own version
   folders (`videodb://movies/videoversions/`). Versions added or removed while a wall is open

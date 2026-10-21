@@ -11,7 +11,7 @@ from . import geometry as G
 from . import library as lib
 from . import listmodel as L
 from .media import Album, Show
-from .model import Movie
+from .model import Movie, merge_duplicates
 from .ranking import album_score, score, show_score
 
 
@@ -29,6 +29,7 @@ class Kind:
     s_search = 32093                # search heading
     s_no_match = 32098              # empty search results
     has_extra = False               # a second, slower query fills in more (movie cast)
+    merges = False                  # separate library copies of one film share a cover
     child_types = ()                # notification item types that change one of ours (a song)
     collections_xml = 'script-kscape-collections.xml'
     s_count, s_count_one = 32154, 32155     # "{} movies", "1 movie" (collections heading)
@@ -78,6 +79,11 @@ class Kind:
     def play(self, item):
         raise NotImplementedError
 
+    def visible(self, items):
+        """What the views show: one cover per film (its copies become versions, see
+        model.merge_duplicates)."""
+        return merge_duplicates(items) if self.merges else items
+
     def count_text(self, n):
         tr = xbmcaddon.Addon('script.kscape.wall').getLocalizedString
         return tr(self.s_count_one) if n == 1 else tr(self.s_count).format(n)
@@ -99,6 +105,7 @@ class Movies(Kind):
     item_type = 'movie'
     record = Movie
     has_extra = True
+    merges = True
 
     def total(self):
         return lib.library_total()

@@ -65,7 +65,7 @@ class Movie:
     setname: str = ''
     stereo: bool = False           # the file is 3D
     uid: str = ''                  # 'tmdb:603' / 'imdb:tt0133093': what makes copies one film
-    versions: Tuple[V.Version, ...] = ()   # Kodi's versions of this movie (two or more)
+    versions: Tuple[V.Version, ...] = ()   # Kodi's versions of this movie (two or more), or merged copies
 
     @property
     def formats(self):
@@ -145,8 +145,11 @@ def uid_of(uniqueid):
     return ''
 
 
-EDITION = re.compile(r"(director'?s[ ._-]?cut|extended|unrated|uncut|theatrical|remastered|imax|"
-                     r"final[ ._-]?cut|special[ ._-]?edition|ultimate|criterion|redux|open[ ._-]?matte)",
+BADGE_RANK = {'HDR': 2, 'UHD': 1, '': 0}
+# Cuts of a film. IMAX, open matte and 3D are ways of presenting the same cut, so those copies
+# become versions of one cover instead.
+EDITION = re.compile(r"(director'?s[ ._-]?cut|extended|unrated|uncut|theatrical|remastered|"
+                     r"final[ ._-]?cut|special[ ._-]?edition|ultimate|criterion|redux)",
                      re.IGNORECASE)
 
 
@@ -170,3 +173,58 @@ def _title_key(movie):
     edition. Entries without such an id never match another (titles alone are not enough)."""
     k = _film_key(movie)
     return k if k[0] == 'item' else k + (edition_of(movie),)
+
+
+def copy_groups(movies):
+    """Library entries of one film together, in library order ([[movie, ...], ...]): grouped by
+    _title_key, with the edition (a regex over title and file) only worked out for films that
+    have several entries - a library is mostly single copies."""
+    first, order = {}, []
+    for m in movies:
+        k = _film_key(m)
+        if k not in first:
+            first[k] = []
+            order.append(k)
+        first[k].append(m)
+    groups = []
+    for k in order:
+        group = first[k]
+        if len(group) == 1:
+            groups.append(group)
+            continue
+        by_edition = {}
+        for m in group:
+            by_edition.setdefault(edition_of(m), []).append(m)
+        groups.extend(by_edition.values())
+    position = {id(g[0]): i for i, g in enumerate(groups)}
+    return sorted(groups, key=lambda g: position[id(g[0])])
+
+
+def copy_versions(m, default=False):
+    """The versions a library entry brings to a merged film: its own (Kodi's) versions, or itself
+    (the kept copy counts as the default version)."""
+    if m.versions:
+        return m.versions
+    return (V.Version(movieid=m.movieid, file=m.file, name='', resolution=m.resolution, hdr=m.hdr,
+                      audio=m.audio, stereo=m.stereo, resume=m.resume_position, default=default),)
+
+
+def merge_duplicates(movies):
+    """One cover per film, in the original order: separate library entries of one film (see
+    _title_key) are shown once. Kodi's own versions are already one movie each.
+
+    The copy kept is the one with a resume point, then the best quality badge, then one with a
+    poster, then the lowest movie id, so the choice is stable. It carries every copy's versions,
+    so its badges list all formats and Play Version offers them all.
+    """
+    from dataclasses import replace
+    rank = lambda x: (x.resume_position > 0, BADGE_RANK.get(x.badge, 0), bool(x.poster), -x.movieid)
+    out = []
+    for group in copy_groups(movies):
+        if len(group) == 1:
+            out.append(group[0])
+            continue
+        best = max(group, key=rank)
+        merged = tuple(v for m in group for v in copy_versions(m, m is best))
+        out.append(replace(best, versions=merged))
+    return out

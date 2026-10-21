@@ -68,6 +68,7 @@ class ListWindow(xbmcgui.WindowXML):
         self.focus_id = self.start_id            # key of the item under the band when closed
         self.explore = kwargs.get('explore')     # window.ExploreLink: the wall's filters
         self.host = kwargs.get('host')           # window.ListHost: the wall underneath, if any
+        self.copies = kwargs.get('copies') or (lambda m: [m])   # duplicate copies a row stands for
 
     def onInit(self):
         if self.ready:
@@ -375,7 +376,7 @@ class ListWindow(xbmcgui.WindowXML):
             self._load(row.movie.key if row else None)
 
     def _files(self, movie):
-        return collectionui.keys_of([movie])
+        return collectionui.keys_of(self.copies(movie))
 
     def _drop_uncollected(self):
         """Listing a collection: take out rows whose movie has left it, keeping the band near."""
@@ -443,15 +444,15 @@ class ListWindow(xbmcgui.WindowXML):
 
 
 def show_list(kind, movies, focus, favs=None, query=None, library=None, store=None, collection=None,
-              back='wall', explore=None, host=None):
+              copies=None, back='wall', explore=None, host=None):
     """Run the list view for `kind` (or search results, with `query`; `library` is what a new
     search searches; `store` the movie collections, `collection` the one listed, if any).
     Returns (result, key of the item under the band)."""
     menu.wait_for_dialogs()
     window = ListWindow(kind.list_spec.xml, ADDON.getAddonInfo('path'), 'Default', '1080i',
                         kind=kind, movies=movies, focus=focus, favs=favs, query=query, library=library,
-                        store=store, collection=collection, back=back, explore=explore,
-                        host=host)
+                        store=store, collection=collection, copies=copies, back=back,
+                        explore=explore, host=host)
     modal.run(window)
     result, focus_id = window.result, window.focus_id
     del window

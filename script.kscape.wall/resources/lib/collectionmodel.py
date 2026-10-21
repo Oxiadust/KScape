@@ -15,7 +15,7 @@ follow Kodi without any bookkeeping of their own:
 Custom collections are named, ordered lists kept in a small JSON file per library in the
 add-on's profile folder. Each item is stored by a key that survives a library rebuild that
 renumbers ids (member_key): a movie or show by its file or folder, as Kodi's favourites store
-movies; an album by artist and title.
+movies; an album by artist and title. With duplicate movie copies shown once, any copy counts.
 """
 import json
 import os
@@ -135,7 +135,7 @@ def member_key(item):
 
 
 def title_key(movie):
-    """Duplicate copies of one film share this: the same TMDB / IMDb id,
+    """Duplicate copies of one film share this (model.merge_duplicates): the same TMDB / IMDb id,
     title, year and edition."""
     from .model import _title_key
     return _title_key(movie)

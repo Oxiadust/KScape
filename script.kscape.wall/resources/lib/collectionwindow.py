@@ -133,7 +133,7 @@ class CollectionsWindow(xbmcgui.WindowXML):
     # ---- what is shown ---------------------------------------------------------------------
 
     def _shown(self):
-        return self.all_movies
+        return self.kind.visible(self.all_movies)
 
     def _members(self, cid, shown=None):
         if cid == 'scenes':
@@ -458,7 +458,11 @@ class CollectionsWindow(xbmcgui.WindowXML):
         return None
 
     def _files(self, movie):
-        return collectionui.keys_of([movie])
+        """Member keys of every library copy of `movie` (one cover may stand for duplicates)."""
+        if not self.kind.merges:
+            return collectionui.keys_of([movie])
+        key = C.title_key(movie)
+        return collectionui.keys_of([m for m in self.all_movies if C.title_key(m) == key] or [movie])
 
     # ---- moving a movie within a custom collection ----------------------------------------------
 
