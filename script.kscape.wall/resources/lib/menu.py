@@ -22,6 +22,7 @@ S_VIEW, S_REDUCE_MOTION, S_AUTO_SHUFFLE = 32404, 32405, 32406
 S_EXIT_WALL, S_EXIT_HOME, S_EXIT_COLLECTIONS = 32407, 32408, 32409
 S_ON, S_OFF = 32030, 32031
 S_COVER_WALL, S_LIST_VIEW = 32070, 32071
+S_GROUP_SETS = 32411
 PROP_REDUCED = 'kscape.reduced'         # read by the info screen's slide-in animation
 
 LIST = 300                              # not 3: WindowXML takes 2-4 for its sort and view buttons

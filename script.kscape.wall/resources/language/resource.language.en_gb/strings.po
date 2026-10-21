@@ -1368,3 +1368,12 @@ msgstr ""
 msgctxt "#32410"
 msgid "{} of {}"
 msgstr ""
+
+#. C menu toggle on the movies cover wall: one cover per Kodi movie set
+msgctxt "#32411"
+msgid "Group by Collection"
+msgstr ""
+
+msgctxt "#32412"
+msgid "Group movies by collection (Kodi movie sets) on the cover wall"
+msgstr ""

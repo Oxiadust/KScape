@@ -34,12 +34,13 @@ import xbmcvfs
 from . import geometry as G
 from . import badges, cache, collectionui, displayui, menu, modal, ratings, state
 from . import explore as E
+from . import moviesets as MS
 from . import npchip as np_chip
 from . import exploreui as X
 from . import scenes as S
 from .favourites import Favourites
 from .info import estimate_lines
-from .library import rpc
+from .library import fetch_sets, rpc
 from .listwindow import show_list
 from .model import copy_groups
 from .search import search
@@ -323,13 +324,16 @@ class LibraryMonitor(xbmc.Monitor):
 class WallWindow(xbmcgui.WindowXML):
     ready = False
     base_total = 0                   # covers before filters (the counter's "of")
+    shown_total = 0                  # movies the wall shows (a set's cover counts its movies)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args)
         self.kind = kwargs['kind']
         self.favourites_only = kwargs.get('favourites', False)
         self.collection = kwargs.get('collection')   # collection id: show only its movies
-        self.filtered = self.favourites_only or self.collection is not None
+        self.movie_set = kwargs.get('movie_set')     # Kodi movie set id: show only its movies
+        self.given = kwargs.get('library')           # (items, cast complete) from the wall beneath
+        self.filtered = self.favourites_only or self.collection is not None or self.movie_set is not None
         self.start_view = kwargs.get('view')         # 'list' or 'wall' if chosen from Home
         self.layout = kwargs.get('layout') or self.kind.layout
         self.stage = kwargs.get('stage') or displayui.current(self.kind.layout.pitch_y)
@@ -405,16 +409,23 @@ class WallWindow(xbmcgui.WindowXML):
         self.retries = {}                # poster url -> (attempts, next attempt time)
 
         self.status.setLabel(ADDON.getLocalizedString(32001))
-        items, self.cast_complete, cached, total = load_library(self.kind)
+        self.group_sets = self._can_group() and ADDON.getSettingBool('group_sets')
+        self.sets = {}                   # Kodi movie sets: setid -> title, artwork, plot
+        if self.given:                   # a set's wall: the library the wall beneath has loaded
+            (items, self.cast_complete), cached, total = self.given, None, len(self.given[0])
+        else:
+            items, self.cast_complete, cached, total = load_library(self.kind)
+        if self.group_sets or self.movie_set is not None:
+            self.sets = fetch_sets()
 
         self.all_movies = items
-        visible = self._visible(items)
+        visible = self._covers(self._visible(items))
         self.wall = Wall.column_major(visible, layout=self.lay)
         prop, key = remembered(self.kind)
         last = HOME.getProperty(prop) or str(state.load().get(key, ''))
         if self.nested:
             last = str(self.session.trail[-1][1])     # the movie explored from, if it is shown
-        start = self.wall.cell_of(int(last)) if last.isdigit() else None
+        start = self.wall.cell_of(int(last)) if last.lstrip('-').isdigit() else None
         self.focus = start or (0, 0)
         self._show_status()
         if visible:
@@ -426,7 +437,7 @@ class WallWindow(xbmcgui.WindowXML):
             self._start_reload()
         elif cached and self.collection is not None:
             threading.Thread(target=self._refresh_status, daemon=True).start()
-        elif items and not self.cast_complete:
+        elif items and not self.cast_complete and not self.given:   # the wall beneath loads it
             threading.Thread(target=self._load_cast, args=(total, self.library_gen), daemon=True).start()
         view = self.start_view or (None if self.filtered else state.load().get(view_key(self.kind)))
         if self.start_view and not self.filtered:
@@ -464,7 +475,10 @@ class WallWindow(xbmcgui.WindowXML):
         """Loading done: an empty library or empty favourites says so; otherwise no status. The
         counter shows how many covers the wall has (of how many, when filtered)."""
         self._show_caption()
-        self.setProperty('kscape.count', self.kind.counter(len(self.wall.movies()), self.base_total))
+        count = self.kind.counter(self.shown_total, self.base_total)   # movies, a set's each counted
+        if self.movie_set is not None and count:
+            count = f'{self._set_title()}  ·  {count}'
+        self.setProperty('kscape.count', count)
         if self.wall.movies():
             self.status.setLabel('')
         elif self.session and self.all_movies:
@@ -564,6 +578,8 @@ class WallWindow(xbmcgui.WindowXML):
             empty = not self.wall.movies()
             if aid in MOVES and not empty:
                 self._move(*MOVES[aid])
+            elif aid in (SELECT + PLAY) and not empty and MS.is_set(self.wall.at(*self.focus)):
+                overlay = 'set'
             elif aid in SELECT and not empty:
                 overlay = 'details'
             elif aid in PLAY and not empty:
@@ -584,6 +600,8 @@ class WallWindow(xbmcgui.WindowXML):
                 self._open_details(page='explore')
         elif overlay == 'details':
             self._open_details()
+        elif overlay == 'set':
+            self._open_set(self.wall.at(*self.focus))
         elif overlay == 'filter':
             self._filter_menu()
         elif overlay == 'play':
@@ -637,6 +655,8 @@ class WallWindow(xbmcgui.WindowXML):
         with self.lock:
             current = self.wall.at(*self.focus)
             items = self._visible(self.all_movies)          # library order, whatever the wall's
+            if MS.is_set(current):                          # the list has no set covers
+                current = next(iter(MS.members_of(items, MS.set_id(current))), None)
             library = self.kind.visible(self.all_movies)
         if not self.filtered:
             state.save(**{view_key(self.kind): 'list'})
@@ -1013,6 +1033,8 @@ class WallWindow(xbmcgui.WindowXML):
         view = []
         if item:
             view.append(('list', tr(menu.S_VIEW), tr(menu.S_COVER_WALL)))
+        if self._can_group():
+            view.append(menu.toggle('groupsets', menu.S_GROUP_SETS, self.group_sets))
         view += [menu.toggle('motion', menu.S_REDUCE_MOTION, self.reduced),
                  menu.toggle('auto', menu.S_AUTO_SHUFFLE, self.auto_shuffle)]
         misc = [('search', tr(menu.S_SEARCH))]
@@ -1028,7 +1050,7 @@ class WallWindow(xbmcgui.WindowXML):
         if item:
             actions.append(('shuffle', tr(32021)))
         actions.append(('reload', tr(32024)))
-        if item:
+        if item and not MS.is_set(item):              # a set cover is no single movie
             actions += menu.favourite_entries(item, self.favs, self._is_favourite(item))
             actions.append(('collect', tr(collectionui.S_COLLECT)))
             if self.collection is not None and self.store.get(self.collection):
@@ -1065,6 +1087,8 @@ class WallWindow(xbmcgui.WindowXML):
         elif choice == 'auto':
             self.auto_shuffle = not self.auto_shuffle
             menu.set_auto_shuffle(self.auto_shuffle)
+        elif choice == 'groupsets':
+            self._toggle_grouping()
         elif choice == 'motion':
             self.reduced = not self.reduced
             menu.set_reduced_motion(self.reduced)
@@ -1081,8 +1105,45 @@ class WallWindow(xbmcgui.WindowXML):
     def _visible(self, items):
         """What the wall shows: _base() narrowed by the filters (Explore, Filter…)."""
         base = self._base(items)
-        self.base_total = len(base)                  # the counter's "of"
-        return self._apply_filters(base)
+        self.base_total = len(base)                  # the counter: "shown of base"
+        shown = self._apply_filters(base)
+        self.shown_total = len(shown)
+        return shown
+
+    # ---- Group by Collection (Kodi movie sets) -----------------------------------------------------
+
+    def _can_group(self):
+        """Group by Collection applies to the movies cover wall only (not favourites, your own
+        collections or a set's wall)."""
+        return (self.kind.name == 'movies' and not self.favourites_only and self.collection is None
+                and self.movie_set is None)
+
+    def _covers(self, visible):
+        """The wall's covers: `visible`, with each movie set as one cover when grouping."""
+        if not self.group_sets:
+            return visible
+        return MS.group(visible, self.sets, self.kind.count_text)
+
+    def _set_title(self):
+        info = self.sets.get(self.movie_set) or {}
+        if info.get('title'):
+            return info['title']
+        return next((m.setname for m in self.all_movies if m.setid == self.movie_set and m.setname), '')
+
+    def _open_set(self, item):
+        """Select on a set cover: a cover wall of the set's movies over this one; Back returns."""
+        self._remember(item)
+        library = (self.all_movies, self.cast_complete)
+        self._covered(lambda: open_wall(self.kind, view='wall', movie_set=MS.set_id(item), library=library))
+        self._after_favourites()
+        self._after_collections()
+
+    def _toggle_grouping(self):
+        self.group_sets = not self.group_sets
+        ADDON.setSettingBool('group_sets', self.group_sets)
+        if self.group_sets and not self.sets:
+            self.sets = fetch_sets()
+        self._apply_library(self.all_movies)
 
     def _base(self, items):
         """The wall's items before filters: in favourites mode only favourites (any copy of a
@@ -1091,6 +1152,8 @@ class WallWindow(xbmcgui.WindowXML):
         if self.collection is not None:
             shown = self.kind.visible(items)
             return [m for m, _ in collectionui.members(self.collection, self.store, items, shown, self.new_days)]
+        if self.movie_set is not None:
+            return self.kind.visible(MS.members_of(items, self.movie_set))
         if self.favourites_only:
             items = [m for m in items if self.favs.contains(m)]
         return self.kind.visible(items)
@@ -1207,11 +1270,17 @@ class WallWindow(xbmcgui.WindowXML):
         if focus_key is not None:
             current = next((m for m in items if m.key == focus_key), current)
         self.all_movies = items
-        visible = self._visible(items)
+        visible = self._covers(self._visible(items))
         self.wall = Wall.column_major(visible, layout=self.lay)
         self.history = []
         self.front.shown = [None] * self.pool_size     # artwork may have changed
         cell = self.wall.cell_of(current.key) if current else None
+        if cell is None and current and MS.is_set(current):
+            # Grouping turned off: the set's first movie.
+            first = MS.members_of(visible, MS.set_id(current))
+            cell = self.wall.cell_of(first[0].key) if first else None
+        elif cell is None and current and getattr(current, 'setid', 0):
+            cell = self.wall.cell_of(-current.setid)   # grouped now: its set's cover
         if cell is None and current and self.kind.merges:
             # The focused copy was merged away: stay on the copy that represents that title.
             cell = next((self.wall.cell_of(m.key) for m in self.wall.movies()
@@ -1487,10 +1556,13 @@ def wall_xml(kind):
     return root, name, layout, stage
 
 
-def open_wall(kind, view=None, favourites=False, collection=None, explore=None):
-    """Run the wall for `kind` (filtered by an Explore (filter, movie key) pair, if given)."""
+def open_wall(kind, view=None, favourites=False, collection=None, explore=None, movie_set=None,
+              library=None):
+    """Run the wall for `kind` (filtered by an Explore (filter, movie key) pair, or showing one
+    Kodi movie set, if given). `library`: (items, cast complete) already loaded, if any."""
     root, name, layout, stage = wall_xml(kind)
     window = WallWindow(name, root, 'Default', '1080i', kind=kind, view=view, favourites=favourites,
-                        collection=collection, explore=explore, layout=layout, stage=stage)
+                        collection=collection, explore=explore, layout=layout, stage=stage,
+                        movie_set=movie_set, library=library)
     modal.run(window)
     del window

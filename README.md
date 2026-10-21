@@ -76,6 +76,14 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   removed, or **Clear all filters**; Back clears them too. Actor filters use Kodi's own library
   filter, so the whole cast counts. In Favourites or a collection, filters narrow what that wall
   shows, and Explore opens a filtered wall of the whole library over it.
+- **Group by Collection** (**C → Group by Collection**, movie cover wall only; off by default,
+  remembered across restarts): the movies of each Kodi movie set share one cover, with the
+  set's artwork (or its first movie's poster) and synopsis, placed where the set's name falls in
+  title order. Select opens a cover wall of the set's movies, oldest first, with the set's name
+  and count bottom right; Back returns to the set's cover. Sets come from Kodi's library
+  (Movie sets), never from matching titles; a set with one movie on the wall shows the movie
+  itself. The list view, favourites, your own Collections, music and TV shows are not grouped,
+  and the counter still counts movies (a set's cover counts all its movies).
 - **Play Scenes** (movie info → Play Scenes): **Play All Scenes** and the movie's scenes with
   their lengths (favourites marked with a heart), as on Kaleidescape. Select plays a scene from
   its start to its end in Kodi's own player, then the info screen returns to the scene list;
@@ -224,7 +232,7 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
 | Select / Enter | Open the movie info screen |
 | Play | Play the movie (resumes from the last position if there is one) |
 | Back / Esc | Leave the wall, straight back to Home (the shuffles can be undone from the menu) |
-| Menu / C / Info | The menu, in three sections. **View Options**: **View** (switch to the list view), **Reduce Motion** On/Off, **Automatic Shuffle** On/Off. **Misc Options**: **Search…**, **Favourites** (the wall of your favourites), **Filter…** (movies; **Clear all filters** when some are on). **Actions**: **Undo shuffle** (after a shuffle), shuffle now, **Reload library**, **Add to / Remove from Favourites** (labelled for the selected item), **Add to collection…**, the movie's scene entries, then **Exit to Home Page** (or **Exit to Wall** / **Exit to Collections** on a wall opened over another view) |
+| Menu / C / Info | The menu, in three sections. **View Options**: **View** (switch to the list view), **Group by Collection** On/Off (movies), **Reduce Motion** On/Off, **Automatic Shuffle** On/Off. **Misc Options**: **Search…**, **Favourites** (the wall of your favourites), **Filter…** (movies; **Clear all filters** when some are on). **Actions**: **Undo shuffle** (after a shuffle), shuffle now, **Reload library**, **Add to / Remove from Favourites** (labelled for the selected item), **Add to collection…**, the movie's scene entries, then **Exit to Home Page** (or **Exit to Wall** / **Exit to Collections** on a wall opened over another view) |
 
 In the **list view**: Up/Down move through items, Left/Right between columns, Select opens the
 info, album or show screen, Play plays, Back goes back to Home (or, when the list was opened

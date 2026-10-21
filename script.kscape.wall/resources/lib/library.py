@@ -51,6 +51,18 @@ def fetch_movie(movieid):
     return Movie.from_jsonrpc(m) if m else None
 
 
+def fetch_sets():
+    """{setid: {'title', 'poster', 'fanart', 'plot'}} for Kodi's movie sets (Group by Collection)."""
+    result = rpc('VideoLibrary.GetMovieSets', {'properties': ['title', 'art', 'plot']})
+    sets = {}
+    for s in result.get('sets', []):
+        art = s.get('art') or {}
+        sets[int(s['setid'])] = {'title': s.get('title') or s.get('label') or '',
+                                 'poster': art.get('poster') or art.get('thumb') or '',
+                                 'fanart': art.get('fanart') or '', 'plot': s.get('plot') or ''}
+    return sets
+
+
 VERSIONS_ROOT = 'videodb://movies/videoversions/'
 VERSION_PROPERTIES = ['file', 'streamdetails', 'resume']
 

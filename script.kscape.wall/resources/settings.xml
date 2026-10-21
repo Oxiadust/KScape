@@ -8,6 +8,11 @@
 					<default>true</default>
 					<control type="toggle"/>
 				</setting>
+				<setting id="group_sets" type="boolean" label="32412" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
 				<setting id="reduced_motion" type="boolean" label="32012" help="">
 					<level>0</level>
 					<default>false</default>
