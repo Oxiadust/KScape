@@ -98,9 +98,8 @@
 				</control>
 				<control type="list" id="9010">
 					<left>120</left>
-					<top>8</top>
 					<width>1680</width>
-					<height>72</height>
+					<height>88</height>
 					<orientation>horizontal</orientation>
 					<ondown>9000</ondown>
 					<onback>9000</onback>
@@ -109,10 +108,10 @@
 					<onright>Control.Move(9000,1)</onright>
 					<onright>SetFocus(9030)</onright>
 					<scrolltime tween="cubic" easing="out">240</scrolltime>
-					<itemlayout width="240" height="72">
+					<itemlayout width="240" height="88">
 						<control type="label">
 							<width>240</width>
-							<height>72</height>
+							<height>88</height>
 							<align>center</align>
 							<aligny>center</aligny>
 							<font>kscape_sub</font>
@@ -120,17 +119,17 @@
 							<label>$INFO[ListItem.Label]</label>
 						</control>
 					</itemlayout>
-					<focusedlayout width="240" height="72">
+					<focusedlayout width="240" height="88">
 						<control type="image">
 							<width>240</width>
-							<height>72</height>
+							<height>88</height>
 							<texture colordiffuse="kscape_blue_focus">white.png</texture>
 							<visible>Control.HasFocus(9010)</visible>
 							<animation effect="fade" start="0" end="100" time="140">Visible</animation>
 						</control>
 						<control type="label">
 							<width>240</width>
-							<height>72</height>
+							<height>88</height>
 							<align>center</align>
 							<aligny>center</aligny>
 							<font>kscape_sub</font>

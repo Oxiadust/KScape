@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The C menu (resources/lib/menu.py). Hand-written. One list: section headings are rows of
+     their own (property heading; menu.py steps over them), with a thin rule above every heading
+     but the first. Label2 is an entry's state (On / Off, the current view), On in amber.
+     menu.py sizes the panel (110) and the list (300) to the number of rows and centres them (100). -->
+<window>
+	<defaultcontrol always="true">300</defaultcontrol>
+	<controls>
+		<control type="group">
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>DialogDim</include>
+			<control type="group" id="100">
+				<left>560</left>
+				<top>150</top>
+				<include>PanelOpenClose</include>
+				<control type="image" id="110">
+					<description>Panel, sized by menu.py</description>
+					<width>800</width>
+					<height>780</height>
+					<texture colordiffuse="kscape_blue">white.png</texture>
+				</control>
+				<control type="image">
+					<width>800</width>
+					<height>64</height>
+					<texture colordiffuse="kscape_blue_head">white.png</texture>
+				</control>
+				<control type="label">
+					<left>50</left>
+					<width>700</width>
+					<height>64</height>
+					<aligny>center</aligny>
+					<font>kscape_info_head</font>
+					<textcolor>white</textcolor>
+					<label>$INFO[Window.Property(heading)]</label>
+				</control>
+				<control type="list" id="300">
+					<top>76</top>
+					<width>800</width>
+					<height>690</height>
+					<onup>999</onup>
+					<ondown>999</ondown>
+					<onleft>999</onleft>
+					<onright>999</onright>
+					<scrolltime tween="cubic" easing="out">160</scrolltime>
+					<itemlayout width="800" height="58">
+						<control type="image">
+							<description>Rule between sections</description>
+							<left>50</left>
+							<top>8</top>
+							<width>700</width>
+							<height>2</height>
+							<texture colordiffuse="kscape_text_faint">white.png</texture>
+							<visible>!String.IsEmpty(ListItem.Property(rule))</visible>
+						</control>
+						<control type="label">
+							<left>50</left>
+							<top>18</top>
+							<width>700</width>
+							<height>40</height>
+							<aligny>center</aligny>
+							<font>kscape_small</font>
+							<textcolor>kscape_text_dim</textcolor>
+							<label>$INFO[ListItem.Property(heading)]</label>
+							<visible>!String.IsEmpty(ListItem.Property(heading))</visible>
+						</control>
+						<control type="label">
+							<left>50</left>
+							<width>520</width>
+							<height>58</height>
+							<aligny>center</aligny>
+							<font>kscape_menu</font>
+							<textcolor>kscape_text</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+							<visible>String.IsEmpty(ListItem.Property(heading))</visible>
+						</control>
+						<control type="label">
+							<right>50</right>
+							<width>220</width>
+							<height>58</height>
+							<align>right</align>
+							<aligny>center</aligny>
+							<font>kscape_small</font>
+							<textcolor>kscape_text_dim</textcolor>
+							<label>$INFO[ListItem.Label2]</label>
+							<visible>String.IsEmpty(ListItem.Property(on))</visible>
+						</control>
+						<control type="label">
+							<right>50</right>
+							<width>220</width>
+							<height>58</height>
+							<align>right</align>
+							<aligny>center</aligny>
+							<font>kscape_small</font>
+							<textcolor>kscape_amber</textcolor>
+							<label>$INFO[ListItem.Label2]</label>
+							<visible>!String.IsEmpty(ListItem.Property(on))</visible>
+						</control>
+					</itemlayout>
+					<focusedlayout width="800" height="58">
+						<control type="image">
+							<width>800</width>
+							<height>58</height>
+							<texture colordiffuse="kscape_blue_focus">white.png</texture>
+							<visible>String.IsEmpty(ListItem.Property(heading))</visible>
+						</control>
+						<control type="image">
+							<left>50</left>
+							<top>8</top>
+							<width>700</width>
+							<height>2</height>
+							<texture colordiffuse="kscape_text_faint">white.png</texture>
+							<visible>!String.IsEmpty(ListItem.Property(rule))</visible>
+						</control>
+						<control type="label">
+							<left>50</left>
+							<top>18</top>
+							<width>700</width>
+							<height>40</height>
+							<aligny>center</aligny>
+							<font>kscape_small</font>
+							<textcolor>kscape_text_dim</textcolor>
+							<label>$INFO[ListItem.Property(heading)]</label>
+							<visible>!String.IsEmpty(ListItem.Property(heading))</visible>
+						</control>
+						<control type="label">
+							<left>50</left>
+							<width>520</width>
+							<height>58</height>
+							<aligny>center</aligny>
+							<font>kscape_menu</font>
+							<textcolor>white</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+							<visible>String.IsEmpty(ListItem.Property(heading))</visible>
+						</control>
+						<control type="label">
+							<right>50</right>
+							<width>220</width>
+							<height>58</height>
+							<align>right</align>
+							<aligny>center</aligny>
+							<font>kscape_small</font>
+							<textcolor>white</textcolor>
+							<label>$INFO[ListItem.Label2]</label>
+							<visible>String.IsEmpty(ListItem.Property(on))</visible>
+						</control>
+						<control type="label">
+							<right>50</right>
+							<width>220</width>
+							<height>58</height>
+							<align>right</align>
+							<aligny>center</aligny>
+							<font>kscape_small</font>
+							<textcolor>kscape_amber</textcolor>
+							<label>$INFO[ListItem.Label2]</label>
+							<visible>!String.IsEmpty(ListItem.Property(on))</visible>
+						</control>
+					</focusedlayout>
+				</control>
+			</control>
+			<control type="button" id="999">
+				<description>Never visible: list edges point here so they stop instead of wrapping</description>
+				<width>1</width>
+				<height>1</height>
+				<visible>false</visible>
+			</control>
+		</control>
+	</controls>
+</window>

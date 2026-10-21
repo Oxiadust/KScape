@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from resources.lib import collectionmodel as C  # noqa: E402
 from resources.lib.media import Album, Show  # noqa: E402
-from resources.lib.model import Movie, merge_duplicates  # noqa: E402
+from resources.lib.model import Movie  # noqa: E402
 
 NOW = datetime(2026, 10, 18, 12, 0, 0)
 
@@ -173,7 +173,7 @@ class ResolveTest(unittest.TestCase):
         a2 = movie(2, 'Alien', 1979, file='/a-4k.mkv', resume=5.0)    # kept when merged
         b = movie(3, 'Brazil', 1985, file='/b.mkv')
         library = [a, a2, b]
-        shown = merge_duplicates(library)
+        shown = [a2, b]                                    # one cover for both copies of Alien
         pairs = C.resolve(['/b.mkv', '/missing.mkv', '/a.mkv', '/a-4k.mkv'], library, shown)
         self.assertEqual([(m.movieid, f) for m, f in pairs], [(3, '/b.mkv'), (2, '/a.mkv')])
         unmerged = C.resolve(['/a.mkv', '/a-4k.mkv'], library, library)

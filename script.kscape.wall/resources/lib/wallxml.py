@@ -11,8 +11,11 @@ Control ids (k = 0..POOL-1, POOL = the layout's pool_cols x pool_rows):
   900          focus sink (keeps Kodi delivering actions to the window)
   998          viewport group: the camera's frame, placed at the wall's view (the screen, or a
                CinemaScope band); 1971-1974 black masks around a band
-  1000         camera group: positioned at -camera, glides via runtime slide animations
-  1001         amber focus frame: four bars around the focused cell, in front of the covers
+  1000         camera group: placed at -camera only by runtime slide animations (window.Glide)
+  1001         amber focus frame: four bars around the focused cell, in front of the covers,
+               placed the same way
+  1006 / 1007  pool A / pool B: the groups holding each pool's slots (Python hides the idle back
+               pool, so Kodi skips its slots' conditions every frame)
   10000+k      pool A cover slot group: card, fallback title, poster, format badge (one box per
                width in BADGE_WIDTHS) and favourite heart, all drawn from Container(1990)'s item k
   1990 / 1991  the pools' data lists (slot(): poster art, properties on, text, badge, bw, fav)
@@ -25,6 +28,7 @@ Control ids (k = 0..POOL-1, POOL = the layout's pool_cols x pool_rows):
                window property (p.res, p.tmdb, p.rt), the images sized by Python
   1950         status label (loading / empty library), outside the camera group
   1960         filter caption along the bottom (Python shows it): 1962 the active filters
+  1965         item counter bottom right (npchip.count_chip): Window.Property(kscape.count)
   1980         now-playing chip top right while something plays (npchip.py)
 
 No <visible> tags on Python-driven controls: a visibility condition overrides setVisible().
@@ -65,6 +69,7 @@ def plot_lines(L):
 # box per cover would cost Python control calls, which wait for Kodi's GUI lock.
 BADGE_WIDTHS = ((2, 44), (5, 72), (10, 124), (99, 176))     # (most characters, width at 16:9)
 SOURCES = {10000: 1990, 20000: 1991}                         # pool base -> its data list
+POOL_GROUPS = {10000: 1006, 20000: 1007}                     # pool base -> its slots' group
 
 
 def badge_width(n, L):
@@ -76,7 +81,8 @@ def slot(base, L):
     shows ListItemAbsolute(k)'s poster art and its properties - on (shown), text (no artwork),
     badge and bw (badge box), fav. Python updates those offscreen list items, which takes no
     GUI lock; only moving a slot is a control call."""
-    out = []
+    out = [f'''			<control type="group" id="{POOL_GROUPS[base]}">
+				<description>Pool {"A" if base == 10000 else "B"}</description>''']
     W, H = L.cover_w, L.cover_h
     src = SOURCES[base]
     for k in range(L.pool_cols * L.pool_rows):
@@ -157,6 +163,7 @@ def slot(base, L):
 					</control>
 				</control>
 			</control>''')
+    out.append('			</control>')
     return '\n'.join(out)
 
 
@@ -414,7 +421,7 @@ def _build(L):
 			<textcolor>FFE6E6EA</textcolor>
 			<wrapmultiline>true</wrapmultiline>
 		</control>
-{caption()}{np_chip.chip(cid=1980)}	</controls>
+{caption()}{np_chip.count_chip('$INFO[Window.Property(kscape.count)]', cid=1965)}{np_chip.chip(cid=1980)}	</controls>
 </window>
 '''
 

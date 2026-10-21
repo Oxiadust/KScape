@@ -6,6 +6,7 @@ Control ids:
   9000   fixedlist: one row per movie, the focused row is a tall blue band at a fixed height
   901    never-visible target for the list's edge actions (stops wrap-around at the ends)
   (no id) now-playing chip top right while something plays (tools/np_chip.py)
+  (no id) item counter bottom right (npchip.count_chip)
 
 The window drives the layouts through Home window properties:
   kscape.list.col      focused column key (lighter cell in the band)
@@ -15,6 +16,7 @@ The window drives the layouts through Home window properties:
   kscape.list.jump     '1' while the list scrolls to a far row (a value step or re-sort): dimmed
   kscape.list.heading  search results: what was searched and how many matched (else empty)
   kscape.list.empty    search results: the no-match message when nothing matched
+  kscape.list.count    item counter: "248 movies", "42 of 248 movies" with filters or a search
 Item properties: <col>, <col>_full, <col>_mark (line of the ▶ marker), see listmodel.row_values;
 poster; fav = '1' for items in Kodi's favourites (amber heart before the title).
 """
@@ -349,7 +351,7 @@ def build(spec):
 			<label>$INFO[{prop('empty')}]</label>
 			<visible>!String.IsEmpty({prop('empty')})</visible>
 		</control>
-{np_chip.chip()}	</controls>
+{np_chip.count_chip(f'$INFO[{prop("count")}]')}{np_chip.chip()}	</controls>
 </window>
 '''
     return xml

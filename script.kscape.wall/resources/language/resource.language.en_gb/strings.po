@@ -29,15 +29,6 @@ msgctxt "#32012"
 msgid "Reduce motion"
 msgstr ""
 
-msgctxt "#32013"
-msgid "Show each movie once (hide duplicate copies)"
-msgstr ""
-
-#. Menu toggle; {} is replaced by On or Off
-msgctxt "#32029"
-msgid "Show duplicates once: {}"
-msgstr ""
-
 msgctxt "#32020"
 msgid "KScape"
 msgstr ""
@@ -46,26 +37,8 @@ msgctxt "#32021"
 msgid "Shuffle related covers now"
 msgstr ""
 
-#. Menu toggle; {} is replaced by On or Off
-msgctxt "#32022"
-msgid "Automatic shuffle: {}"
-msgstr ""
-
-#. Menu toggle; {} is replaced by On or Off
-msgctxt "#32023"
-msgid "Reduce motion: {}"
-msgstr ""
-
 msgctxt "#32024"
 msgid "Reload library"
-msgstr ""
-
-msgctxt "#32025"
-msgid "Switch to another skin…"
-msgstr ""
-
-msgctxt "#32026"
-msgid "Exit the wall"
 msgstr ""
 
 msgctxt "#32027"
@@ -1351,4 +1324,47 @@ msgstr ""
 
 msgctxt "#32400"
 msgid "Line it up with your screen using the aspect ratio, offsets and safe area.[CR]Back closes the preview."
+msgstr ""
+
+#. C menu section headings
+msgctxt "#32401"
+msgid "View Options"
+msgstr ""
+
+msgctxt "#32402"
+msgid "Misc Options"
+msgstr ""
+
+msgctxt "#32403"
+msgid "Actions"
+msgstr ""
+
+#. C menu: switch between the cover wall and the list view; the current view shows beside it
+msgctxt "#32404"
+msgid "View"
+msgstr ""
+
+msgctxt "#32405"
+msgid "Reduce Motion"
+msgstr ""
+
+msgctxt "#32406"
+msgid "Automatic Shuffle"
+msgstr ""
+
+msgctxt "#32407"
+msgid "Exit to Wall"
+msgstr ""
+
+msgctxt "#32408"
+msgid "Exit to Home Page"
+msgstr ""
+
+msgctxt "#32409"
+msgid "Exit to Collections"
+msgstr ""
+
+#. Item counter with filters or a search: "42 of 248 movies"
+msgctxt "#32410"
+msgid "{} of {}"
 msgstr ""

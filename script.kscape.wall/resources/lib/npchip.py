@@ -5,6 +5,8 @@ A video shows live in Kodi's own videowindow control (the playing video, scaled,
 aspect ratio, rendered by Kodi's player: no extra decoding); music shows its cover. Then the play
 state, elapsed / total time, the title and a progress bar. Colours are literal so the chip also
 draws under another skin.
+
+Also the item counter bottom right of the cover walls and list views (count_chip).
 """
 
 X, Y, W, H = 1272, 26, 620, 108
@@ -113,3 +115,46 @@ def chip(ind='\t\t', white='kscape-white.png', cid=None):
 {ind}</control>
 '''
 
+
+
+COUNT_W, COUNT_H = 600, 44          # item counter: room for "4812 of 5120 TV shows"
+COUNT_RIGHT = 28                    # from the view's right edge, as the chip above
+COUNT_BOTTOM = 9                    # from its bottom: centred in the wall's filter caption (62 px)
+
+
+def count_chip(label, ind='\t\t', white='kscape-white.png', cid=None, left=None, top=None):
+    """The item counter ("248 movies", "42 of 248 movies") bottom right of the cover walls and
+    list views: small dim text on a dark chip that fits the text (an auto-width button in a
+    right-aligned grouplist; disabled, so it never takes focus). `label` is its $INFO text;
+    `cid` an id for windows that move it (the cover wall, into a CinemaScope band)."""
+    gid = f' id="{cid}"' if cid else ''
+    left = 1920 - COUNT_RIGHT - COUNT_W if left is None else left
+    top = 1080 - COUNT_BOTTOM - COUNT_H if top is None else top
+    return f'''{ind}<control type="group"{gid}>
+{ind}	<description>Item counter (npchip.count_chip)</description>
+{ind}	<left>{left}</left>
+{ind}	<top>{top}</top>
+{ind}	<animation effect="fade" start="0" end="100" time="250">Visible</animation>
+{ind}	<visible>!String.IsEmpty({label[len('$INFO['):-1]})</visible>
+{ind}	<control type="grouplist">
+{ind}		<width>{COUNT_W}</width>
+{ind}		<height>{COUNT_H}</height>
+{ind}		<orientation>horizontal</orientation>
+{ind}		<align>right</align>
+{ind}		<usecontrolcoords>true</usecontrolcoords>
+{ind}		<control type="button">
+{ind}			<width>auto</width>
+{ind}			<height>{COUNT_H}</height>
+{ind}			<enable>false</enable>
+{ind}			<textoffsetx>18</textoffsetx>
+{ind}			<aligny>center</aligny>
+{ind}			<font>kscape_small</font>
+{ind}			<textcolor>{DIM}</textcolor>
+{ind}			<disabledcolor>{DIM}</disabledcolor>
+{ind}			<texturenofocus colordiffuse="C0070B16">{white}</texturenofocus>
+{ind}			<texturefocus colordiffuse="C0070B16">{white}</texturefocus>
+{ind}			<label>{label}</label>
+{ind}		</control>
+{ind}	</control>
+{ind}</control>
+'''

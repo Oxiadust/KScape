@@ -45,10 +45,11 @@ S = 320 / 1920.0               # card scale
 CARD_W, CARD_H = 320, 192
 VOFF = (CARD_H - 1080 * S) / 2  # the 16:9 view sits centred in the slightly taller card
 CARD_PITCH = 216
-BOTTOM = 952                    # bottom of the lowest card, just above the bar (984)
+BAR_TOP = 984                   # top of Home's navigation bar (Home.xml)
 HAIRLINE = 3                    # unfocused card border
 AMBER_T = 16                    # focused card frame, outside the card
 AMBER_OUT = 14
+BOTTOM = BAR_TOP - AMBER_OUT     # bottom of the lowest card: its amber frame sits on the bar
 MICRO_LINE = 7.5                # line pitch of kscape_micro (6 px)
 
 PANEL_BLUE = 'kscape_blue'

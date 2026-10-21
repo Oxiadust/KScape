@@ -5,12 +5,13 @@ reads its kind-specific parts from here: which library to load, the cover layout
 items rank, what the synopsis panel says and what Select does.
 """
 import xbmc
+import xbmcaddon
 
 from . import geometry as G
 from . import library as lib
 from . import listmodel as L
 from .media import Album, Show
-from .model import Movie, merge_duplicates
+from .model import Movie
 from .ranking import album_score, score, show_score
 
 
@@ -28,7 +29,6 @@ class Kind:
     s_search = 32093                # search heading
     s_no_match = 32098              # empty search results
     has_extra = False               # a second, slower query fills in more (movie cast)
-    merges = False                  # duplicate copies can be shown once
     child_types = ()                # notification item types that change one of ours (a song)
     collections_xml = 'script-kscape-collections.xml'
     s_count, s_count_one = 32154, 32155     # "{} movies", "1 movie" (collections heading)
@@ -78,8 +78,19 @@ class Kind:
     def play(self, item):
         raise NotImplementedError
 
-    def visible(self, items, merge):
-        return merge_duplicates(items) if merge and self.merges else items
+    def count_text(self, n):
+        tr = xbmcaddon.Addon('script.kscape.wall').getLocalizedString
+        return tr(self.s_count_one) if n == 1 else tr(self.s_count).format(n)
+
+    def counter(self, shown, total):
+        """The item counter: '248 movies', or '42 of 248 movies' when filters or a search
+        narrow the view; '' for an empty library."""
+        if not total:
+            return ''
+        if shown == total:
+            return self.count_text(total)
+        tr = xbmcaddon.Addon('script.kscape.wall').getLocalizedString
+        return tr(32410).format(shown, self.count_text(total))
 
 
 class Movies(Kind):
@@ -88,7 +99,6 @@ class Movies(Kind):
     item_type = 'movie'
     record = Movie
     has_extra = True
-    merges = True
 
     def total(self):
         return lib.library_total()

@@ -339,6 +339,33 @@
 				<visible>!String.IsEmpty(Window(Home).Property(kscape.list.empty))</visible>
 			</control>
 			<control type="group">
+				<description>Item counter (npchip.count_chip)</description>
+				<left>1292</left>
+				<top>1027</top>
+				<animation effect="fade" start="0" end="100" time="250">Visible</animation>
+				<visible>!String.IsEmpty(Window(Home).Property(kscape.list.count))</visible>
+				<control type="grouplist">
+					<width>600</width>
+					<height>44</height>
+					<orientation>horizontal</orientation>
+					<align>right</align>
+					<usecontrolcoords>true</usecontrolcoords>
+					<control type="button">
+						<width>auto</width>
+						<height>44</height>
+						<enable>false</enable>
+						<textoffsetx>18</textoffsetx>
+						<aligny>center</aligny>
+						<font>kscape_small</font>
+						<textcolor>FF9AA3B5</textcolor>
+						<disabledcolor>FF9AA3B5</disabledcolor>
+						<texturenofocus colordiffuse="C0070B16">kscape-white.png</texturenofocus>
+						<texturefocus colordiffuse="C0070B16">kscape-white.png</texturefocus>
+						<label>$INFO[Window(Home).Property(kscape.list.count)]</label>
+					</control>
+				</control>
+			</control>
+			<control type="group">
 				<description>Now playing chip (tools/np_chip.py)</description>
 				<left>1272</left>
 				<top>26</top>

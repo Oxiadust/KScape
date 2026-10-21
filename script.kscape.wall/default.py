@@ -28,19 +28,15 @@ VIEWS = {'covers': 'wall', 'list': 'list', 'favorites': 'favorites', 'favourites
 
 
 def run_view(fn):
-    """Run `fn` (which opens KScape windows) as the one open view. It returns the skin the user
-    chose to switch to, if any."""
+    """Run `fn` (which opens KScape windows) as the one open view."""
     if not modal.claim():
         return
     done = modal.watch()
-    skin = None
     try:
-        skin = fn()
+        fn()
     finally:
         done.set()
         modal.release()
-    if skin:
-        switch_to(skin)
 
 
 def open_view(kind, view=None):

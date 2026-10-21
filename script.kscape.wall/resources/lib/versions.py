@@ -8,8 +8,7 @@ Kodi's own library paths do (library.fetch_versions):
     videodb://movies/videoversions/<type>/     every movie with that version: its file, stream
                                                details and resume point
 Playing a version's file is recognised by Kodi as that movie and version; resume points are kept
-per version (per file). Copies of a film that are separate library entries can also be shown as
-one (model.merge_duplicates); their copies become versions here too.
+per version (per file).
 
 Formats are worked out from the stream details Kodi measured; missing details give no format
 rather than a guess.

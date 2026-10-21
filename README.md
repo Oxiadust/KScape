@@ -109,16 +109,11 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   keeps the answer for a month (`ratings.json`) and never writes it into Kodi's library.
 - **Library aware.** The wall reloads itself after a library scan or clean, keeping your place.
 - **Remembers where you were**, across Kodi restarts.
-- **One cover per movie** (movie versions). A movie appears once on the wall and in the list,
-  however many versions it has:
-  - *Kodi's own versions* (Kodi 21: Manage versions → Add version, e.g. 4K, 1080p, 3D,
-    Director's Cut) are one movie in Kodi already. KScape reads them from Kodi's library (no
-    file scanning, cached with the library) and shows their formats.
-  - *Separate library entries of one film* (copies added as different movies) show as one cover
-    when they share the same TMDB or IMDb id, title, year and edition; titles alone never merge
-    two entries, and different editions (Director's Cut, Extended, Theatrical, IMAX...) named in
-    the title or file name stay apart. The copies then count as versions of that cover.
-    Optional: add-on settings → Show duplicates once.
+- **Movie versions.** A movie with *Kodi's own versions* (Kodi 21: Manage versions → Add
+  version, e.g. 4K, 1080p, 3D, Director's Cut) is one movie in Kodi, so it appears once on the
+  wall and in the list; KScape reads its versions from Kodi's library (no file scanning, cached
+  with the library) and shows their formats. Separate library entries of one film (copies added
+  as different movies) each have their own cover, as Kodi lists them.
   - **Play** starts the version KScape prefers: the resolution chosen in Skin settings → Movie
     versions → *Version Play starts* (4K first by default, then 1080p, 720p, SD; or Kodi's
     default version), never a 3D version over a 2D one unless *Prefer 3D versions* is on.
@@ -223,13 +218,16 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
 | Select / Enter | Open the movie info screen |
 | Play | Play the movie (resumes from the last position if there is one) |
 | Back / Esc | Leave the wall, straight back to Home (the shuffles can be undone from the menu) |
-| Menu / C / Info | Menu: **Add to / Remove from Favourites** (labelled for the selected item), **Search…**, **Add to collection…**, then **Undo shuffle** (after a shuffle), list view, shuffle now, automatic shuffle on/off, reduce motion on/off, show duplicates once on/off (movies), **Favourites** (the wall of your favourites), reload library, switch skin, exit |
+| Menu / C / Info | The menu, in three sections. **View Options**: **View** (switch to the list view), **Reduce Motion** On/Off, **Automatic Shuffle** On/Off. **Misc Options**: **Search…**, **Favourites** (the wall of your favourites), **Filter…** (movies; **Clear all filters** when some are on). **Actions**: **Undo shuffle** (after a shuffle), shuffle now, **Reload library**, **Add to / Remove from Favourites** (labelled for the selected item), **Add to collection…**, the movie's scene entries, then **Exit to Home Page** (or **Exit to Wall** / **Exit to Collections** on a wall opened over another view) |
 
 In the **list view**: Up/Down move through items, Left/Right between columns, Select opens the
 info, album or show screen, Play plays, Back goes back to Home (or, when the list was opened
 from the wall's menu, returns to the wall on the same item), and
-Menu offers favourites / search / cover wall / switch skin / exit. The view you were in is
-remembered across restarts, per library.
+Menu has the wall's three sections, with **View** switching back to the cover wall. The view
+you were in is remembered across restarts, per library.
+
+Bottom right, the walls and list views count what they show - **248 movies**, or **42 of 248
+movies** while filters or a search narrow it - small and dim, so it stays out of the way.
 
 On the **info, album and show screens**: Up/Down choose, Left/Right move between the menu and
 the track, season or episode list, Select runs it, Back returns (from episodes, to the seasons),
@@ -279,7 +277,7 @@ then set `lookandfeel.skin` to `skin.kscape` in `userdata/guisettings.xml`.
 
 ## Switching back to another skin
 
-- **Wall menu → Switch to another skin…**, or **Home → System → Switch skin**, or Kodi's own
+- **Home → System → Switch skin**, or Kodi's own
   **Settings → Interface → Skin**.
   Kodi loads the chosen skin and asks whether to keep it; if you do not answer, it reverts.
 - Or, from this repository: `tools/revert_kodi_skin.sh [skin-id]` (default `skin.aeon.nox.silvo`).
@@ -309,8 +307,8 @@ its colours from the theme.
 The wall's own options are stored as add-on settings of `script.kscape.wall` and toggled from the wall menu:
 
 - **Shuffle related covers automatically** (on). Off: use *Shuffle related covers now*.
-- **Show each movie once** (on). Off: every library entry gets its own cover.
-- **Reduce motion** (off). On: no glide or flight; covers swap in place.
+- **Reduce motion** (off). On: no glide or flight; covers swap in place. From the menu it also
+  sets the skin's own Reduce motion, so dialogs fade instead of sliding.
 
 Add-on settings → **Ratings**: an optional **OMDb API key** for Rotten Tomatoes scores (empty by
 default: OMDb is never contacted).
@@ -505,8 +503,7 @@ add-on's window XML and Python are re-read each time a view opens).
 - The Home submenu sits above the bar rather than below it as in SiLVO, so Up (not Down) enters
   it. SiLVO's skinshortcuts-only "Master user" profile condition is not copied.
 - Favourites cover movies, albums and TV shows (the items the walls show), not single songs or
-  episodes. A movie is a favourite by its file, as Kodi stores it, so a favourite added for one
-  copy of a merged duplicate counts for the cover.
+  episodes. A movie is a favourite by its file, as Kodi stores it.
 - Scenes and Demo Scripts are played by a service (part of `script.kscape.wall`, starting with
   Kodi): the skin alone cannot stop a video at a given time. After installing or updating the
   add-on, restart Kodi once so the service starts.
@@ -531,9 +528,6 @@ add-on's window XML and Python are re-read each time a view opens).
   titles; movie and show titles and people, but not plots.
 - The Home Collections cards show the library's most recently added titles under the New tab,
   not your own collections (a skin cannot read them).
-- Duplicates are matched on title and year, the only thing Kodi's metadata offers. Entries the
-  scraper misidentified as the same film (for example several different films all matched to
-  one title) are merged too; fix the match in Kodi (*Refresh* on the item) or turn the option off.
 - Badges depend on Kodi's stream details, which it records only after reading the files.
 - Movie versions: JSON-RPC has no version API in Kodi 21, so KScape reads Kodi's own version
   folders (`videodb://movies/videoversions/`). Versions added or removed while a wall is open

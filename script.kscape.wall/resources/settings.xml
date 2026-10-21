@@ -8,11 +8,6 @@
 					<default>true</default>
 					<control type="toggle"/>
 				</setting>
-				<setting id="merge_duplicates" type="boolean" label="32013" help="">
-					<level>0</level>
-					<default>true</default>
-					<control type="toggle"/>
-				</setting>
 				<setting id="reduced_motion" type="boolean" label="32012" help="">
 					<level>0</level>
 					<default>false</default>

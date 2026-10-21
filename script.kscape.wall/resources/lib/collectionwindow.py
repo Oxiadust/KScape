@@ -56,12 +56,11 @@ def tr(string_id):
 
 
 def count_text(kind, n):
-    return tr(kind.s_count_one) if n == 1 else tr(kind.s_count).format(n)
+    return kind.count_text(n)
 
 
 class CollectionsWindow(xbmcgui.WindowXML):
     ready = False
-    pending_skin = None              # chosen from the wall's menu; switched to after closing
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args)
@@ -84,7 +83,6 @@ class CollectionsWindow(xbmcgui.WindowXML):
         self.episode_ids = S.library_episode_ids() if self.media == 'episode' else None
         self.favs = Favourites(rpc, FAVOURITES_FILE)
         self.favs_seen = self.favs.version
-        self.merge = ADDON.getSettingBool('merge_duplicates')
         self.days = collectionui.new_days()
         self.loading = False
         self.reload_again = False
@@ -135,7 +133,7 @@ class CollectionsWindow(xbmcgui.WindowXML):
     # ---- what is shown ---------------------------------------------------------------------
 
     def _shown(self):
-        return self.kind.visible(self.all_movies, self.merge)
+        return self.all_movies
 
     def _members(self, cid, shown=None):
         if cid == 'scenes':
@@ -308,10 +306,7 @@ class CollectionsWindow(xbmcgui.WindowXML):
                 self._search()
             elif isinstance(follow, tuple) and follow[0] == 'explore':
                 from .window import open_wall              # Explore: the library, filtered
-                skin = open_wall(self.kind, explore=(follow[1], arg.key))
-                if skin:
-                    self.pending_skin = skin
-                    self._close()
+                open_wall(self.kind, explore=(follow[1], arg.key))
         elif what == 'open':
             self._open(arg)
         elif what == 'search':
@@ -329,10 +324,7 @@ class CollectionsWindow(xbmcgui.WindowXML):
                       store=self.store, collection=None if C.is_builtin(self.cid) else self.cid)
             return
         from .window import open_wall
-        skin = open_wall(self.kind, view='wall', collection=self.cid)
-        if skin:
-            self.pending_skin = skin
-            self._close()
+        open_wall(self.kind, view='wall', collection=self.cid)
 
     def _open_script(self, did):
         """A Demo Script's screen; it may ask to play the script or preview a scene."""
@@ -466,11 +458,7 @@ class CollectionsWindow(xbmcgui.WindowXML):
         return None
 
     def _files(self, movie):
-        """Member keys of every library copy of `movie` (one cover may stand for duplicates)."""
-        if not (self.kind.merges and self.merge):
-            return collectionui.keys_of([movie])
-        key = C.title_key(movie)
-        return collectionui.keys_of([m for m in self.all_movies if C.title_key(m) == key] or [movie])
+        return collectionui.keys_of([movie])
 
     # ---- moving a movie within a custom collection ----------------------------------------------
 
@@ -559,12 +547,9 @@ class CollectionsWindow(xbmcgui.WindowXML):
 
 
 def show_collections(kind, cid=None, focus=None):
-    """Run the Collections view (on collection `cid` with row `focus` under the band, if given).
-    Returns the skin the user chose to switch to, if any."""
+    """Run the Collections view (on collection `cid` with row `focus` under the band, if given)."""
     menu.wait_for_dialogs()
     window = CollectionsWindow(kind.collections_xml, ADDON.getAddonInfo('path'), 'Default', '1080i', kind=kind,
                                cid=cid, focus=focus)
     modal.run(window)
-    skin = window.pending_skin
     del window
-    return skin

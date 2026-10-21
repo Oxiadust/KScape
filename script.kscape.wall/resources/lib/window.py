@@ -19,7 +19,9 @@ Filter…. The filters are shared with the list view opened over the wall, a cap
 bottom says what they are and how many movies match, and Back retraces them - back to the
 movie's Explore panel, then to the whole library - before it leaves the wall.
 """
+import itertools
 import json
+import math
 import random
 import threading
 import time
@@ -32,15 +34,14 @@ import xbmcvfs
 from . import geometry as G
 from . import badges, cache, collectionui, displayui, menu, modal, ratings, state
 from . import explore as E
+from . import npchip as np_chip
 from . import exploreui as X
 from . import scenes as S
 from .favourites import Favourites
 from .info import estimate_lines
 from .library import rpc
 from .listwindow import show_list
-from .model import copy_groups
 from .search import search
-from .skins import choose_skin
 from .ranking import rank_related
 from .wallmodel import (Wall, camera_target, cell_origin, clip_outside, detour, ease_out_back,
                         ease_out_cubic)
@@ -58,9 +59,8 @@ MENU = (xbmcgui.ACTION_CONTEXT_MENU, xbmcgui.ACTION_SHOW_INFO)
 
 HOME = xbmcgui.Window(10000)
 ADDON = xbmcaddon.Addon('script.kscape.wall')
-PROP_CAM = 'kscape.cam'
-PROP_FRONT = 'kscape.front'
-PROP_FRAME = 'kscape.frame'
+PROP_MOTION = 'kscape.motion.{}'       # per wall: '<frame token>.<camera token>' (Glide)
+PROP_FRONT = 'kscape.front.{}'         # per wall: the shuffle token (_transition)
 PROP_REDUCED = 'kscape.reduced'         # read by the info screen's slide-in animation
 FAVOURITES_FILE = xbmcvfs.translatePath('special://profile/favourites.xml')
 FAVOURITES_POLL_S = 1.0
@@ -117,14 +117,20 @@ class Pool:
     (wallxml.slot): poster art and the properties on, text, badge, bw and fav. Updating those
     takes no GUI lock; only moving a slot (setPosition) and its animations are control calls,
     each of which waits for Kodi's GUI lock (a frame or so) - binding a screenful of covers
-    control by control took tens of seconds."""
+    control by control took tens of seconds.
+
+    The pool's slots sit in one group (wallxml.POOL_GROUPS), hidden while the pool is the idle
+    back buffer: Kodi then skips their visibility conditions every frame, and retiring a pool
+    is one control call rather than one per slot."""
 
     def __init__(self, win, base, count, layout, sx=1.0):
-        from .wallxml import SOURCES
+        from .wallxml import POOL_GROUPS, SOURCES
         self.count = count
         self.base = base
         self.layout = layout
         self.sx = sx                     # the screen's horizontal stretch (display.stage)
+        self.group = win.getControl(POOL_GROUPS[base])
+        self.group_on = True             # XML default
         self.slots = [win.getControl(base + k) for k in range(count)]
         self.items = [xbmcgui.ListItem(offscreen=True) for _ in range(count)]
         win.getControl(SOURCES[base]).addItems(self.items)
@@ -158,6 +164,9 @@ class Pool:
             li.setProperty('fav', '1' if favourite else '')
             self.heart_shown[k] = favourite
         self.set_visible(k, True)
+        if not self.group_on:
+            self.group.setVisible(True)
+            self.group_on = True
 
     def reload_poster(self, k, url, phase):
         """Ask for a poster again (window._heal_posters): cleared first, set back a moment later,
@@ -172,16 +181,97 @@ class Pool:
             self.visible[k] = on
 
     def reset(self):
-        """Hide every slot and drop its animations (pool becomes the back buffer)."""
+        """Hide the pool and every slot (pool becomes the back buffer). Slot animations stay:
+        their conditions name a past shuffle token, so they no longer apply (_transition), and
+        the next shuffle replaces them."""
         for k in range(self.count):
-            self.slots[k].setAnimations([])
             self.set_visible(k, False)
+        if self.group_on:
+            self.group.setVisible(False)
+            self.group_on = False
 
 
 def badge_bucket(text):
     """Which fixed badge box fits `text` (wallxml.BADGE_WIDTHS)."""
     from .wallxml import BADGE_WIDTHS
     return str(next(n for n, _ in BADGE_WIDTHS if len(text) <= n))
+
+
+_walls = itertools.count(1)             # wall instances: each gets its own motion properties
+
+REDUCED_MS = 160                        # Reduce motion: a short plain glide instead of a jump
+SETTLE_S = 0.8                          # idle this long: finished glides become static (Glide.settle)
+
+
+def ease_out_sine(p):
+    """Matches Kodi's tween="sine" easing="out"."""
+    return math.sin(max(0.0, min(1.0, p)) * math.pi / 2)
+
+
+class Glide:
+    """A control (the camera, the focus frame) placed only by runtime slide animations from its
+    XML position (0, 0); Python never calls setPosition on it.
+
+    Each move replaces its animations with two: a hold where it is drawn now (condition: the
+    current token) and the glide from there to the target (the next token). Writing the motion
+    property switches from one to the other in the same frame, so a move that interrupts a
+    glide carries on from where the control is, without the snap to the old target and the
+    jump to the new one that setPosition between the calls caused. The camera and the frame
+    share one property ('<frame token>.<camera token>'): one write starts both glides together.
+    Once a glide is over, settle() swaps it for a static placement (same token), so a window
+    re-init (which replays conditional animations) shows nothing moving."""
+
+    def __init__(self, control, prop, part):
+        self.control = control
+        self.prop = prop
+        self.part = part                 # 0: frame (first token), 1: camera (second)
+        self.token = 0
+        self.pos = None                  # target, in the control's coordinates
+        self.anim = None                 # (start time, start position, ms, ease)
+        self.settled = True
+
+    def cond(self, token):
+        if self.part == 0:
+            return f'String.StartsWith(Window(Home).Property({self.prop}),{token}.)'
+        return f'String.EndsWith(Window(Home).Property({self.prop}),.{token})'
+
+    def visual(self, now):
+        if not self.anim:
+            return self.pos
+        t0, frm, ms, ease = self.anim
+        e = ease((now - t0) * 1000.0 / ms)
+        return (frm[0] + (self.pos[0] - frm[0]) * e, frm[1] + (self.pos[1] - frm[1]) * e)
+
+    def busy(self, now):
+        return self.anim is not None and (now - self.anim[0]) * 1000.0 < self.anim[2]
+
+    def plan(self, target, now, start=None, ms=0, tween='cubic', ease=None):
+        """The animations taking the control to `target` (from `start`, default where it is
+        drawn now; ms=0 places it at once). Bumps the token: commit with Window._commit."""
+        target = (int(round(target[0])), int(round(target[1])))
+        old = self.token
+        self.token += 1
+        if self.pos is None or not ms:
+            self.pos, self.anim, self.settled = target, None, True
+            return [self._place(target, self.token)]
+        vis = self.visual(now) if start is None else start
+        vis = (int(round(vis[0])), int(round(vis[1])))
+        self.pos, self.anim, self.settled = target, (now, vis, ms, ease), False
+        return [self._place(vis, old),
+                ('Conditional', f'effect=slide start={vis[0]},{vis[1]} end={target[0]},{target[1]} '
+                                f'time={ms} tween={tween} easing=out reversible=false '
+                                f'condition={self.cond(self.token)}')]
+
+    def _place(self, at, token):
+        return ('Conditional', f'effect=slide start={at[0]},{at[1]} end={at[0]},{at[1]} time=0 '
+                               f'reversible=false condition={self.cond(token)}')
+
+    def settle(self, now):
+        """After a glide: the same placement without the animation (one control call)."""
+        if self.settled or self.busy(now):
+            return
+        self.control.setAnimations([self._place(self.pos, self.token)])
+        self.anim, self.settled = None, True
 
 
 class LibraryMonitor(xbmc.Monitor):
@@ -231,7 +321,7 @@ class LibraryMonitor(xbmc.Monitor):
 
 class WallWindow(xbmcgui.WindowXML):
     ready = False
-    pending_skin = None              # set when the user picks another skin; acted on after close
+    base_total = 0                   # covers before filters (the counter's "of")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args)
@@ -270,20 +360,24 @@ class WallWindow(xbmcgui.WindowXML):
         self.caption.setVisible(False)
         self.front = Pool(self, 10000, self.pool_size, self.lay, self.sx)
         self.back = Pool(self, 20000, self.pool_size, self.lay, self.sx)
+        self.back.reset()
+        n = next(_walls)
+        self.prop_motion, self.prop_front = PROP_MOTION.format(n), PROP_FRONT.format(n)
+        HOME.setProperty(self.prop_motion, '0.0')
+        HOME.setProperty(self.prop_front, '0')
+        self.frame_glide = Glide(self.frame, self.prop_motion, 0)
+        self.cam_glide = Glide(self.camera, self.prop_motion, 1)
         self._place_view()
         self.frame.setVisible(False)
+        self.frame_on = False
         self.panel.setVisible(False)
-        self.reduced = (ADDON.getSettingBool('reduced_motion')
-                        or xbmc.getCondVisibility('Skin.HasSetting(ReducedMotion)'))
+        self.reduced = menu.reduced_motion()
         HOME.setProperty(PROP_REDUCED, '1' if self.reduced else '')
         self.auto_shuffle = ADDON.getSettingBool('auto_shuffle')
-        self.merge = ADDON.getSettingBool('merge_duplicates')
         self.show_badges = not xbmc.getCondVisibility('Skin.HasSetting(KScapeHideFormatBadges)')
-        self.frame_pos = None            # frame target position (wall pixels)
-        self.frame_anim = None           # (start time, start position, duration ms)
-        self.frame_token = 0
         self.library_gen = 0             # bumped by every full reload; stale results are dropped
         self.loading = False             # a full reload is running in the background
+        self.list_reloaded = None        # the list view's callback for a reload it asked for
         self.reload_again = False        # another change arrived while it was running
         self.pending_library = None      # reloaded items waiting for an idle moment
         self.paused = False              # the info screen or list view is on top of the wall
@@ -296,12 +390,10 @@ class WallWindow(xbmcgui.WindowXML):
         self.new_days = collectionui.new_days()
 
         self.wall = Wall.column_major([], layout=self.lay)
-        self.all_movies = []             # every library entry; the wall may filter or merge them
+        self.all_movies = []             # every library entry; the wall may filter them
         self.history = []                # (wall, focus) before each shuffle, for Back
         self.focus = (0, 0)
         self.cam = (0, 0)
-        self.cam_anim = None             # (start time, start camera, duration ms)
-        self.cam_token = 0
         self.front_token = 0
         self.shuffle_until = 0.0
         self.panel_cells = ()
@@ -362,12 +454,16 @@ class WallWindow(xbmcgui.WindowXML):
         self.caption.setPosition(vx, vy + vh - CAPTION_PX)
         for cid in (1961, 1963):
             self.getControl(cid).setWidth(vw)
-        self.getControl(1962).setWidth(max(1, vw - 96))
+        self.getControl(1962).setWidth(max(1, vw - 96 - np_chip.COUNT_W // 2))   # clear of the counter
+        self.getControl(1965).setPosition(vx + vw - np_chip.COUNT_RIGHT - np_chip.COUNT_W,
+                                          vy + vh - np_chip.COUNT_BOTTOM - np_chip.COUNT_H)
         self.getControl(1980).setPosition(vx + vw - CHIP_W - 28, vy + 26)
 
     def _show_status(self):
-        """Loading done: an empty library or empty favourites says so; otherwise no status."""
+        """Loading done: an empty library or empty favourites says so; otherwise no status. The
+        counter shows how many covers the wall has (of how many, when filtered)."""
         self._show_caption()
+        self.setProperty('kscape.count', self.kind.counter(len(self.wall.movies()), self.base_total))
         if self.wall.movies():
             self.status.setLabel('')
         elif self.session and self.all_movies:
@@ -401,7 +497,7 @@ class WallWindow(xbmcgui.WindowXML):
 
     def _library(self):
         """What Explore and the Filter menu choose from: the library as the wall shows it."""
-        return self.kind.visible(self.all_movies, self.merge)
+        return self.all_movies
 
     def _filters_changed(self, focus_key=None):
         """Show the movies the filters now leave, on `focus_key` when it is among them."""
@@ -413,11 +509,8 @@ class WallWindow(xbmcgui.WindowXML):
         it is the view in use) now shows the library's movies it matches. A favourites or
         collection wall opens a filtered wall of the whole library over itself instead."""
         if self.filtered:
-            skin = self._covered(lambda: open_wall(self.kind, explore=(f, origin)))
+            self._covered(lambda: open_wall(self.kind, explore=(f, origin)))
             self._after_favourites()
-            if skin:
-                self.pending_skin = skin
-                self._close()
             return
         self.session.explore(f, origin)
         self._filters_changed(origin)
@@ -536,18 +629,25 @@ class WallWindow(xbmcgui.WindowXML):
     def _open_list(self, back_home=False):
         """The list view over the wall. Opened as the view itself (from Home), Back there goes
         straight back to Home; opened from the wall's menu, Back returns to the wall."""
+        while self._list_once(back_home) == 'favourites':
+            self._open_favourites(view='list')         # C -> Favourites in the list: then back to it
+
+    def _list_once(self, back_home):
         with self.lock:
             current = self.wall.at(*self.focus)
             items = self._visible(self.all_movies)          # library order, whatever the wall's
+            library = self.all_movies
         if not self.filtered:
             state.save(**{view_key(self.kind): 'list'})
-        library = self.kind.visible(self.all_movies, self.merge)
         seen = self.session.version
         link = ExploreLink(self) if self.kind.explores else None
         result, key = self._covered(lambda: show_list(self.kind, items, current.key if current else None,
                                                       self.favs, library=library, store=self.store,
-                                                      collection=self.collection, copies=self._copies,
-                                                      back='exit' if back_home else 'wall', explore=link))
+                                                      collection=self.collection,
+                                                      back='exit' if back_home else 'wall', explore=link,
+                                                      host=ListHost(self)))
+        self.reduced = menu.reduced_motion()        # the list's menu may have toggled these
+        self.auto_shuffle = ADDON.getSettingBool('auto_shuffle')
         if self.session.version != seen:
             self._filters_changed(key)              # filtered in the list: the wall follows
         self._after_favourites()
@@ -562,30 +662,21 @@ class WallWindow(xbmcgui.WindowXML):
             if result == 'wall':
                 if not self.filtered:
                     state.save(**{view_key(self.kind): 'wall'})
-            elif result == 'skin':
-                skin = choose_skin()
-                if skin:
-                    self.pending_skin = skin
-                    self._close()
             elif result == 'exit':
                 self._close()
+        return result
 
     def _view_scenes(self):
         """View Scenes: the Collections view on the Scenes tab, at this title's first scene."""
         from .collectionwindow import show_collections
-        skin = self._covered(lambda: show_collections(self.kind, cid='scenes', focus=self.scene_focus))
-        if skin:
-            self.pending_skin = skin
-            self._close()
+        self._covered(lambda: show_collections(self.kind, cid='scenes', focus=self.scene_focus))
 
-    def _open_favourites(self):
-        """The cover wall of just this library's favourites, over this one; Back returns here."""
-        skin = self._covered(lambda: open_wall(self.kind, view='wall', favourites=True))
+    def _open_favourites(self, view='wall'):
+        """This library's favourites, over this wall (in the list view, with `view`); Back
+        returns here."""
+        self._covered(lambda: open_wall(self.kind, view=view, favourites=True))
         self._after_favourites()
         self._after_collections()
-        if skin:
-            self.pending_skin = skin
-            self._close()
 
     @property
     def _order(self):
@@ -598,10 +689,10 @@ class WallWindow(xbmcgui.WindowXML):
         if not query:
             return
         with self.lock:
-            library = self.kind.visible(self.all_movies, self.merge)
+            library = self.all_movies
         results = search(library, query)
         self._covered(lambda: show_list(self.kind, results, None, self.favs, query=query, library=library,
-                                        store=self.store, copies=self._copies))
+                                        store=self.store))
         self._after_favourites()
         self._after_collections()
 
@@ -613,33 +704,17 @@ class WallWindow(xbmcgui.WindowXML):
         self.focus = (c, r)
         self.last_input = time.time()
         self._hide_panel()
-        self._set_frame(animate=True)
-        self._pan(camera_target(self.wall, self.focus))
+        # Frame and camera glides first, started together by one property write; the covers
+        # the camera brings into the pool are bound after (they are still off-screen).
+        frame = self._frame_plan(animate=True)
+        cam = self._cam_plan(camera_target(self.wall, self.focus))
+        self._commit(frame=frame, cam=cam)
+        self._rebind(self.front)
 
     # ---- favourites ------------------------------------------------------------------------
 
-    def _copies(self, item):
-        """The library entries a cover stands for: itself, plus merged duplicate copies."""
-        if not (self.kind.merges and self.merge):
-            return [item]
-        if getattr(self, '_copy_of', (None,))[0] is not self.all_movies:
-            index = {}
-            for group in copy_groups(self.all_movies):      # once per library change, not per cover
-                for m in group:
-                    index[m.key] = group
-            self._copy_of = (self.all_movies, index)
-        return self._copy_of[1].get(item.key) or [item]
-
-    def _is_favourite(self, item):
-        return any(self.favs.contains(c) for c in self._copies(item))
-
     def _toggle_favourite(self, item):
-        if self._is_favourite(item):
-            for c in self._copies(item):
-                if self.favs.contains(c):
-                    self.favs.toggle(c)
-        else:
-            self.favs.toggle(item)
+        self.favs.toggle(item)
         self._favourites_changed()
 
     def _after_collections(self):
@@ -650,12 +725,12 @@ class WallWindow(xbmcgui.WindowXML):
 
     def _collect(self, item):
         """Add to collection…: the user's collections, ticked where `item` (any copy) is."""
-        keys = collectionui.keys_of(self._copies(item))
+        keys = collectionui.keys_of([item])
         if collectionui.choose(item, keys, self.store) and self.collection is not None:
             self._apply_library(self.all_movies)
 
     def _uncollect(self, item):
-        self.store.remove(self.collection, collectionui.keys_of(self._copies(item)))
+        self.store.remove(self.collection, collectionui.keys_of([item]))
         self._apply_library(self.all_movies)
 
     def _after_favourites(self):
@@ -674,35 +749,46 @@ class WallWindow(xbmcgui.WindowXML):
 
     # ---- camera ----------------------------------------------------------------------------
 
-    def _visual_cam(self, now):
-        if not self.cam_anim:
-            return self.cam
-        t0, frm, dur = self.cam_anim
-        e = ease_out_cubic((now - t0) * 1000.0 / dur) if dur else 1.0
-        return (frm[0] + (self.cam[0] - frm[0]) * e, frm[1] + (self.cam[1] - frm[1]) * e)
+    def _motion(self, tween, ms):
+        """(ms, tween, ease) of a glide: Reduce motion keeps a short plain ease."""
+        if self.reduced:
+            return REDUCED_MS, 'sine', ease_out_sine
+        return ms, tween, ease_out_back if tween == 'back' else ease_out_cubic
 
-    def _pan(self, target, animate=True):
+    def _commit(self, frame=None, cam=None):
+        """Install planned glides (Glide.plan) and start them with one property write."""
+        if frame is not None:
+            self.frame.setAnimations(frame)
+        if cam is not None:
+            self.camera.setAnimations(cam)
+        HOME.setProperty(self.prop_motion, f'{self.frame_glide.token}.{self.cam_glide.token}')
+        if frame is not None and not self.frame_on:
+            self.frame.setVisible(True)
+            self.frame_on = True
+
+    def _settle(self, now):
+        """Idle wall: finished glides become static placements (Glide.settle)."""
+        self.frame_glide.settle(now)
+        self.cam_glide.settle(now)
+
+    def _cam_plan(self, target, animate=True):
         lay = self.lay
         now = time.time()
-        vis = self._visual_cam(now)
+        g = self.cam_glide
+        v = g.visual(now) if g.pos is not None else (-self.cam[0], -self.cam[1])
+        vis = (-v[0], -v[1])                         # camera drawn now (wall pixels)
         # Never lag further than the pool's slack, or the screen edge would show empty cells.
         dx = max(-lay.pitch_x * 1.3, min(lay.pitch_x * 1.3, target[0] - vis[0]))
         dy = max(-lay.pitch_y * 1.1, min(lay.pitch_y * 1.1, target[1] - vis[1]))
-        animate = animate and not self.reduced and (abs(dx) > 0.5 or abs(dy) > 0.5)
+        animate = animate and (abs(dx) > 0.5 or abs(dy) > 0.5)
         self.cam = target
+        ms, tween, ease = self._motion('cubic', G.PAN_MS)
+        return g.plan((-target[0], -target[1]), now, start=(dx - target[0], dy - target[1]),
+                      ms=ms if animate else 0, tween=tween, ease=ease)
+
+    def _pan(self, target, animate=True):
+        self._commit(cam=self._cam_plan(target, animate))
         self._rebind(self.front)
-        if animate:
-            self.cam_anim = (now, (target[0] - dx, target[1] - dy), G.PAN_MS)
-            self.cam_token += 1
-            self.camera.setAnimations([('Conditional',
-                f'effect=slide start={int(round(dx))},{int(round(dy))} end=0,0 time={G.PAN_MS} '
-                f'tween=cubic easing=out reversible=false condition={_is(PROP_CAM, self.cam_token)}')])
-        else:
-            self.cam_anim = None
-            self.camera.setAnimations([])
-        self.camera.setPosition(-int(target[0]), -int(target[1]))
-        if animate:
-            HOME.setProperty(PROP_CAM, str(self.cam_token))
 
     def _origin(self):
         """Top-left grid cell of the pool window around the camera centre."""
@@ -723,7 +809,7 @@ class WallWindow(xbmcgui.WindowXML):
         if item is None:
             pool.bind(k, cell, None)
         else:
-            pool.bind(k, cell, item, self.kind.fallback(item), self._is_favourite(item),
+            pool.bind(k, cell, item, self.kind.fallback(item), self.favs.contains(item),
                       self.kind.cover_badge(item, self.show_badges))
 
     def _rebind(self, pool, wall=None):
@@ -734,36 +820,16 @@ class WallWindow(xbmcgui.WindowXML):
     def _cell_xy(self, cell):
         return cell_origin(*cell, layout=self.lay)
 
-    def _visual_frame(self, now):
-        if not self.frame_anim:
-            return self.frame_pos
-        t0, frm, dur = self.frame_anim
-        p = (now - t0) * 1000.0 / dur if dur else 1.0
-        e = ease_out_back(p) if G.FRAME_TWEEN == 'back' else ease_out_cubic(p)
-        return (frm[0] + (self.frame_pos[0] - frm[0]) * e, frm[1] + (self.frame_pos[1] - frm[1]) * e)
+    def _frame_plan(self, animate=False):
+        """The focus frame's glide to the focused cell, from wherever it is drawn now."""
+        x, y = self._cell_xy(self.focus)
+        ms, tween, ease = self._motion(G.FRAME_TWEEN, G.FRAME_MS)
+        return self.frame_glide.plan((x - G.fx(self.lay), y - self.lay.frame), time.time(),
+                                     ms=ms if animate else 0, tween=tween, ease=ease)
 
     def _set_frame(self, animate=False):
         """Move the focus frame; animated moves glide from wherever the frame is drawn now."""
-        x, y = self._cell_xy(self.focus)
-        target = (x - G.fx(self.lay), y - self.lay.frame)
-        now = time.time()
-        animate = animate and not self.reduced and self.frame_pos is not None
-        if animate:
-            vis = self._visual_frame(now)
-            dx, dy = int(round(vis[0] - target[0])), int(round(vis[1] - target[1]))
-            self.frame_token += 1
-            self.frame.setAnimations([('Conditional',
-                f'effect=slide start={dx},{dy} end=0,0 time={G.FRAME_MS} tween={G.FRAME_TWEEN} '
-                f'easing=out reversible=false condition={_is(PROP_FRAME, self.frame_token)}')])
-            self.frame_anim = (now, vis, G.FRAME_MS)
-        else:
-            self.frame.setAnimations([])
-            self.frame_anim = None
-        self.frame.setPosition(*target)
-        self.frame_pos = target
-        self.frame.setVisible(True)
-        if animate:
-            HOME.setProperty(PROP_FRAME, str(self.frame_token))
+        self._commit(frame=self._frame_plan(animate))
 
     # ---- info panel ------------------------------------------------------------------------
 
@@ -852,6 +918,8 @@ class WallWindow(xbmcgui.WindowXML):
                 if self.shuffle_until and now >= self.shuffle_until:
                     self._finish_shuffle()
                 idle = now - self.last_input
+                if idle >= SETTLE_S:
+                    self._settle(now)
                 if self.pending_library is not None and idle >= 1.0 and not self.shuffle_until:
                     items, self.pending_library = self.pending_library, None
                     self._apply_library(items)
@@ -920,39 +988,34 @@ class WallWindow(xbmcgui.WindowXML):
 
     def _menu(self):
         tr = ADDON.getLocalizedString
-        on_off = lambda flag: tr(32030 if flag else 32031)
         item = self.wall.at(*self.focus)
-        entries = []
-        if self.history:
-            entries.append(('undo', tr(32295)))
+        view = []
         if item:
-            entries += [
-                ('list', tr(32071)),
-                ('shuffle', tr(32021)),
-                ('auto', tr(32022).format(on_off(self.auto_shuffle))),
-                ('motion', tr(32023).format(on_off(self.reduced))),
-            ]
-            if self.kind.merges:
-                entries.append(('merge', tr(32029).format(on_off(self.merge))))
-        if item:
-            for e in reversed(S.item_entries(self.kind, item, self.scenes)):
-                entries.insert(0, e)
-            entries.insert(0, ('collect', tr(collectionui.S_COLLECT)))
-            if self.collection is not None and self.store.get(self.collection):
-                entries.insert(1, ('uncollect', tr(32165).format(collectionui.name_of(self.collection, self.store))))
-        if self.kind.explores and self.all_movies:
-            entries.append(('filter', tr(X.S_FILTER_MENU)))
-            if self.session:
-                entries.append(('clearfilters', tr(X.S_CLEAR)))
+            view.append(('list', tr(menu.S_VIEW), tr(menu.S_COVER_WALL)))
+        view += [menu.toggle('motion', menu.S_REDUCE_MOTION, self.reduced),
+                 menu.toggle('auto', menu.S_AUTO_SHUFFLE, self.auto_shuffle)]
+        misc = [('search', tr(menu.S_SEARCH))]
         if not self.favourites_only:
-            entries.append(('favourites', tr(32187)))
-        entries += [
-            ('reload', tr(32024)),
-            ('skin', tr(32025)),
-            ('exit', tr(32026)),
-        ]
-        choice = menu.show(item, self.favs, entries,
-                           is_favourite=self._is_favourite(item) if item else None)
+            misc.append(('favourites', tr(32187)))
+        if self.kind.explores and self.all_movies:
+            misc.append(('filter', tr(X.S_FILTER_MENU)))
+            if self.session:
+                misc.append(('clearfilters', tr(X.S_CLEAR)))
+        actions = []
+        if self.history:
+            actions.append(('undo', tr(32295)))
+        if item:
+            actions.append(('shuffle', tr(32021)))
+        actions.append(('reload', tr(32024)))
+        if item:
+            actions += menu.favourite_entries(item, self.favs)
+            actions.append(('collect', tr(collectionui.S_COLLECT)))
+            if self.collection is not None and self.store.get(self.collection):
+                actions.append(('uncollect', tr(32165).format(collectionui.name_of(self.collection, self.store))))
+            actions += S.item_entries(self.kind, item, self.scenes)
+        actions.append(menu.exit_entry(self))
+        choice = menu.show_sections([(menu.S_VIEW_OPTIONS, view), (menu.S_MISC_OPTIONS, misc),
+                                     (menu.S_ACTIONS, actions)])
         self.last_input = time.time()
         if choice == 'favourite':
             self._toggle_favourite(item)
@@ -980,40 +1043,34 @@ class WallWindow(xbmcgui.WindowXML):
             self._shuffle_related(item)
         elif choice == 'auto':
             self.auto_shuffle = not self.auto_shuffle
-            ADDON.setSettingBool('auto_shuffle', self.auto_shuffle)
+            menu.set_auto_shuffle(self.auto_shuffle)
         elif choice == 'motion':
             self.reduced = not self.reduced
-            ADDON.setSettingBool('reduced_motion', self.reduced)
-            HOME.setProperty(PROP_REDUCED, '1' if self.reduced else '')
-        elif choice == 'merge':
-            self.merge = not self.merge
-            ADDON.setSettingBool('merge_duplicates', self.merge)
-            self._apply_library(self.all_movies)
+            menu.set_reduced_motion(self.reduced)
         elif choice == 'reload':
-            cache.discard(self.kind.name)
-            self._start_reload()
-        elif choice == 'skin':
-            skin = choose_skin()
-            if skin:
-                self.pending_skin = skin
-                self._close()
+            self._reload()
         elif choice == 'exit':
             self._close()
 
+    def _reload(self):
+        """Reload Library: drop the cache and re-read the library in the background."""
+        cache.discard(self.kind.name)
+        self._start_reload()
+
     def _visible(self, items):
         """What the wall shows: _base() narrowed by the filters (Explore, Filter…)."""
-        return self._apply_filters(self._base(items))
+        base = self._base(items)
+        self.base_total = len(base)                  # the counter's "of"
+        return self._apply_filters(base)
 
     def _base(self, items):
-        """The wall's items before filters: in favourites mode only favourites (any copy of a
-        merged movie counts), in collection mode the collection's, then duplicate copies merged
-        when that setting is on."""
+        """The wall's items before filters: in favourites mode only favourites, in collection
+        mode the collection's. Every library entry has its own cover, duplicate copies too."""
         if self.collection is not None:
-            shown = self.kind.visible(items, self.merge)
-            return [m for m, _ in collectionui.members(self.collection, self.store, items, shown, self.new_days)]
+            return [m for m, _ in collectionui.members(self.collection, self.store, items, items, self.new_days)]
         if self.favourites_only:
-            items = [m for m in items if self.favs.contains(m)]
-        return self.kind.visible(items, self.merge)
+            return [m for m in items if self.favs.contains(m)]
+        return items
 
     # Library data is fetched on background threads (a large library takes tens of seconds) and
     # applied under the lock, so the wall stays responsive while it loads.
@@ -1057,6 +1114,13 @@ class WallWindow(xbmcgui.WindowXML):
                 return
             self.pending_library = items
             self.cast_complete = True
+            reloaded, self.list_reloaded = self.list_reloaded, None
+            if reloaded:                     # asked for by the list view on top: apply it now
+                self.pending_library = None
+                self._apply_library(items)
+                shown, library = self._visible(self.all_movies), self.all_movies
+        if reloaded:
+            reloaded(shown, library)
         if items:
             cache.save(total, [m.to_cache() for m in items], True, self.kind.name)
 
@@ -1125,10 +1189,6 @@ class WallWindow(xbmcgui.WindowXML):
         self.history = []
         self.front.shown = [None] * self.pool_size     # artwork may have changed
         cell = self.wall.cell_of(current.key) if current else None
-        if cell is None and current and self.kind.merges:
-            # The focused copy was merged away: stay on the copy that represents that title.
-            cell = next((self.wall.cell_of(m.key) for m in self.wall.movies()
-                         if (m.title, m.year) == (current.title, current.year)), None)
         if cell is None and current and current.key in self._order:
             # Gone from favourites: stay near where it was, on the next item in library order.
             order = self._order
@@ -1145,6 +1205,7 @@ class WallWindow(xbmcgui.WindowXML):
             self._pan(camera_target(self.wall, self.focus), animate=False)
         else:
             self.frame.setVisible(False)
+            self.frame_on = False
             self.front.reset()
             self.back.reset()
         xbmc.log(f'kscape.wall: applied library of {len(visible)} covers', xbmc.LOGINFO)
@@ -1180,7 +1241,8 @@ class WallWindow(xbmcgui.WindowXML):
         old = self.wall
         self.front_token += 1
         tok = self.front_token
-        on = _is(PROP_FRONT, tok)
+        on = _is(self.prop_front, tok)
+        before = _is(self.prop_front, tok - 1)       # the value until the flip below
         rng = random.Random(tok)
         cx, cy = self.cam
         vw, vh = G.view_size(lay)
@@ -1237,7 +1299,9 @@ class WallWindow(xbmcgui.WindowXML):
             ]
 
         # Back buffer: new arrangement, transparent until the trigger, then flying into place.
-        hold = ('Conditional', f'effect=fade start=0 end=0 time=0 reversible=false condition=!{on}')
+        # The hold names the token before the flip (not "not this one"), so once the pool is
+        # retired its stale animations stay inert (Pool.reset no longer clears them).
+        hold = ('Conditional', f'effect=fade start=0 end=0 time=0 reversible=false condition={before}')
         for k, cell in self._slot_cells():
             item = new.at(*cell)
             anims = [hold]
@@ -1281,7 +1345,7 @@ class WallWindow(xbmcgui.WindowXML):
             ])
             longest = max(longest, delay + dur)
 
-        HOME.setProperty(PROP_FRONT, str(tok))      # one flip starts every animation above
+        HOME.setProperty(self.prop_front, str(tok))  # one flip starts every animation above
         self.wall = new
         self.front, self.back = self.back, self.front
         self.shuffle_until = time.time() + longest / 1000.0 + 0.05
@@ -1291,6 +1355,25 @@ class WallWindow(xbmcgui.WindowXML):
         if self.shuffle_until:
             self.back.reset()
             self.shuffle_until = 0.0
+
+
+class ListHost:
+    """What the list view opened over a wall asks of it: the window beneath (the menu's exit
+    leads where closing the wall does), whether it can show Favourites, and Reload Library."""
+
+    def __init__(self, wall):
+        self.wall = wall
+
+    @property
+    def favourites(self):
+        return not self.wall.favourites_only
+
+    def reload(self, done):
+        """Re-read the library; `done(shown, library)` runs (on a background thread) once the
+        wall has it."""
+        with self.wall.lock:
+            self.wall.list_reloaded = done
+            self.wall._reload()
 
 
 class ExploreLink:
@@ -1316,6 +1399,10 @@ class ExploreLink:
     def items(self):
         with self.wall.lock:
             return self.wall._visible(self.wall.all_movies)
+
+    def total(self):
+        """How many movies the wall has before its filters."""
+        return self.wall.base_total
 
     def caption(self, count):
         s = self.wall.session
@@ -1374,12 +1461,9 @@ def wall_xml(kind):
 
 
 def open_wall(kind, view=None, favourites=False, collection=None, explore=None):
-    """Run the wall for `kind` (filtered by an Explore (filter, movie key) pair, if given).
-    Returns the skin the user chose to switch to, if any."""
+    """Run the wall for `kind` (filtered by an Explore (filter, movie key) pair, if given)."""
     root, name, layout, stage = wall_xml(kind)
     window = WallWindow(name, root, 'Default', '1080i', kind=kind, view=view, favourites=favourites,
                         collection=collection, explore=explore, layout=layout, stage=stage)
     modal.run(window)
-    skin = window.pending_skin
     del window
-    return skin

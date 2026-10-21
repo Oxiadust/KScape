@@ -63,11 +63,11 @@ class ListWindow(xbmcgui.WindowXML):
         self.library = kwargs.get('library') or self.movies    # what Search searches
         self.store = kwargs.get('store')         # this library's collections (None: no C menu entry)
         self.collection = kwargs.get('collection')   # listing this collection's movies
-        self.copies = kwargs.get('copies') or (lambda m: [m])   # duplicate copies a row stands for
-        self.result = 'wall'                     # 'wall', 'exit' or 'skin' once closed
+        self.result = 'wall'                     # 'wall', 'exit' or 'favourites' once closed
         self.back = kwargs.get('back') or 'wall'  # what Back does: 'wall', or 'exit' (to Home)
         self.focus_id = self.start_id            # key of the item under the band when closed
         self.explore = kwargs.get('explore')     # window.ExploreLink: the wall's filters
+        self.host = kwargs.get('host')           # window.ListHost: the wall underneath, if any
 
     def onInit(self):
         if self.ready:
@@ -111,6 +111,16 @@ class ListWindow(xbmcgui.WindowXML):
         else:
             _set('heading', menu.search_heading(self.query, len(self.movies)))
             _set('empty', '' if self.movies else ADDON.getLocalizedString(self.kind.s_no_match).format(self.query))
+        _set('count', self.kind.counter(len(self.movies), self._total()))
+
+    def _total(self):
+        """The counter's "of": the library searched, the wall's covers before its filters, or
+        (nothing narrowing the list) the rows themselves."""
+        if self.query is not None:
+            return len(self.library)
+        if self.explore is not None and self.explore.active:
+            return self.explore.total()
+        return len(self.movies)
 
     def _load(self, focus_key):
         t0 = time.perf_counter()
@@ -293,48 +303,79 @@ class ListWindow(xbmcgui.WindowXML):
 
     def _menu(self):
         tr = ADDON.getLocalizedString
-        if self.query is None:
-            entries = [('wall', tr(32070)), ('skin', tr(32025)), ('exit', tr(32026))]
-            if self.explore is not None and self.library:
-                entries.insert(0, ('filter', tr(X.S_FILTER_MENU)))
-                if self.explore.active:
-                    entries.insert(1, ('clearfilters', tr(X.S_CLEAR)))
-        else:
-            entries = [('wall', tr(32066))]                   # Return
         row = self._current()
+        movie = row.movie if row else None
+        listing = self.query is None                  # the library, not search results
+        view = []
+        if listing and self.host is not None:
+            view.append(('wall', tr(menu.S_VIEW), tr(menu.S_LIST_VIEW)))
+        view += [menu.toggle('motion', menu.S_REDUCE_MOTION, menu.reduced_motion()),
+                 menu.toggle('auto', menu.S_AUTO_SHUFFLE, ADDON.getSettingBool('auto_shuffle'))]
+        misc = [('search', tr(menu.S_SEARCH))]
+        if self.host is not None and self.host.favourites:
+            misc.append(('favourites', tr(32187)))
+        if listing and self.explore is not None and self.library:
+            misc.append(('filter', tr(X.S_FILTER_MENU)))
+            if self.explore.active:
+                misc.append(('clearfilters', tr(X.S_CLEAR)))
+        actions = []
+        if self.host is not None:
+            actions.append(('reload', tr(32024)))
         scene_store = S.store() if row and self.kind.name in S.MEDIA_OF_KIND else None
         if row:
-            for e in reversed(S.item_entries(self.kind, row.movie, scene_store)):
-                entries.insert(0, e)
-        if row and self.store is not None:
-            entries.insert(0, ('collect', tr(collectionui.S_COLLECT)))
-            if self.collection is not None and self.store.get(self.collection):
-                entries.insert(1, ('uncollect', tr(32165).format(collectionui.name_of(self.collection, self.store))))
-        choice = menu.show(row.movie if row else None, self.favs, entries)
+            actions += menu.favourite_entries(movie, self.favs)
+            if self.store is not None:
+                actions.append(('collect', tr(collectionui.S_COLLECT)))
+                if self.collection is not None and self.store.get(self.collection):
+                    actions.append(('uncollect', tr(32165).format(collectionui.name_of(self.collection, self.store))))
+            actions += S.item_entries(self.kind, movie, scene_store)
+        if listing:
+            actions.append(menu.exit_entry(self.host.wall if self.host is not None else self))
+        else:
+            actions.append(('wall', menu.exit_entry(self)[1]))   # search results: back where they started
+        choice = menu.show_sections([(menu.S_VIEW_OPTIONS, view), (menu.S_MISC_OPTIONS, misc),
+                                     (menu.S_ACTIONS, actions)])
         if choice == 'favourite':
-            self.favs.toggle(row.movie)
+            self.favs.toggle(movie)
             self._sync_favourites()
         elif choice == 'collect':
-            collectionui.choose(row.movie, self._files(row.movie), self.store)
+            collectionui.choose(movie, self._files(movie), self.store)
             self._drop_uncollected()
         elif choice == 'uncollect':
-            self.store.remove(self.collection, self._files(row.movie))
+            self.store.remove(self.collection, self._files(movie))
             self._drop_uncollected()
         elif choice in S.ITEM_CHOICES:
-            focus = S.handle_item_choice(self.kind, row.movie, choice, scene_store)
+            focus = S.handle_item_choice(self.kind, movie, choice, scene_store)
             if focus:
                 return ('scenes', focus)
         elif choice in ('search', 'filter'):
             return choice
         elif choice == 'clearfilters':
             self.explore.clear()
-            self._refilter(row.movie.key if row else None)
+            self._refilter(movie.key if movie else None)
+        elif choice == 'motion':
+            menu.set_reduced_motion(not menu.reduced_motion())
+        elif choice == 'auto':
+            menu.set_auto_shuffle(not ADDON.getSettingBool('auto_shuffle'))
+        elif choice == 'reload':
+            self.host.reload(self._reloaded)
         elif choice:
-            self._close(choice)
+            self._close(choice)                       # 'wall', 'favourites' or 'exit'
         return None
 
+    def _reloaded(self, shown, library):
+        """Reload Library finished (window.ListHost.reload): list what the wall now shows."""
+        with self.lock:
+            if self.closing or self.query is not None:
+                return
+            row = self._current()
+            self.movies, self.library = shown, library
+            self.built, self.prebuilt = {}, None
+            self._apply_props()
+            self._load(row.movie.key if row else None)
+
     def _files(self, movie):
-        return collectionui.keys_of(self.copies(movie))
+        return collectionui.keys_of([movie])
 
     def _drop_uncollected(self):
         """Listing a collection: take out rows whose movie has left it, keeping the band near."""
@@ -350,6 +391,7 @@ class ListWindow(xbmcgui.WindowXML):
         before = [r.movie.key for r in self.rows[:i] if inside(r.movie)]
         self.movies = kept
         self.built, self.prebuilt = {}, None
+        self._apply_props()
         self._load(after[0] if after else (before[-1] if before else None))
 
     # ---- favourites and search ---------------------------------------------------------------
@@ -401,14 +443,15 @@ class ListWindow(xbmcgui.WindowXML):
 
 
 def show_list(kind, movies, focus, favs=None, query=None, library=None, store=None, collection=None,
-              copies=None, back='wall', explore=None):
+              back='wall', explore=None, host=None):
     """Run the list view for `kind` (or search results, with `query`; `library` is what a new
     search searches; `store` the movie collections, `collection` the one listed, if any).
     Returns (result, key of the item under the band)."""
     menu.wait_for_dialogs()
     window = ListWindow(kind.list_spec.xml, ADDON.getAddonInfo('path'), 'Default', '1080i',
                         kind=kind, movies=movies, focus=focus, favs=favs, query=query, library=library,
-                        store=store, collection=collection, copies=copies, back=back, explore=explore)
+                        store=store, collection=collection, back=back, explore=explore,
+                        host=host)
     modal.run(window)
     result, focus_id = window.result, window.focus_id
     del window

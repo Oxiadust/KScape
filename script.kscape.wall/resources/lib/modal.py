@@ -37,6 +37,12 @@ def run(window):
             _stack.remove(window)
 
 
+def under(window):
+    """The tracked window `window` was opened over (None: it was opened from Home)."""
+    i = _stack.index(window) if window in _stack else 0
+    return _stack[i - 1] if i > 0 else None
+
+
 def abandoned():
     """True once a later request is closing every KScape window (waits should give up)."""
     return _abandoned.is_set()

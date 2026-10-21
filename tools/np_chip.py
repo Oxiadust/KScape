@@ -7,3 +7,4 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 from resources.lib import npchip  # noqa: E402
 
 chip = npchip.chip
+count_chip = npchip.count_chip

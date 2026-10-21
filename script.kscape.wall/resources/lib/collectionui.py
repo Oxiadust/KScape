@@ -56,7 +56,7 @@ def name_of(cid, st):
 
 def members(cid, st, library, shown, days=None):
     """(item, stored key or None) pairs of collection `cid`, in its order. `library` is every
-    library entry, `shown` what the views show (duplicates merged or not)."""
+    library entry, `shown` what the views show."""
     if cid in C.BUILTIN:
         return [(m, None) for m in C.builtin_movies(cid, shown, days or new_days())]
     c = st.get(cid)
@@ -74,7 +74,7 @@ def create(st):
 
 
 def keys_of(copies):
-    """Member keys of an item's copies (one cover may stand for duplicate movies)."""
+    """Member keys of `copies` (library items)."""
     return [C.member_key(c) for c in copies]
 
 

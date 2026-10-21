@@ -39,6 +39,8 @@
 			<description>Viewport: the screen, or a CinemaScope band (window.py places it)</description>
 		<control type="group" id="1000">
 			<description>Camera</description>
+			<control type="group" id="1006">
+				<description>Pool A</description>
 			<control type="group" id="10000">
 				<width>228</width>
 				<height>228</height>
@@ -11512,6 +11514,9 @@
 					</control>
 				</control>
 			</control>
+			</control>
+			<control type="group" id="1007">
+				<description>Pool B</description>
 			<control type="group" id="20000">
 				<width>228</width>
 				<height>228</height>
@@ -22985,6 +22990,7 @@
 					</control>
 				</control>
 			</control>
+			</control>
 			<control type="group" id="1001">
 				<description>Focus frame</description>
 				<width>276</width>
@@ -23113,6 +23119,33 @@
 				<aligny>center</aligny>
 				<font>kscape_panel_body</font>
 				<textcolor>kscape_text</textcolor>
+			</control>
+		</control>
+		<control type="group" id="1965">
+			<description>Item counter (npchip.count_chip)</description>
+			<left>1292</left>
+			<top>1027</top>
+			<animation effect="fade" start="0" end="100" time="250">Visible</animation>
+			<visible>!String.IsEmpty(Window.Property(kscape.count))</visible>
+			<control type="grouplist">
+				<width>600</width>
+				<height>44</height>
+				<orientation>horizontal</orientation>
+				<align>right</align>
+				<usecontrolcoords>true</usecontrolcoords>
+				<control type="button">
+					<width>auto</width>
+					<height>44</height>
+					<enable>false</enable>
+					<textoffsetx>18</textoffsetx>
+					<aligny>center</aligny>
+					<font>kscape_small</font>
+					<textcolor>FF9AA3B5</textcolor>
+					<disabledcolor>FF9AA3B5</disabledcolor>
+					<texturenofocus colordiffuse="C0070B16">kscape-white.png</texturenofocus>
+					<texturefocus colordiffuse="C0070B16">kscape-white.png</texturefocus>
+					<label>$INFO[Window.Property(kscape.count)]</label>
+				</control>
 			</control>
 		</control>
 		<control type="group" id="1980">
