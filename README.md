@@ -308,7 +308,7 @@ or movie title), **Movie versions** (format badges on covers, the version Play s
 
 **Colours.** KScape is drawn in two colours, and Skin settings lets you pick each:
 
-- **Theme colour** - Blue (default), Crimson, Emerald, Violet, Teal or Graphite: the panels,
+- **Theme colour** - Graphite (default), Blue, Crimson, Emerald, Violet or Teal: the panels,
   the list band, tabs and bars, and the tint of text on dark backgrounds.
 - **Highlight colour** - Amber (default), White, Cyan, Lime or Rose: the selection frame,
   sort letters, markers, hearts and badges.

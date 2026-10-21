@@ -36,8 +36,8 @@ class ColoursTest(unittest.TestCase):
                 self.assertEqual(colours.parse(value), (m, h))
 
     def test_unknown_values_are_the_default(self):
-        self.assertEqual(colours.parse('SKINDEFAULT'), ('Blue', 'Amber'))
-        self.assertEqual(colours.parse('Neon - Pink'), ('Blue', 'Amber'))
+        self.assertEqual(colours.parse('SKINDEFAULT'), ('Graphite', 'Amber'))
+        self.assertEqual(colours.parse('Neon - Pink'), ('Graphite', 'Amber'))
 
     def test_retint_keeps_lightness_and_alpha(self):
         out = gen_colors.retint('EE1F5BD3', gen_colors.MAINS['Crimson'])

@@ -7,7 +7,7 @@ tabs and bars, and the bluish text on dark backgrounds) and a highlight colour (
 selection frame, sort letters and badges). Every view, the skin's and the add-on's, uses the
 named colours below, so a theme only has to give them new values.
 
-defaults.xml is Blue with Amber. Every other main / highlight pair gets a file named
+defaults.xml is Graphite with Amber. Every other main / highlight pair gets a file named
 "<Main> - <Highlight>", the name Kodi's skin colours setting (lookandfeel.skincolors) takes;
 Skin settings sets it (script.kscape.wall's colours.py). Each shade of the main colour keeps its
 lightness and transparency and takes the theme's hue, with its saturation scaled as the theme's
@@ -67,7 +67,7 @@ HIGHLIGHTS = {
     'Lime': 'A6E22E',
     'Rose': 'FF5C8A',
 }
-DEFAULT = ('Blue', 'Amber')
+DEFAULT = ('Graphite', 'Amber')
 
 
 def hls(rgb):

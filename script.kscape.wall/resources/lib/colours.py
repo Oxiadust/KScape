@@ -1,7 +1,7 @@
 """KScape's colour theme: a main colour and a highlight colour, chosen from Skin settings.
 
 The skin ships one colour file per pair (skin.kscape/colors, made by tools/gen_colors.py):
-defaults.xml is Blue with Amber, the others are named "<Main> - <Highlight>". Choosing sets Kodi's
+defaults.xml is Graphite with Amber, the others are named "<Main> - <Highlight>". Choosing sets Kodi's
 own skin colours setting (lookandfeel.skincolors), and Kodi reloads the skin in the new colours.
 The choice is mirrored in Skin strings KScapeColourMain / KScapeColourHighlight (localised
 names) for Skin settings to show.
@@ -18,7 +18,7 @@ DEFAULT_VALUE = 'SKINDEFAULT'
 # Keep in step with tools/gen_colors.py (MAINS, HIGHLIGHTS): name -> string id.
 MAINS = {'Blue': 32190, 'Crimson': 32191, 'Emerald': 32192, 'Violet': 32193, 'Teal': 32194, 'Graphite': 32195}
 HIGHLIGHTS = {'Amber': 32196, 'White': 32197, 'Cyan': 32198, 'Lime': 32199, 'Rose': 32200}
-DEFAULT = ('Blue', 'Amber')
+DEFAULT = ('Graphite', 'Amber')
 HEADINGS = {'main': 32201, 'highlight': 32202}
 
 
