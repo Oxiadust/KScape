@@ -413,10 +413,10 @@ def _build(L):
 		<control type="image" id="1951">
 			<description>KScape logo while the library loads: Python sets Window.Property(kscape.loading). Fades in after
 			450 ms so instant loads never flash it, then breathes.</description>
-			<left>760</left>
-			<top>380</top>
-			<width>400</width>
-			<height>75</height>
+			<left>360</left>
+			<top>428</top>
+			<width>1200</width>
+			<height>225</height>
 			<aspectratio>keep</aspectratio>
 			<texture>kscape-logo.png</texture>
 			<visible>!String.IsEmpty(Window.Property(kscape.loading))</visible>

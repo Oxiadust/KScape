@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodi's video information dialog (the Info key anywhere in Kodi, Dialog.info() from scripts), in
+     KScape's panel. KScape's own movie screen is the add-on's (script-kscape-info.xml); this one
+     serves everything else and is how the add-on reaches Kodi's own Manage extras: with
+     Window(Home).Property(kscape.infoaction) = extras the dialog draws nothing, presses Extras
+     (15) the moment it opens and the add-on closes it once the manager is done.
+     The control ids are Kodi's contract: 8 Play / Resume, 11 Trailer, 7 Your rating, 14 Versions,
+     15 Extras, 10 Choose art, 6 Refresh, 12 Fanart, 13 Director, 50 the cast list. -->
+<window>
+	<defaultcontrol always="true">8</defaultcontrol>
+	<onload condition="String.IsEqual(Window(Home).Property(kscape.infoaction),extras)">SetFocus(15)</onload>
+	<onload condition="String.IsEqual(Window(Home).Property(kscape.infoaction),extras)">Action(Select)</onload>
+	<controls>
+		<control type="group">
+			<description>Display &amp; aspect ratio root (Includes_Display.xml); invisible while the add-on drives the dialog</description>
+			<include>KScapeDisplay</include>
+			<animation effect="fade" start="0" end="0" time="0" condition="!String.IsEmpty(Window(Home).Property(kscape.infoaction))">Conditional</animation>
+			<include>DialogDim</include>
+			<control type="group">
+				<left>130</left>
+				<top>90</top>
+				<include>PanelOpenClose</include>
+				<include content="SystemPanel">
+					<param name="width" value="1660"/>
+					<param name="height" value="900"/>
+					<param name="title">$INFO[ListItem.Title]$INFO[ListItem.Year, (,)]</param>
+				</include>
+				<control type="image">
+					<description>Left column</description>
+					<top>64</top>
+					<width>360</width>
+					<height>836</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+				</control>
+				<control type="image">
+					<left>30</left>
+					<top>94</top>
+					<width>300</width>
+					<height>450</height>
+					<aspectratio aligny="top">keep</aspectratio>
+					<texture background="true" fallback="DefaultVideo.png">$INFO[ListItem.Art(poster)]</texture>
+				</control>
+				<control type="label">
+					<description>Runtime, genre, certification</description>
+					<left>400</left>
+					<top>84</top>
+					<width>1220</width>
+					<height>44</height>
+					<aligny>center</aligny>
+					<font>kscape_panel_body</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$INFO[ListItem.Duration][COLOR kscape_text_dim]  ·  [/COLOR]$INFO[ListItem.Genre][COLOR kscape_text_dim]  ·  [/COLOR]$INFO[ListItem.MPAA]</label>
+				</control>
+				<control type="textbox">
+					<description>Tagline and plot</description>
+					<left>400</left>
+					<top>140</top>
+					<width>1220</width>
+					<height>250</height>
+					<font>kscape_panel_body</font>
+					<textcolor>kscape_tint_light</textcolor>
+					<label>$INFO[ListItem.Tagline,[I],[/I][CR]]$INFO[ListItem.Plot]</label>
+					<autoscroll delay="6000" time="3000" repeat="8000">true</autoscroll>
+				</control>
+				<control type="label">
+					<left>400</left>
+					<top>400</top>
+					<width>1220</width>
+					<height>40</height>
+					<aligny>center</aligny>
+					<font>kscape_info_label</font>
+					<textcolor>white</textcolor>
+					<label>$LOCALIZE[206]</label>
+					<visible>Integer.IsGreater(Container(50).NumItems,0)</visible>
+				</control>
+				<control type="list" id="50">
+					<description>Cast</description>
+					<left>400</left>
+					<top>444</top>
+					<width>1240</width>
+					<height>270</height>
+					<orientation>horizontal</orientation>
+					<onup>5000</onup>
+					<ondown>5000</ondown>
+					<scrolltime tween="cubic" easing="out">200</scrolltime>
+					<itemlayout width="170" height="270">
+						<control type="image">
+							<width>150</width>
+							<height>200</height>
+							<texture colordiffuse="FF1A1A1F">white.png</texture>
+						</control>
+						<control type="image">
+							<width>150</width>
+							<height>200</height>
+							<aspectratio>scale</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+						<control type="label">
+							<top>204</top>
+							<width>150</width>
+							<height>30</height>
+							<font>kscape_small</font>
+							<textcolor>kscape_text</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+						<control type="label">
+							<top>234</top>
+							<width>150</width>
+							<height>30</height>
+							<font>kscape_micro</font>
+							<textcolor>kscape_text_dim</textcolor>
+							<label>$INFO[ListItem.Label2]</label>
+						</control>
+					</itemlayout>
+					<focusedlayout width="170" height="270">
+						<control type="image">
+							<left>-6</left>
+							<top>-6</top>
+							<width>162</width>
+							<height>212</height>
+							<texture colordiffuse="kscape_amber">white.png</texture>
+							<visible>Control.HasFocus(50)</visible>
+						</control>
+						<control type="image">
+							<width>150</width>
+							<height>200</height>
+							<texture colordiffuse="FF1A1A1F">white.png</texture>
+						</control>
+						<control type="image">
+							<width>150</width>
+							<height>200</height>
+							<aspectratio>scale</aspectratio>
+							<texture background="true">$INFO[ListItem.Icon]</texture>
+						</control>
+						<control type="label">
+							<top>204</top>
+							<width>150</width>
+							<height>30</height>
+							<font>kscape_small</font>
+							<textcolor>white</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+						<control type="label">
+							<top>234</top>
+							<width>150</width>
+							<height>30</height>
+							<font>kscape_micro</font>
+							<textcolor>kscape_tint_light</textcolor>
+							<label>$INFO[ListItem.Label2]</label>
+						</control>
+					</focusedlayout>
+				</control>
+				<control type="image">
+					<description>Button strip</description>
+					<left>360</left>
+					<top>760</top>
+					<width>1300</width>
+					<height>140</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+				</control>
+				<control type="grouplist" id="5000">
+					<left>380</left>
+					<top>780</top>
+					<width>1260</width>
+					<height>100</height>
+					<orientation>horizontal</orientation>
+					<itemgap>8</itemgap>
+					<onup>50</onup>
+					<ondown>50</ondown>
+					<scrolltime tween="cubic" easing="out">160</scrolltime>
+					<control type="button" id="8">
+						<label>$LOCALIZE[208]</label>
+						<include content="SystemButton">
+							<param name="width" value="200"/>
+							<param name="height" value="64"/>
+						</include>
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+					</control>
+					<control type="button" id="11">
+						<label>$LOCALIZE[20410]</label>
+						<include content="SystemButton">
+							<param name="width" value="200"/>
+							<param name="height" value="64"/>
+						</include>
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<visible>!String.IsEmpty(ListItem.Trailer)</visible>
+					</control>
+					<control type="button" id="7">
+						<label>$LOCALIZE[38023]</label>
+						<include content="SystemButton">
+							<param name="width" value="200"/>
+							<param name="height" value="64"/>
+						</include>
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<visible>Control.IsEnabled(7)</visible>
+					</control>
+					<control type="button" id="14">
+						<label>$LOCALIZE[40000]</label>
+						<include content="SystemButton">
+							<param name="width" value="200"/>
+							<param name="height" value="64"/>
+						</include>
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<visible>String.IsEqual(ListItem.DBType,movie)</visible>
+					</control>
+					<control type="button" id="15">
+						<label>$LOCALIZE[40211]</label>
+						<include content="SystemButton">
+							<param name="width" value="200"/>
+							<param name="height" value="64"/>
+						</include>
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<visible>String.IsEqual(ListItem.DBType,movie)</visible>
+					</control>
+					<control type="button" id="10">
+						<label>$LOCALIZE[13511]</label>
+						<include content="SystemButton">
+							<param name="width" value="200"/>
+							<param name="height" value="64"/>
+						</include>
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<visible>Control.IsEnabled(10)</visible>
+					</control>
+					<control type="button" id="6">
+						<label>$LOCALIZE[184]</label>
+						<include content="SystemButton">
+							<param name="width" value="200"/>
+							<param name="height" value="64"/>
+						</include>
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<visible>Control.IsEnabled(6)</visible>
+					</control>
+					<control type="button" id="13">
+						<label>$LOCALIZE[20339]</label>
+						<include content="SystemButton">
+							<param name="width" value="200"/>
+							<param name="height" value="64"/>
+						</include>
+						<align>center</align>
+						<textoffsetx>0</textoffsetx>
+						<visible>!String.IsEmpty(ListItem.Director)</visible>
+					</control>
+				</control>
+			</control>
+		</control>
+	</controls>
+</window>

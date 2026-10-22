@@ -219,7 +219,7 @@ def play_trailer(url, title='', poster=''):
 
 ALBUM_SORT = {'method': 'artist', 'order': 'ascending', 'ignorearticle': True}
 MUSIC_PLAYLIST = 0
-SONG_PROPERTIES = ['title', 'track', 'disc', 'duration', 'artist', 'file', 'albumid']
+SONG_PROPERTIES = ['title', 'track', 'disc', 'duration', 'artist', 'file', 'albumid', 'contributors']
 
 
 def album_total():
@@ -342,3 +342,73 @@ def play_episode(episodeid, resume=None):
         details = rpc('VideoLibrary.GetEpisodeDetails', {'episodeid': episodeid, 'properties': ['resume']})
         resume = ((details.get('episodedetails') or {}).get('resume') or {}).get('position', 0) > 0
     rpc('Player.Open', {'item': {'episodeid': episodeid}, 'options': {'resume': bool(resume)}})
+
+
+# ---- people, artists and single records (information screens) ---------------------------------
+
+ARTIST_PROPERTIES = ['description', 'born', 'formed', 'died', 'disbanded', 'yearsactive', 'genre', 'style',
+                     'mood', 'instrument', 'type', 'gender', 'sortname', 'musicbrainzartistid', 'thumbnail',
+                     'fanart', 'art']
+SONG_DETAIL_PROPERTIES = ['title', 'artist', 'album', 'albumid', 'track', 'disc', 'duration', 'genre', 'year',
+                          'displaycomposer', 'displaylyricist', 'displayconductor', 'contributors', 'originaldate', 'bitrate', 'samplerate', 'channels', 'file',
+                          'playcount', 'lastplayed', 'userrating', 'comment', 'art', 'albumartistid', 'artistid']
+ALBUM_DETAIL_PROPERTIES = ['title', 'artist', 'artistid', 'year', 'genre', 'style', 'mood', 'theme', 'type',
+                           'albumlabel', 'rating', 'userrating', 'description', 'playcount', 'dateadded',
+                           'musicbrainzalbumid', 'releasedate', 'originaldate', 'art', 'displayartist']
+MOVIE_BRIEF = ['title', 'year', 'art', 'playcount', 'resume']
+EPISODE_DETAIL_PROPERTIES = EPISODE_PROPERTIES + ['director', 'writer', 'cast', 'ratings', 'streamdetails',
+                                                  'lastplayed', 'dateadded', 'showtitle', 'tvshowid',
+                                                  'seasonid', 'userrating']
+SHOW_DETAIL_PROPERTIES = ['title', 'originaltitle', 'year', 'premiered', 'studio', 'genre', 'mpaa', 'plot',
+                          'cast', 'ratings', 'userrating', 'episode', 'watchedepisodes', 'season', 'tag',
+                          'lastplayed', 'dateadded', 'file', 'uniqueid', 'art', 'imdbnumber']
+
+
+def fetch_show_details(tvshowid):
+    d = rpc('VideoLibrary.GetTVShowDetails', {'tvshowid': tvshowid, 'properties': SHOW_DETAIL_PROPERTIES})
+    return d.get('tvshowdetails') or {}
+
+
+def fetch_episode_details(episodeid):
+    d = rpc('VideoLibrary.GetEpisodeDetails', {'episodeid': episodeid, 'properties': EPISODE_DETAIL_PROPERTIES})
+    return d.get('episodedetails') or {}
+
+
+def fetch_album_details(albumid):
+    d = rpc('AudioLibrary.GetAlbumDetails', {'albumid': albumid, 'properties': ALBUM_DETAIL_PROPERTIES})
+    return d.get('albumdetails') or {}
+
+
+def fetch_song_details(songid):
+    d = rpc('AudioLibrary.GetSongDetails', {'songid': songid, 'properties': SONG_DETAIL_PROPERTIES})
+    return d.get('songdetails') or {}
+
+
+def fetch_artist(artistid):
+    d = rpc('AudioLibrary.GetArtistDetails', {'artistid': artistid, 'properties': ARTIST_PROPERTIES})
+    return d.get('artistdetails') or {}
+
+
+def artist_albums(artistid):
+    """The artist's albums (as album artist or contributor), newest last: discography order."""
+    result = rpc('AudioLibrary.GetAlbums', {'filter': {'artistid': artistid},
+                                            'properties': ['title', 'year', 'art', 'artist', 'playcount'],
+                                            'sort': {'method': 'year', 'order': 'ascending'}})
+    return result.get('albums', [])
+
+
+def artist_songs(artistid):
+    result = rpc('AudioLibrary.GetSongs', {'filter': {'artistid': artistid}, 'properties': ['title']})
+    return result.get('songs', [])
+
+
+def movies_of(name):
+    """The library's movies a person is credited in (as actor, director or writer): Kodi's own
+    filters, so every credit counts, not only the top-billed cast. Oldest first."""
+    found = {}
+    for field in ('actor', 'director', 'writer'):
+        result = rpc('VideoLibrary.GetMovies', {'properties': MOVIE_BRIEF,
+                                                'filter': {'field': field, 'operator': 'is', 'value': name}})
+        for m in result.get('movies', []):
+            found.setdefault(int(m['movieid']), m)
+    return sorted(found.values(), key=lambda m: (m.get('year') or 0, m.get('title') or ''))

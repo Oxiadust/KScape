@@ -44,6 +44,14 @@
 					</constraints>
 					<control type="edit" format="string"/>
 				</setting>
+				<setting id="tmdb_key" type="string" label="32590" help="32591">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string"/>
+				</setting>
 			</group>
 		</category>
 	</section>

@@ -150,6 +150,12 @@ class Movies(Kind):
         while True:
             choice, details, extra = show_details(item, favs, library=library, page=page, focus=focus,
                                                   resolver=resolver)
+            if choice == 'movie':                  # another movie, chosen on a person's screen
+                other = lib.fetch_movie(extra['movieid'])
+                if not other:
+                    return None
+                item, page, focus = other, None, None
+                continue
             if choice == 'scenes':
                 # Play the scenes, then come back to the movie's scene list when they are over.
                 S.play_scenes(extra['ids'])
@@ -162,6 +168,8 @@ class Movies(Kind):
             lib.play(item, resume=choice == 'resume')
         elif choice == 'version':
             lib.play_version(extra['version'], resume=extra['resume'])
+        elif choice == 'extra':
+            lib.play_trailer(extra['file'], extra['title'], item.poster)
         elif choice == 'trailer' and details and details.get('trailer'):
             lib.play_trailer(details['trailer'], details.get('title') or item.title, item.poster)
         elif choice == 'explore':
@@ -206,8 +214,22 @@ class Music(Kind):
     def activate(self, item, favs, library=None, page=None, resolver=None):
         from .browse import show_album
         choice = show_album(item, favs)
+        while choice and choice[0] == 'album':            # an album chosen on an artist's screen
+            album = lib.fetch_album(choice[1])
+            if not album:
+                return None
+            item = album
+            choice = show_album(item, favs)
         if choice and choice[0] == 'play':
             lib.play_album(item.albumid, choice[1])
+            open_now_playing()
+        elif choice and choice[0] == 'artist-play':
+            lib.rpc('Playlist.Clear', {'playlistid': lib.MUSIC_PLAYLIST})
+            lib.rpc('Playlist.Add', {'playlistid': lib.MUSIC_PLAYLIST, 'item': {'artistid': choice[1]}})
+            lib.rpc('Player.Open', {'item': {'playlistid': lib.MUSIC_PLAYLIST, 'position': 0}})
+            open_now_playing()
+        elif choice and choice[0] == 'song-play':
+            lib.rpc('Player.Open', {'item': {'songid': choice[1]}})
             open_now_playing()
         return 'search' if choice and choice[0] == 'search' else None
 
@@ -242,6 +264,8 @@ class TV(Kind):
         choice = show_tvshow(item, favs)
         if choice and choice[0] == 'episode':
             lib.play_episode(choice[1], resume=choice[2])
+        elif choice and choice[0] == 'movie':
+            return open_movie(choice[1])
         return 'search' if choice and choice[0] == 'search' else None
 
     def play(self, item):
@@ -252,6 +276,12 @@ class TV(Kind):
             return
         nxt = next((e for e in episodes if not e.get('playcount')), episodes[0])
         lib.play_episode(nxt['episodeid'])
+
+
+def open_movie(movieid):
+    """A movie chosen on a person's screen (from a TV show): its info screen, over the show's."""
+    movie = lib.fetch_movie(movieid)
+    return KINDS['movies'].activate(movie, None) if movie else None
 
 
 def open_now_playing():

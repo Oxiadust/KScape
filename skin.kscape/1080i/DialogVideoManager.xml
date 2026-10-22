@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kodi's version and extras manager (Manage versions / Manage extras), opened by Kodi itself from a
+     movie's information dialog; KScape's Play Extra → Add or Manage Extras reaches it that way. The
+     control ids are Kodi's contract (they match Estuary's): 2 heading, 50 list, 21 Play, 22 Add
+     version, 23 Add extra, 27 Choose art, 24 Choose type, 25 Set as default, 28 Rename, 26 Remove.
+     22 / 24 / 25 belong to the version manager, 23 / 28 to the extras manager. -->
+<window>
+	<defaultcontrol always="true">50</defaultcontrol>
+	<controls>
+		<control type="group">
+			<description>Display &amp; aspect ratio root (Includes_Display.xml)</description>
+			<include>KScapeDisplay</include>
+			<include>DialogDim</include>
+			<control type="group">
+				<left>260</left>
+				<top>140</top>
+				<include>PanelOpenClose</include>
+				<include content="SystemPanel">
+					<param name="width" value="1400"/>
+					<param name="height" value="800"/>
+				</include>
+				<control type="label" id="2">
+					<left>30</left>
+					<width>1340</width>
+					<height>64</height>
+					<aligny>center</aligny>
+					<font>kscape_info_head</font>
+					<textcolor>white</textcolor>
+				</control>
+				<control type="image">
+					<description>Button column</description>
+					<left>1000</left>
+					<top>64</top>
+					<width>400</width>
+					<height>736</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+				</control>
+				<control type="list" id="50">
+					<description>The movie's versions or extras</description>
+					<top>84</top>
+					<width>1000</width>
+					<height>680</height>
+					<onup>50</onup>
+					<ondown>50</ondown>
+					<onleft>50</onleft>
+					<onright>101</onright>
+					<scrolltime tween="cubic" easing="out">160</scrolltime>
+					<itemlayout width="1000" height="84">
+						<control type="label">
+							<left>30</left>
+							<width>940</width>
+							<height>50</height>
+							<aligny>center</aligny>
+							<font>kscape_menu</font>
+							<textcolor>kscape_text</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+						<control type="label">
+							<left>30</left>
+							<top>44</top>
+							<width>940</width>
+							<height>34</height>
+							<aligny>center</aligny>
+							<font>kscape_small</font>
+							<textcolor>kscape_text_dim</textcolor>
+							<label>$INFO[ListItem.Label2]  $INFO[ListItem.FileNameAndPath]</label>
+						</control>
+					</itemlayout>
+					<focusedlayout width="1000" height="84">
+						<control type="image">
+							<width>1000</width>
+							<height>84</height>
+							<texture colordiffuse="kscape_blue_focus">white.png</texture>
+							<visible>Control.HasFocus(50)</visible>
+						</control>
+						<control type="image">
+							<width>1000</width>
+							<height>84</height>
+							<texture colordiffuse="kscape_blue_mid">white.png</texture>
+							<visible>!Control.HasFocus(50)</visible>
+						</control>
+						<control type="label">
+							<left>30</left>
+							<width>940</width>
+							<height>50</height>
+							<aligny>center</aligny>
+							<font>kscape_menu</font>
+							<textcolor>white</textcolor>
+							<label>$INFO[ListItem.Label]</label>
+						</control>
+						<control type="label">
+							<left>30</left>
+							<top>44</top>
+							<width>940</width>
+							<height>34</height>
+							<aligny>center</aligny>
+							<font>kscape_small</font>
+							<textcolor>kscape_tint_light</textcolor>
+							<label>$INFO[ListItem.Label2]  $INFO[ListItem.FileNameAndPath]</label>
+						</control>
+					</focusedlayout>
+				</control>
+				<control type="grouplist" id="101">
+					<left>1020</left>
+					<top>84</top>
+					<width>360</width>
+					<height>680</height>
+					<itemgap>8</itemgap>
+					<onleft>50</onleft>
+					<scrolltime tween="cubic" easing="out">160</scrolltime>
+					<control type="button" id="21">
+						<label>$LOCALIZE[208]</label>
+						<include content="SystemButton">
+							<param name="width" value="360"/>
+							<param name="height" value="64"/>
+						</include>
+					</control>
+					<control type="button" id="22">
+						<label>$LOCALIZE[40014]</label>
+						<include content="SystemButton">
+							<param name="width" value="360"/>
+							<param name="height" value="64"/>
+						</include>
+						<visible>Window.IsVisible(managevideoversions)</visible>
+					</control>
+					<control type="button" id="23">
+						<label>$LOCALIZE[40015]</label>
+						<include content="SystemButton">
+							<param name="width" value="360"/>
+							<param name="height" value="64"/>
+						</include>
+						<visible>Window.IsVisible(managevideoextras)</visible>
+					</control>
+					<control type="button" id="27">
+						<label>$LOCALIZE[13511]</label>
+						<include content="SystemButton">
+							<param name="width" value="360"/>
+							<param name="height" value="64"/>
+						</include>
+					</control>
+					<control type="button" id="24">
+						<label>$LOCALIZE[40004]</label>
+						<include content="SystemButton">
+							<param name="width" value="360"/>
+							<param name="height" value="64"/>
+						</include>
+						<visible>Window.IsVisible(managevideoversions)</visible>
+					</control>
+					<control type="button" id="28">
+						<label>$LOCALIZE[118]</label>
+						<include content="SystemButton">
+							<param name="width" value="360"/>
+							<param name="height" value="64"/>
+						</include>
+						<visible>Window.IsVisible(managevideoextras)</visible>
+					</control>
+					<control type="button" id="26">
+						<label>$LOCALIZE[15015]</label>
+						<include content="SystemButton">
+							<param name="width" value="360"/>
+							<param name="height" value="64"/>
+						</include>
+					</control>
+					<control type="button" id="25">
+						<label>$LOCALIZE[40023]</label>
+						<include content="SystemButton">
+							<param name="width" value="360"/>
+							<param name="height" value="64"/>
+						</include>
+						<visible>Window.IsVisible(managevideoversions)</visible>
+					</control>
+				</control>
+			</control>
+		</control>
+	</controls>
+</window>

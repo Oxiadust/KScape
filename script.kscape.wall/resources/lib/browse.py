@@ -13,11 +13,25 @@ from Favourites (for the album or show) and Search.
 import xbmcaddon
 import xbmcgui
 
-from . import info, menu, modal
+from . import actions as A
+from . import info, menu, modal, people
 from . import library as lib
+from . import s as S
 
 ADDON = xbmcaddon.Addon('script.kscape.wall')
 tr = ADDON.getLocalizedString
+
+
+class _Profiles:
+    """profile.py (the person / artist / episode screens) builds on this module's dialog, so it is
+    imported on first use."""
+
+    def __getattr__(self, name):
+        from . import profile
+        return getattr(profile, name)
+
+
+PF = _Profiles()
 BACK = (xbmcgui.ACTION_NAV_BACK, xbmcgui.ACTION_PREVIOUS_MENU)
 CONTEXT = (xbmcgui.ACTION_CONTEXT_MENU,)
 PLAY = (xbmcgui.ACTION_PLAYER_PLAY,)
@@ -28,6 +42,10 @@ ART_TOP = 88
 ART_W = 420
 ART_H = {'square': 420, 'poster': 630}
 MENU_GAP = 16
+MENU_ROW_H = 60                      # the menu's rows (script-kscape-browse.xml)
+MENU_BOTTOM = 974
+MIN_ART = 300                        # the artwork shrinks to this to make room for the menu
+ART_IDS = {'square': (161, 162, 163), 'poster': (171, 172, 173)}   # card, fallback text, image
 # Right-hand column (panel pixels), see the XML.
 RIGHT_TOP, RIGHT_BOTTOM = 88, 954
 TEXT_W, BODY_PX, LINE_H = 1150, 29, 38
@@ -64,13 +82,18 @@ class BrowseDialog(xbmcgui.WindowXMLDialog):
         fav = self.favs is not None and self.favs.contains(self.item)
         self.setProperty('favourite', '1' if fav else '')
 
-    def _header(self, title, art, shape, summary, plot, heading):
+    def _header(self, title, art, shape, summary, plot, heading, plot_lines=4, menu_rows=2):
         """Fill the panel; the right column is laid out from estimated line counts (as on the
         movie info screen), and the menu sits under the artwork whatever its shape."""
         self.setProperty('title', title)
         self.setProperty('art', art or '')
         self.setProperty('shape', shape)
-        self.menu.setPosition(self.menu.getX(), ART_TOP + ART_H[shape] + MENU_GAP)
+        room = MENU_BOTTOM - ART_TOP - MENU_GAP - menu_rows * MENU_ROW_H
+        art_h = max(MIN_ART, min(ART_H[shape], room))
+        self._size_art(shape, art_h)
+        top = ART_TOP + art_h + MENU_GAP
+        self.menu.setPosition(self.menu.getX(), top)
+        self.menu.setHeight(MENU_BOTTOM - top)
         y = RIGHT_TOP
         box = self.getControl(SUMMARY)
         if summary:
@@ -82,7 +105,7 @@ class BrowseDialog(xbmcgui.WindowXMLDialog):
         box.setVisible(bool(summary))
         box = self.getControl(PLOT)
         if plot:
-            lines = min(4, info.estimate_lines(plot, TEXT_W, BODY_PX))
+            lines = min(plot_lines, info.estimate_lines(plot, TEXT_W, BODY_PX))
             box.setPosition(box.getX(), y)
             box.setHeight(lines * LINE_H)
             box.setText(plot)
@@ -94,6 +117,19 @@ class BrowseDialog(xbmcgui.WindowXMLDialog):
         y += HEADING_H
         self.entries.setPosition(self.entries.getX(), y)
         self.entries.setHeight(RIGHT_BOTTOM - y)
+
+    def _size_art(self, shape, h):
+        """The artwork as tall as the menu below it leaves room for, centred in the column."""
+        w = h if shape == 'square' else int(round(h * 2 / 3.0))
+        x = (ART_W - w) // 2
+        card, text, image = (self.getControl(i) for i in ART_IDS[shape])
+        for c in (card, image):
+            c.setPosition(x, 0)
+            c.setWidth(w)
+            c.setHeight(h)
+        text.setPosition(x + 24, 24)
+        text.setWidth(max(1, w - 48))
+        text.setHeight(max(1, h - 48))
 
     def _fill_menu(self, items, select):
         self.menu.reset()
@@ -138,6 +174,8 @@ class BrowseDialog(xbmcgui.WindowXMLDialog):
         elif aid in PLAY:
             self.on_play()
         elif aid in CONTEXT:
+            if self.on_context():
+                return
             choice = menu.show(self.item, self.favs, [])
             if choice == 'favourite':
                 self.favs.toggle(self.item)
@@ -163,6 +201,10 @@ class BrowseDialog(xbmcgui.WindowXMLDialog):
     def on_play(self):
         pass
 
+    def on_context(self):
+        """C on a list row: True when the screen handled it (its own row menu)."""
+        return False
+
     def back(self):
         """Step up a level; False when already at the top (the dialog then closes)."""
         return False
@@ -177,8 +219,14 @@ class AlbumDialog(BrowseDialog):
         count = tr(32117 if len(self.songs) != 1 else 32118).format(len(self.songs))
         facts = [a.artist, str(a.year) if a.year else '', ', '.join(sorted(a.genres)),
                  f'{count}, {_duration(total)}' if total else count, a.label]
-        self._header(a.title, a.poster, 'square', ' · '.join(f for f in facts if f), a.plot, tr(32111))
-        self._fill_menu([('return', tr(32066), ''), ('play', tr(32110), '')], 'play')
+        items = [('return', tr(32066), ''), ('play', tr(32110), ''), ('queue', tr(S.QUEUE), '')]
+        self.artist_ids = [int(i) for i in (lib.fetch_album_details(a.albumid).get('artistid') or [])]
+        if self.artist_ids:
+            items.append(('artist', tr(S.ARTIST), ''))
+        items += [('details', tr(S.DETAILS), ''), ('art', tr(S.CHOOSE_ART), '')]
+        self._header(a.title, a.poster, 'square', ' · '.join(f for f in facts if f), a.plot, tr(32111),
+                     menu_rows=len(items))
+        self._fill_menu(items, 'play')
         rows = []
         discs = len({s.get('disc') or 0 for s in self.songs}) > 1
         for s in self.songs:
@@ -196,6 +244,49 @@ class AlbumDialog(BrowseDialog):
             self.finish(('play', 0))
         elif key == 'return':
             self.finish(None)
+        elif key == 'queue':
+            lib.rpc('Playlist.Add', {'playlistid': lib.MUSIC_PLAYLIST, 'item': {'albumid': self.item.albumid}})
+        elif key == 'artist':
+            self._artist()
+        elif key == 'details':
+            d = lib.fetch_album_details(self.item.albumid)
+            PF.run(PF.details(self.item.title, self.item.poster, 'square', people.album_rows(d, self.songs, tr)))
+        elif key == 'art':
+            if A.choose_art('album', self.item.albumid, self.item.title):
+                self.item = lib.fetch_album(self.item.albumid) or self.item
+                self.start()
+
+    def _artist(self):
+        """The album's artist screen (a choice of several artists asks which)."""
+        ids = self.artist_ids
+        if len(ids) > 1:
+            names = [lib.fetch_artist(i).get('artist') or str(i) for i in ids]
+            n = xbmcgui.Dialog().select(tr(S.ARTIST), names)
+            if n < 0:
+                return
+            ids = [ids[n]]
+        choice = PF.show_artist(ids[0])
+        if choice:
+            self.finish(choice)
+
+    def on_context(self):
+        """C on a track: its information, or queue it."""
+        if self.getFocusId() != ENTRIES:
+            return False
+        i = self.entries.getSelectedPosition()
+        if not 0 <= i < len(self.songs):
+            return False
+        songid = self.songs[i].get('songid')
+        n = xbmcgui.Dialog().contextmenu([tr(S.INFO), tr(S.QUEUE), tr(S.PLAY_NEXT)])
+        if n == 0:
+            choice = PF.show_song(songid)
+            if choice:
+                self.finish(choice)
+        elif n == 1:
+            A.queue_songs([songid])
+        elif n == 2:
+            A.queue_songs([songid], play_next=True)
+        return True
 
     def on_entry(self, index):
         if 0 <= index < len(self.songs):
@@ -246,14 +337,17 @@ class ShowDialog(BrowseDialog):
             resume = (nxt.get('resume') or {}).get('position') or 0
             code = f'S{nxt.get("season", 0):02d}E{nxt.get("episode", 0):02d}'
             items.append(('next', tr(32122 if resume else 32121), code))
+        items += [('cast', tr(S.CAST), ''), ('details', tr(S.DETAILS), ''),
+                  ('art', tr(S.CHOOSE_ART), ''), ('refresh', tr(S.REFRESH), '')]
         return items
 
     def _show_seasons(self):
         t = self.item
         self.season = None
-        self._header(t.title, t.poster, 'poster', self._summary(), t.plot, tr(32112))
         self.next = self._next_episode()
-        self._fill_menu(self._menu_items(self.next), 'return')
+        items = self._menu_items(self.next)
+        self._header(t.title, t.poster, 'poster', self._summary(), t.plot, tr(32112), menu_rows=len(items))
+        self._fill_menu(items, 'return')
         rows = []
         for s in self.seasons:
             n = s.get('season') or 0
@@ -269,13 +363,15 @@ class ShowDialog(BrowseDialog):
     def _show_episodes(self, season):
         t = self.item
         self.season = season.get('season') or 0
+        self.season_rec = season
         self.episodes = lib.fetch_episodes(t.tvshowid, self.season)
         art = season.get('art') or {}
         name = season.get('title') or (tr(32114).format(self.season) if self.season else tr(32115))
-        self._header(f'{t.title} · {name}', art.get('poster') or t.poster, 'poster', self._summary(),
-                     t.plot, tr(32113))
         self.next = self._next_episode()
-        self._fill_menu(self._menu_items(self.next), 'return')
+        items = self._menu_items(self.next)
+        self._header(f'{t.title} · {name}', art.get('poster') or t.poster, 'poster', self._summary(),
+                     t.plot, tr(32113), menu_rows=len(items))
+        self._fill_menu(items, 'return')
         rows = []
         for e in self.episodes:
             n = e.get('episode') or 0
@@ -305,6 +401,72 @@ class ShowDialog(BrowseDialog):
             self._play(self.next)
         elif key == 'return':
             self.finish(None)
+        elif key == 'cast':
+            self._cast()
+        elif key == 'details':
+            d = lib.fetch_show_details(self.item.tvshowid)
+            PF.run(PF.details(self.item.title, self.item.poster, 'poster', people.show_rows(d, self.seasons, tr)))
+        elif key == 'art':
+            if A.choose_art('tvshow', self.item.tvshowid, self.item.title):
+                self._reload()
+        elif key == 'refresh':
+            if A.refresh('tvshow', self.item.tvshowid, self.item.title):
+                self._reload()
+
+    def _cast(self, d=None, title=None, art=None, shape='poster'):
+        """Cast of the show (or of an episode): portraits; Select opens a person's profile."""
+        d = d or lib.fetch_show_details(self.item.tvshowid)
+        title = title or self.item.title
+        choice = PF.run(PF.cast(title, art if art is not None else self.item.poster, shape, d, PF.show_person_here))
+        if choice is not None:
+            self.finish(choice)
+
+    def _reload(self):
+        """Show / season data changed (art, refresh): read the show again and redraw."""
+        item = lib.fetch_show(self.item.tvshowid)
+        if item:
+            self.item = item
+        self.start()
+
+    def on_context(self):
+        """C on a season or episode: information, art, refresh, watched state."""
+        if self.getFocusId() != ENTRIES:
+            return False
+        i = self.entries.getSelectedPosition()
+        if self.season is None:
+            if not 0 <= i < len(self.seasons):
+                return False
+            s = self.seasons[i]
+            n = xbmcgui.Dialog().contextmenu([tr(S.CHOOSE_ART)])
+            if n == 0 and A.choose_art('season', s['seasonid'], self.item.title, season=s.get('season'),
+                                       showid=self.item.tvshowid):
+                self.seasons = lib.fetch_seasons(self.item.tvshowid)
+                self._show_seasons()
+            return True
+        if not 0 <= i < len(self.episodes):
+            return False
+        e = self.episodes[i]
+        watched = bool(e.get('playcount'))
+        n = xbmcgui.Dialog().contextmenu([tr(S.INFO), tr(S.MARK_UNWATCHED if watched else S.MARK_WATCHED),
+                                          tr(S.CHOOSE_ART), tr(S.REFRESH)])
+        if n == 0:
+            self._episode_info(e['episodeid'])
+        elif n == 1:
+            A.set_watched('episode', e['episodeid'], not watched)
+            self.episodes = lib.fetch_episodes(self.item.tvshowid, self.season)
+            self._show_episodes(self.season_rec)
+        elif n == 2:
+            if A.choose_art('episode', e['episodeid'], e.get('title') or ''):
+                self._show_episodes(self.season_rec)
+        elif n == 3:
+            if A.refresh('episode', e['episodeid'], e.get('title') or ''):
+                self._show_episodes(self.season_rec)
+        return True
+
+    def _episode_info(self, episodeid):
+        choice = PF.show_episode(episodeid)
+        if choice:
+            self.finish(choice)
 
     def on_entry(self, index):
         if self.season is None:

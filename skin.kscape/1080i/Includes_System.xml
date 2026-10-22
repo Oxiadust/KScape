@@ -161,4 +161,117 @@
 			</focusedlayout>
 		</definition>
 	</include>
+	<include name="SystemDetailRow">
+		<description>Row of a detailed selection dialog (Dialog.select useDetails): a thumbnail when the item has one,
+		then the label, with Label2 on the right. Used by Choose Art's image list.</description>
+		<param name="id"/>
+		<param name="width" default="800"/>
+		<param name="height" default="96"/>
+		<definition>
+			<itemlayout width="$PARAM[width]" height="$PARAM[height]">
+				<control type="image">
+					<left>30</left>
+					<top>8</top>
+					<width>120</width>
+					<height>80</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+					<visible>!String.IsEmpty(ListItem.Art(thumb))</visible>
+				</control>
+				<control type="image">
+					<left>30</left>
+					<top>8</top>
+					<width>120</width>
+					<height>80</height>
+					<aspectratio>keep</aspectratio>
+					<texture background="true">$INFO[ListItem.Art(thumb)]</texture>
+					<visible>!String.IsEmpty(ListItem.Art(thumb))</visible>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<width>$PARAM[width]</width>
+					<height>$PARAM[height]</height>
+					<aligny>center</aligny>
+					<font>kscape_menu</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+					<visible>String.IsEmpty(ListItem.Art(thumb))</visible>
+				</control>
+				<control type="label">
+					<left>170</left>
+					<width>380</width>
+					<height>$PARAM[height]</height>
+					<aligny>center</aligny>
+					<font>kscape_menu</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+					<visible>!String.IsEmpty(ListItem.Art(thumb))</visible>
+				</control>
+				<control type="label">
+					<right>30</right>
+					<width>240</width>
+					<height>$PARAM[height]</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>kscape_small</font>
+					<textcolor>kscape_text_dim</textcolor>
+					<label>$INFO[ListItem.Label2]</label>
+				</control>
+			</itemlayout>
+			<focusedlayout width="$PARAM[width]" height="$PARAM[height]">
+				<control type="image">
+					<width>$PARAM[width]</width>
+					<height>$PARAM[height]</height>
+					<texture colordiffuse="kscape_blue_focus">white.png</texture>
+					<visible>Control.HasFocus($PARAM[id])</visible>
+				</control>
+				<control type="image">
+					<left>30</left>
+					<top>8</top>
+					<width>120</width>
+					<height>80</height>
+					<texture colordiffuse="kscape_blue_dark">white.png</texture>
+					<visible>!String.IsEmpty(ListItem.Art(thumb))</visible>
+				</control>
+				<control type="image">
+					<left>30</left>
+					<top>8</top>
+					<width>120</width>
+					<height>80</height>
+					<aspectratio>keep</aspectratio>
+					<texture background="true">$INFO[ListItem.Art(thumb)]</texture>
+					<visible>!String.IsEmpty(ListItem.Art(thumb))</visible>
+				</control>
+				<control type="label">
+					<left>30</left>
+					<width>$PARAM[width]</width>
+					<height>$PARAM[height]</height>
+					<aligny>center</aligny>
+					<font>kscape_menu</font>
+					<textcolor>white</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+					<visible>String.IsEmpty(ListItem.Art(thumb))</visible>
+				</control>
+				<control type="label">
+					<left>170</left>
+					<width>380</width>
+					<height>$PARAM[height]</height>
+					<aligny>center</aligny>
+					<font>kscape_menu</font>
+					<textcolor>white</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+					<visible>!String.IsEmpty(ListItem.Art(thumb))</visible>
+				</control>
+				<control type="label">
+					<right>30</right>
+					<width>240</width>
+					<height>$PARAM[height]</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>kscape_small</font>
+					<textcolor>white</textcolor>
+					<label>$INFO[ListItem.Label2]</label>
+				</control>
+			</focusedlayout>
+		</definition>
+	</include>
 </includes>

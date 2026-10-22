@@ -10,9 +10,16 @@ right one of three pages:
   Select on one closes the screen and shows the library filtered by it (explore.py);
 - Play Scenes: Play All Scenes, the movie's scenes with their lengths (favourites marked), and
   Create scene… / Import chapters…; C on a scene edits, renames, marks it favourite, adds it to
-  a Demo Script or deletes it.
+  a Demo Script or deletes it;
+- Cast & Crew: directors, writers and the cast with their portraits; Select opens a person
+  (profile.py: biography, their movies in the library);
+- Details: every field Kodi has (original title, tagline, studios, languages, ratings, IDs...) and,
+  with a TMDB or OMDb key, budget, box office, production companies and awards (metadata.py).
 
-Right (or Select) on Play Scenes / Explore opens its page; Left or Back returns to the menu.
+Play Extra, Choose Art and Refresh follow Play Scenes: Kodi's own art and refresh functions
+(actions.py), and the trailers, featurettes and other extras found beside the movie.
+
+Right (or Select) on a page entry opens its page; Left or Back returns to the menu.
 The dialog only reports what was chosen; the caller closes it and starts playback, so the video
 never plays underneath an open dialog.
 
@@ -24,7 +31,10 @@ import threading
 import xbmcaddon
 import xbmcgui
 
-from . import badges, displayui, info, menu, modal, ratings
+from . import actions as A
+from . import badges, displayui, info, menu, metadata, modal, people, ratings
+from . import profile as PF
+from . import s as ST
 from . import explore as E
 from . import exploreui as X
 from . import scenemodel as SM
@@ -43,7 +53,9 @@ UP_DOWN = (xbmcgui.ACTION_MOVE_UP, xbmcgui.ACTION_MOVE_DOWN, xbmcgui.ACTION_PAGE
 
 MENU = 100
 POSTER_CARD, POSTER_TEXT, POSTER_ART, POSTER_BADGE = 151, 152, 153, 154
-EXPLORE_LIST, SCENE_LIST = 310, 410
+EXPLORE_LIST, SCENE_LIST, CAST_LIST, DETAILS_LIST = 310, 410, 510, 610
+PAGE_KEYS = ('explore', 'scenes', 'cast', 'details')
+PAGE_LISTS = (EXPLORE_LIST, SCENE_LIST, CAST_LIST, DETAILS_LIST)
 FACTS, RES_BADGE, HDR_BADGE, AUDIO_BADGE = 270, 272, 273, 274
 MORE_FORMATS = (275, 276, 277)          # further formats of other versions
 RATINGS_HEAD, RATINGS, TMDB_ICON, RT_ICON = 280, 285, 287, 289
@@ -67,6 +79,7 @@ FACT_H = 44                    # the facts / badges line and the ratings line
 SECTION_GAP = 26
 ROW_GAP = 18
 MENU_ROW, MENU_BOTTOM = 52, 974
+POSTER_MIN_H = 330             # the menu scrolls rather than shrinking the poster below this
 POSTER_X, POSTER_Y, POSTER_W, POSTER_H = 30, 88, 420, 630
 
 
@@ -90,6 +103,8 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         self.page = ''
         self.explore_filters = []
         self.scene_rows = []
+        self.cast_people = []
+        self.meta = {}                  # budget, revenue... from a provider (metadata.py)
         self.closed = False
         # On a screen of another shape, Kodi stretches boxes but not text or artwork: boxes that
         # must keep a shape (the poster, badges) have their widths divided by the stretch.
@@ -108,6 +123,7 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         self.setProperty('badge', m.badge)
         self._layout()
         self._fill_menu()
+        self._ask_provider()
         if self.start_page == 'explore':
             self._open_explore()
         elif self.start_page == 'scenes':
@@ -117,7 +133,7 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
 
     # ---- menu and poster ----------------------------------------------------------------------
 
-    def _fill_menu(self):
+    def _fill_menu(self, select=None):
         m, d = self.movie, self.details
         items = [('return', tr(32066), '')]
         resume = ((d.get('resume') or {}).get('position') or m.resume_position or 0)
@@ -131,11 +147,14 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
             items.append(('version', tr(32367), tr(32368).format(len(self.versions))))
         if d.get('trailer'):
             items.append(('trailer', tr(32069), ''))
+        items.append(('cast', tr(ST.CAST), '▶'))
+        items.append(('details', tr(ST.DETAILS), '▶'))
         if m.file:
             items.append(('scenes', tr(32301), '▶'))
+        items += [('extra', tr(ST.PLAY_EXTRA), ''), ('art', tr(ST.CHOOSE_ART), ''), ('refresh', tr(ST.REFRESH), '')]
         items.append(('explore', tr(32300), '▶'))
         menu_ctl = self.getControl(MENU)
-        height = len(items) * MENU_ROW
+        height = min(len(items) * MENU_ROW, MENU_BOTTOM - POSTER_Y - 16 - POSTER_MIN_H)
         top = MENU_BOTTOM - height
         menu_ctl.setPosition(0, top)              # sized before it is filled, so it never scrolls
         menu_ctl.setHeight(height)
@@ -148,7 +167,7 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
             listitems.append(li)
         menu_ctl.addItems(listitems)
         keys = [k for k, _, _ in items]
-        start = self.start_page if self.start_page in keys else ('resume' if 'resume' in keys else 'play')
+        start = select if select in [k for k, _, _ in items] else (self.start_page if self.start_page in keys else ('resume' if 'resume' in keys else 'play'))
         menu_ctl.selectItem(keys.index(start))
 
     def _size_poster(self, room):
@@ -225,7 +244,8 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
     def _layout(self):
         d = self.details
         values = {
-            'plot': d.get('plot') or self.movie.plot,
+            'plot': ((f'[I]{d["tagline"]}[/I]\n' if d.get('tagline') else '')
+                     + (d.get('plot') or self.movie.plot)),
             'genre': ', '.join(d.get('genre') or sorted(self.movie.genres)),
             'cast': ', '.join(info.cast_names(d) if d else self.movie.cast),
             'director': ', '.join(d.get('director') or sorted(self.movie.directors)),
@@ -356,6 +376,117 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
             pos = nxt
         self.explore_pos = pos
 
+    # ---- cast & crew, details, provider data -------------------------------------------------
+
+    def _ask_provider(self):
+        """Budget, revenue, companies, original language and awards, if a TMDB / OMDb key is set:
+        asked in the background, shown on the Details page when it arrives."""
+        ids = self.details.get('uniqueid') or {}
+        tmdb = ids.get('tmdb') or ids.get('themoviedb') or ''
+        metadata.movie_extra(tmdb, ids.get('imdb') or '', self._provider_found)
+
+    def _provider_found(self, data):
+        if self.closed:
+            return
+        self.meta = data
+        if self.page == 'details':
+            self._fill_details()
+
+    def _open_cast(self):
+        if not self.cast_people:
+            self._fill_cast()
+        self._set_page('cast')
+        self.setFocusId(CAST_LIST)
+
+    def _fill_cast(self):
+        self.cast_people = people.cast_rows(self.details, tr)
+        items = []
+        for r in self.cast_people:
+            li = xbmcgui.ListItem(r['name'], people.person_summary(r, tr))
+            if r['thumb']:
+                li.setArt({'thumb': r['thumb']})
+            li.setProperty('initial', ''.join(w[0] for w in r['name'].split()[:2]).upper())
+            items.append(li)
+        if not items:
+            items.append(xbmcgui.ListItem(tr(ST.P_NO_CAST)))
+        ctl = self.getControl(CAST_LIST)
+        ctl.reset()
+        ctl.addItems(items)
+        ctl.selectItem(0)
+
+    def _person_clicked(self):
+        i = self.getControl(CAST_LIST).getSelectedPosition()
+        if not 0 <= i < len(self.cast_people):
+            return
+        choice = PF.show_person(self.cast_people[i])
+        if choice and choice[0] == 'movie':
+            self.choice, self.extra = 'movie', {'movieid': choice[1]}
+            self._close()
+        elif choice and choice[0] == 'explore':
+            self.choice, self.extra = 'explore', {'filter': choice[1]}
+            self._close()
+
+    def _open_details_page(self):
+        self._fill_details()
+        self._set_page('details')
+        self.setFocusId(DETAILS_LIST)
+
+    def _fill_details(self):
+        rows = people.movie_rows(self.details, self.meta, tr, metadata.language_name)
+        ctl = self.getControl(DETAILS_LIST)
+        keep = max(0, ctl.getSelectedPosition())
+        items = [xbmcgui.ListItem(tr(label), value) for label, value in rows]
+        if not items:
+            items = [xbmcgui.ListItem(tr(ST.P_NO_DETAILS))]
+        ctl.reset()
+        ctl.addItems(items)
+        ctl.selectItem(min(keep, len(items) - 1))
+
+    # ---- Play Extra, Choose Art, Refresh ----------------------------------------------------
+
+    def _title(self):
+        return self.details.get('title') or self.movie.title
+
+    def _play_extra(self):
+        while True:
+            extras = A.find_extras(dict(self.details, movieid=self.movie.movieid))
+            pick = A.pick_extra(extras)
+            if pick == A.MANAGE:                       # Kodi's own manager; then the list again
+                A.manage_extras(dict(self.details, movieid=self.movie.movieid))
+                continue
+            if pick:
+                self.choice, self.extra = 'extra', {'file': pick['file'],
+                                                    'title': f'{self._title()} - {pick["label"]}'}
+                self._close()
+            return
+
+    def _choose_art(self):
+        if A.choose_art('movie', self.movie.movieid, self._title()):
+            self._reload('art')
+
+    def _refresh(self):
+        if A.refresh('movie', self.movie.movieid, self._title()):
+            self._reload('refresh')
+
+    def _selected_key(self):
+        item = self.getControl(MENU).getSelectedItem()
+        return item.getProperty('action') if item else None
+
+    def _reload(self, select):
+        """The movie changed in Kodi (art, refresh): read it again and redraw this screen."""
+        fresh = fetch_details(self.movie.movieid)
+        if not fresh:
+            return
+        self.details = fresh
+        poster = (fresh.get('art') or {}).get('poster') or self.movie.poster
+        self.setProperty('title', fresh.get('title') or self.movie.title)
+        self.setProperty('poster', poster)
+        self.cast_people = []
+        self.meta = {}
+        self._layout()
+        self._fill_menu(select)
+        self._ask_provider()
+
     def _open_scenes(self, focus=None):
         self._fill_scenes(focus)
         self._set_page('scenes')
@@ -434,6 +565,16 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
                 self._open_scenes()
             elif key == 'version':
                 self._choose_version()
+            elif key == 'cast':
+                self._open_cast()
+            elif key == 'details':
+                self._open_details_page()
+            elif key == 'extra':
+                self._play_extra()
+            elif key == 'art':
+                self._choose_art()
+            elif key == 'refresh':
+                self._refresh()
             else:
                 self.choice = None if key == 'return' else key
                 self._close()
@@ -445,6 +586,8 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
                 self._close()
         elif control_id == SCENE_LIST:
             self._scene_clicked()
+        elif control_id == CAST_LIST:
+            self._person_clicked()
 
     def onAction(self, action):
         aid = action.getId()
@@ -452,7 +595,7 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         if aid in UP_DOWN and focus == EXPLORE_LIST:
             self._skip_headings()
         elif aid in BACK:
-            if focus in (EXPLORE_LIST, SCENE_LIST):
+            if focus in PAGE_LISTS:
                 self.setFocusId(MENU)                 # onFocus returns to the facts page
                 return
             self.choice = None
@@ -464,6 +607,10 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
                 self._open_explore()
             elif key == 'scenes':
                 self._open_scenes()
+            elif key == 'cast':
+                self._open_cast()
+            elif key == 'details':
+                self._open_details_page()
         elif aid in PLAY:
             row = self._scene_row() if focus == SCENE_LIST else None
             if row and row[0] in ('all', 'scene'):
@@ -481,8 +628,17 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
                     else:
                         self._fill_scenes(row[1])
                 return
-            choice = menu.show(self.movie, self.favs, [])
-            if choice == 'favourite':
+            watched = bool(self.details.get('playcount'))
+            choice = menu.show(self.movie, self.favs,
+                               [('watched', tr(ST.MARK_UNWATCHED if watched else ST.MARK_WATCHED)),
+                                ('rate', tr(ST.RATE))])
+            if choice == 'watched':
+                A.set_watched('movie', self.movie.movieid, not watched)
+                self._reload(self._selected_key())
+            elif choice == 'rate':
+                if A.rate('movie', self.movie.movieid, self.details.get('userrating'), self._title()) is not None:
+                    self._reload(self._selected_key())
+            elif choice == 'favourite':
                 self.favs.toggle(self.movie)
                 self._mark_favourite()
             elif choice == 'search':
@@ -520,8 +676,9 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
 def show_details(movie, favs=None, library=None, page=None, focus=None, resolver=None):
     """Open the info screen for `movie` (on its Explore or Play Scenes page if `page` says so).
     Returns (choice, details, extra): choice is 'play', 'resume', 'trailer', 'search' (from the
-    C menu), 'explore' (extra['filter']), 'scenes' (extra['ids'] to play, extra['focus']) or
-    None for Return/Back; details is the GetMovieDetails dict (or None)."""
+    C menu), 'explore' (extra['filter']), 'scenes' (extra['ids'] to play, extra['focus']),
+    'extra' (extra['file'], extra['title'] to play), 'movie' (extra['movieid']: another movie,
+    chosen on a person's screen) or None for Return/Back; details is the GetMovieDetails dict (or None)."""
     details = fetch_details(movie.movieid)
     dialog = DetailsDialog('script-kscape-info.xml', ADDON.getAddonInfo('path'), 'Default', '1080i',
                            movie=movie, details=details, favs=favs, library=library, page=page,

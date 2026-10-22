@@ -1377,3 +1377,627 @@ msgstr ""
 msgctxt "#32412"
 msgid "Group movies by collection (Kodi movie sets) on the cover wall"
 msgstr ""
+
+msgctxt "#32420"
+msgid "Cast & Crew"
+msgstr ""
+
+msgctxt "#32421"
+msgid "Details"
+msgstr ""
+
+msgctxt "#32422"
+msgid "Play Extra"
+msgstr ""
+
+msgctxt "#32423"
+msgid "Choose Art"
+msgstr ""
+
+msgctxt "#32424"
+msgid "Refresh"
+msgstr ""
+
+msgctxt "#32425"
+msgid "Artist"
+msgstr ""
+
+msgctxt "#32426"
+msgid "Information"
+msgstr ""
+
+msgctxt "#32427"
+msgid "Add to Queue"
+msgstr ""
+
+msgctxt "#32428"
+msgid "Play Next"
+msgstr ""
+
+msgctxt "#32429"
+msgid "Mark as Watched"
+msgstr ""
+
+msgctxt "#32430"
+msgid "Mark as Unwatched"
+msgstr ""
+
+msgctxt "#32431"
+msgid "Play All"
+msgstr ""
+
+msgctxt "#32432"
+msgid "Show on the Wall"
+msgstr ""
+
+msgctxt "#32433"
+msgid "Browse for an image…"
+msgstr ""
+
+msgctxt "#32434"
+msgid "Remove"
+msgstr ""
+
+msgctxt "#32435"
+msgid "Songs"
+msgstr ""
+
+msgctxt "#32436"
+msgid "Albums"
+msgstr ""
+
+msgctxt "#32440"
+msgid "Original title"
+msgstr ""
+
+msgctxt "#32441"
+msgid "Tagline"
+msgstr ""
+
+msgctxt "#32442"
+msgid "Released"
+msgstr ""
+
+msgctxt "#32443"
+msgid "Runtime"
+msgstr ""
+
+msgctxt "#32444"
+msgid "Genres"
+msgstr ""
+
+msgctxt "#32445"
+msgid "Directors"
+msgstr ""
+
+msgctxt "#32446"
+msgid "Writers"
+msgstr ""
+
+msgctxt "#32447"
+msgid "Studios"
+msgstr ""
+
+msgctxt "#32448"
+msgid "Production companies"
+msgstr ""
+
+msgctxt "#32449"
+msgid "Country"
+msgstr ""
+
+msgctxt "#32450"
+msgid "Original language"
+msgstr ""
+
+msgctxt "#32451"
+msgid "Audio languages"
+msgstr ""
+
+msgctxt "#32452"
+msgid "Subtitles"
+msgstr ""
+
+msgctxt "#32453"
+msgid "Certification"
+msgstr ""
+
+msgctxt "#32454"
+msgid "Ratings"
+msgstr ""
+
+msgctxt "#32455"
+msgid "Your rating"
+msgstr ""
+
+msgctxt "#32456"
+msgid "Top 250"
+msgstr ""
+
+msgctxt "#32457"
+msgid "Tags"
+msgstr ""
+
+msgctxt "#32458"
+msgid "Collection"
+msgstr ""
+
+msgctxt "#32459"
+msgid "Budget"
+msgstr ""
+
+msgctxt "#32460"
+msgid "Box office"
+msgstr ""
+
+msgctxt "#32461"
+msgid "Awards"
+msgstr ""
+
+msgctxt "#32462"
+msgid "Added"
+msgstr ""
+
+msgctxt "#32463"
+msgid "Last played"
+msgstr ""
+
+msgctxt "#32464"
+msgid "Plays"
+msgstr ""
+
+msgctxt "#32465"
+msgid "Database IDs"
+msgstr ""
+
+msgctxt "#32466"
+msgid "File"
+msgstr ""
+
+msgctxt "#32467"
+msgid "Video"
+msgstr ""
+
+msgctxt "#32468"
+msgid "Audio"
+msgstr ""
+
+msgctxt "#32469"
+msgid "Network"
+msgstr ""
+
+msgctxt "#32470"
+msgid "First aired"
+msgstr ""
+
+msgctxt "#32471"
+msgid "Seasons"
+msgstr ""
+
+msgctxt "#32472"
+msgid "Episodes"
+msgstr ""
+
+msgctxt "#32473"
+msgid "Status"
+msgstr ""
+
+msgctxt "#32474"
+msgid "Aired"
+msgstr ""
+
+msgctxt "#32475"
+msgid "Season / Episode"
+msgstr ""
+
+msgctxt "#32476"
+msgid "Born"
+msgstr ""
+
+msgctxt "#32477"
+msgid "Formed"
+msgstr ""
+
+msgctxt "#32478"
+msgid "Died"
+msgstr ""
+
+msgctxt "#32479"
+msgid "Disbanded"
+msgstr ""
+
+msgctxt "#32480"
+msgid "Years active"
+msgstr ""
+
+msgctxt "#32481"
+msgid "Styles"
+msgstr ""
+
+msgctxt "#32482"
+msgid "Moods"
+msgstr ""
+
+msgctxt "#32483"
+msgid "Instruments"
+msgstr ""
+
+msgctxt "#32484"
+msgid "Type"
+msgstr ""
+
+msgctxt "#32485"
+msgid "Members"
+msgstr ""
+
+msgctxt "#32486"
+msgid "Record label"
+msgstr ""
+
+msgctxt "#32487"
+msgid "Themes"
+msgstr ""
+
+msgctxt "#32488"
+msgid "Rating"
+msgstr ""
+
+msgctxt "#32489"
+msgid "Duration"
+msgstr ""
+
+msgctxt "#32490"
+msgid "Tracks"
+msgstr ""
+
+msgctxt "#32491"
+msgid "Composer"
+msgstr ""
+
+msgctxt "#32492"
+msgid "Lyricist"
+msgstr ""
+
+msgctxt "#32493"
+msgid "Artist"
+msgstr ""
+
+msgctxt "#32494"
+msgid "Album"
+msgstr ""
+
+msgctxt "#32495"
+msgid "Track"
+msgstr ""
+
+msgctxt "#32496"
+msgid "Disc"
+msgstr ""
+
+msgctxt "#32497"
+msgid "Bitrate"
+msgstr ""
+
+msgctxt "#32498"
+msgid "Sample rate"
+msgstr ""
+
+msgctxt "#32499"
+msgid "Channels"
+msgstr ""
+
+msgctxt "#32500"
+msgid "Codec"
+msgstr ""
+
+msgctxt "#32501"
+msgid "Comment"
+msgstr ""
+
+msgctxt "#32502"
+msgid "Year"
+msgstr ""
+
+msgctxt "#32503"
+msgid "Origin"
+msgstr ""
+
+msgctxt "#32504"
+msgid "Also known as"
+msgstr ""
+
+msgctxt "#32505"
+msgid "Credits"
+msgstr ""
+
+msgctxt "#32506"
+msgid "Guest stars"
+msgstr ""
+
+msgctxt "#32507"
+msgid "Added"
+msgstr ""
+
+msgctxt "#32508"
+msgid "Sort name"
+msgstr ""
+
+msgctxt "#32509"
+msgid "Gender"
+msgstr ""
+
+msgctxt "#32510"
+msgid "MusicBrainz ID"
+msgstr ""
+
+msgctxt "#32511"
+msgid "Play count"
+msgstr ""
+
+msgctxt "#32512"
+msgid "Original release"
+msgstr ""
+
+msgctxt "#32520"
+msgid "Cast"
+msgstr ""
+
+msgctxt "#32521"
+msgid "In your library"
+msgstr ""
+
+msgctxt "#32522"
+msgid "Filmography"
+msgstr ""
+
+msgctxt "#32523"
+msgid "Discography"
+msgstr ""
+
+msgctxt "#32524"
+msgid "Songs in your library"
+msgstr ""
+
+msgctxt "#32525"
+msgid "Details"
+msgstr ""
+
+msgctxt "#32526"
+msgid "Play Extra"
+msgstr ""
+
+msgctxt "#32527"
+msgid "as {}"
+msgstr ""
+
+msgctxt "#32528"
+msgid "Director"
+msgstr ""
+
+msgctxt "#32529"
+msgid "Writer"
+msgstr ""
+
+msgctxt "#32530"
+msgid "Born {} in {}"
+msgstr ""
+
+msgctxt "#32531"
+msgid "Born {}"
+msgstr ""
+
+msgctxt "#32532"
+msgid "Died {}"
+msgstr ""
+
+msgctxt "#32533"
+msgid "Kodi's library holds no biography. Add your TMDB API key in KScape's settings to show biographies and filmographies."
+msgstr ""
+
+msgctxt "#32534"
+msgid "{} in your library"
+msgstr ""
+
+msgctxt "#32535"
+msgid "None of their movies is in your library yet."
+msgstr ""
+
+msgctxt "#32536"
+msgid "Kodi has no cast for this title."
+msgstr ""
+
+msgctxt "#32537"
+msgid "Kodi has no further details for this title."
+msgstr ""
+
+msgctxt "#32538"
+msgid "Looking up…"
+msgstr ""
+
+msgctxt "#32539"
+msgid "1 movie in your library"
+msgstr ""
+
+msgctxt "#32540"
+msgid "{} movies in your library"
+msgstr ""
+
+msgctxt "#32541"
+msgid "{} albums in your library"
+msgstr ""
+
+msgctxt "#32542"
+msgid "{} songs in your library"
+msgstr ""
+
+msgctxt "#32550"
+msgid "Choose art type"
+msgstr ""
+
+msgctxt "#32551"
+msgid "Choose {}"
+msgstr ""
+
+msgctxt "#32552"
+msgid "Artwork updated"
+msgstr ""
+
+msgctxt "#32553"
+msgid "No other images are available. Use Browse to pick a file."
+msgstr ""
+
+msgctxt "#32554"
+msgid "Current"
+msgstr ""
+
+msgctxt "#32555"
+msgid "Refresh the information for \"{}\" from its scraper?"
+msgstr ""
+
+msgctxt "#32556"
+msgid "Ignore the local NFO file and use the scraper?"
+msgstr ""
+
+msgctxt "#32557"
+msgid "Refreshing…"
+msgstr ""
+
+msgctxt "#32558"
+msgid "Information refreshed"
+msgstr ""
+
+msgctxt "#32559"
+msgid "Kodi could not refresh this item"
+msgstr ""
+
+msgctxt "#32560"
+msgid "Kodi refreshes music information from Settings > Media > Music > Scrape. Nothing to refresh here."
+msgstr ""
+
+msgctxt "#32561"
+msgid "No extras found for this title."
+msgstr ""
+
+msgctxt "#32562"
+msgid "Play Extra"
+msgstr ""
+
+msgctxt "#32563"
+msgid "Removed"
+msgstr ""
+
+msgctxt "#32570"
+msgid "Trailer"
+msgstr ""
+
+msgctxt "#32571"
+msgid "Behind the Scenes"
+msgstr ""
+
+msgctxt "#32572"
+msgid "Deleted Scenes"
+msgstr ""
+
+msgctxt "#32573"
+msgid "Interviews"
+msgstr ""
+
+msgctxt "#32574"
+msgid "Featurettes"
+msgstr ""
+
+msgctxt "#32575"
+msgid "Shorts"
+msgstr ""
+
+msgctxt "#32576"
+msgid "Scenes"
+msgstr ""
+
+msgctxt "#32577"
+msgid "Extras"
+msgstr ""
+
+msgctxt "#32580"
+msgid "Poster"
+msgstr ""
+
+msgctxt "#32581"
+msgid "Fanart"
+msgstr ""
+
+msgctxt "#32582"
+msgid "Banner"
+msgstr ""
+
+msgctxt "#32583"
+msgid "Clear logo"
+msgstr ""
+
+msgctxt "#32584"
+msgid "Clear art"
+msgstr ""
+
+msgctxt "#32585"
+msgid "Landscape"
+msgstr ""
+
+msgctxt "#32586"
+msgid "Disc art"
+msgstr ""
+
+msgctxt "#32587"
+msgid "Key art"
+msgstr ""
+
+msgctxt "#32588"
+msgid "Thumbnail"
+msgstr ""
+
+msgctxt "#32590"
+msgid "TMDB API key, for budget, biographies and filmographies (optional)"
+msgstr ""
+
+msgctxt "#32591"
+msgid "Kodi's library has no budget, box office, biographies or filmographies. With your own free key from themoviedb.org, KScape asks TMDB for the title or person you are looking at, one at a time, and keeps the answer for a month. Leave empty to never contact TMDB."
+msgstr ""
+
+msgctxt "#32592"
+msgid "Information screens"
+msgstr ""
+
+msgctxt "#32513"
+msgid "Conductor"
+msgstr ""
+
+msgctxt "#32514"
+msgid "Play"
+msgstr ""
+
+msgctxt "#32543"
+msgid "1 album in your library"
+msgstr ""
+
+msgctxt "#32544"
+msgid "1 song in your library"
+msgstr ""
+
+msgctxt "#32515"
+msgid "Your Rating…"
+msgstr ""
+
+msgctxt "#32516"
+msgid "Your rating"
+msgstr ""
+
+msgctxt "#32517"
+msgid "No rating"
+msgstr ""
+
+msgctxt "#32518"
+msgid "Add or Manage Extras…"
+msgstr ""
+
+msgctxt "#32519"
+msgid "Kodi could not open its extras manager for this movie"
+msgstr ""

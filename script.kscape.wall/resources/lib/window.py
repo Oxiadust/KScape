@@ -408,7 +408,7 @@ class WallWindow(xbmcgui.WindowXML):
         self.heal_at = time.time() + HEAL_EVERY_S
         self.retries = {}                # poster url -> (attempts, next attempt time)
 
-        self.status.setLabel(ADDON.getLocalizedString(32001))
+        self.status.setLabel('')                 # the logo says it is loading
         self.setProperty('kscape.loading', '1')
         self.group_sets = self._can_group() and ADDON.getSettingBool('group_sets')
         self.sets = {}                   # Kodi movie sets: setid -> title, artwork, plot
@@ -464,7 +464,7 @@ class WallWindow(xbmcgui.WindowXML):
                 m.setHeight(h)
             m.setVisible(on)
         self.status.setPosition(vx + (vw - 1400) // 2, vy + (vh - 200) // 2)
-        self.getControl(1951).setPosition(vx + (vw - 400) // 2, vy + (vh - 200) // 2 - 60)
+        self.getControl(1951).setPosition(vx + (vw - 1200) // 2, vy + (vh - 225) // 2)
         self.caption.setPosition(vx, vy + vh - CAPTION_PX)
         for cid in (1961, 1963):
             self.getControl(cid).setWidth(vw)

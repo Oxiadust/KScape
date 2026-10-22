@@ -58,9 +58,35 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   best audio track (Dolby Atmos, DTS:X, Dolby TrueHD, DTS-HD MA, Dolby Digital Plus, DTS, Dolby
   Digital, PCM, FLAC, AAC), a **Ratings** row (certificate, TMDB, Rotten Tomatoes), then genres,
   cast, director and collection. The menu: **Return / Resume Movie / Play Movie / Play Trailer
-  / Play Scenes / Explore**. Resume and Trailer only appear when Kodi has a resume point or
-  trailer for that movie. Everything comes from Kodi's library (stream details measured from the
+  / Cast & Crew / Details / Play Scenes / Play Extra / Choose Art / Refresh / Explore**. Resume and
+  Trailer only appear when Kodi has a resume point or trailer for that movie. Everything comes from Kodi's library (stream details measured from the
   file, scraped ratings); anything missing is left out, never guessed.
+- **Cast & Crew** (movie info → Cast & Crew): the directors, writers and cast with their portraits.
+  Select a person for their screen: portrait, role, the movies of theirs in your library (Select
+  opens one; **Show on the Wall** filters the wall by them) and, with a TMDB key, biography, birth
+  and filmography. TV shows and episodes have the same screens.
+- **Details** (movie info → Details): every field Kodi holds - original title, tagline, release
+  date, runtime, genres, directors, writers, studios, country, audio and subtitle languages,
+  certification, ratings, your rating, Top 250 rank, tags, collection, video and audio streams,
+  play count, dates, database IDs and file - and, with a TMDB or OMDb key, budget, box office,
+  production companies, original language and awards. Shows, episodes, albums, songs and artists
+  have a Details page too.
+- **Play Extra / Choose Art / Refresh** (after Play Scenes). *Play Extra* ends with **Add or Manage Extras…**, which opens Kodi's own extras manager (add an
+  extra from a file, rename it, remove it, choose its art; the skin ships the manager and Kodi's
+  information dialog in KScape's look) and then lists the extras again. It lists the trailer, the
+  extras Kodi 21 holds for the movie, and the files beside it that follow the Jellyfin / Plex naming
+  (an `Extras`, `Featurettes`, `Behind The Scenes`, `Deleted Scenes`, `Interviews`, `Trailers`,
+  `Shorts` or `Scenes` folder, or a `-trailer`, `-featurette`, `-behindthescenes`, `-deleted`,
+  `-interview`, `-short` or `-scene` suffix). *Choose Art* offers every art type of the item (poster,
+  fanart, banner, landscape, clear logo, clear art, disc art, key art; a cover for albums, a still
+  for episodes), the images the scraper offered, a file you browse to, or none; *Refresh* has Kodi's
+  scraper reload the item (movies, shows, episodes). Both change Kodi's own library, so every
+  view updates. **C** on a movie also marks it watched / unwatched and sets your rating.
+- **Albums, songs, artists.** The album screen adds **Add to Queue**, **Artist**, **Details** and
+  **Choose Art**; **C** on a track opens its information (credits, bitrate, sample rate...) or queues
+  it. The artist screen shows the biography, life facts, genres and styles Kodi's music scraper
+  stored, the discography (your albums open on Select, other albums the scraper listed are dim),
+  Play All and Choose Art.
 - **Explore** (movie info → Explore, Right or Select): beside the poster, **Related Movies**, the
   movie's collection, director, cast, genres, year and country, each with how many of your
   movies it leads to. Select one and the info screen closes on the library filtered by it, in
@@ -324,8 +350,11 @@ The wall's own options are stored as add-on settings of `script.kscape.wall` and
 - **Reduce motion** (off). On: no glide or flight; covers swap in place. From the menu it also
   sets the skin's own Reduce motion, so dialogs fade instead of sliding.
 
-Add-on settings → **Ratings**: an optional **OMDb API key** for Rotten Tomatoes scores (empty by
-default: OMDb is never contacted).
+Add-on settings → **Ratings**: an optional **OMDb API key** for Rotten Tomatoes scores and awards,
+and an optional **TMDB API key** for budget, box office, production companies, biographies and
+filmographies - Kodi's library has none of these (Estuary gets them from script.embuary.info). Both
+are empty by default: neither service is ever contacted without your key, and then only for the
+title or person on screen.
 
 Motion timings and easing (`FRAME_TWEEN`: `back` for one soft overshoot, or `elastic` for a
 bouncier settle), sizes and the pool size live in
@@ -427,7 +456,11 @@ script.kscape.wall/       The wall add-on: movies, music and TV (Python + window
                           listmodel, search (pure Python); kinds (what differs per library),
                           favourites (Kodi's favourites), menu (the C menu), library, cache,
                           skins, state, window (wall), details (movie info), browse (album and
-                          show screens), listwindow (list view), nowplaying, collectionmodel
+                          show screens), profile (person, artist, episode, song, cast and
+                          details screens), people (their rows; pure), actions (Choose Art,
+                          Refresh, extras, rating), extras and artchoice (pure), metadata
+                          (TMDB / OMDb), kodidb (read-only look at Kodi's databases), s (string
+                          ids), listwindow (list view), nowplaying, collectionmodel
                           (pure), collectionui and collectionwindow (collections), modal (the
                           open windows, closed when Home asks for another view), colours
                           (the colour theme pickers), scenemodel (pure), scenes (scene and
@@ -570,6 +603,11 @@ add-on's window XML and Python are re-read each time a view opens).
 - The info screen lays out its right-hand column from estimated line counts (Kodi cannot
   measure text for scripts): a long synopsis scrolls inside its box, and an unusually long cast
   list is cut at three lines.
+- Not in Kodi, so not on KScape's screens without a TMDB key: biographies of cast and crew, their
+  birth and filmography, budget and box office. Crew members have no portrait (Kodi stores portraits
+  of actors only). Kodi has no JSON-RPC to refresh music information, so albums and artists have no
+  Refresh. Music videos and movie sets have no information screen of their own (sets open a wall
+  of their movies).
 - The video aspect ratio on the info screen is the encoded video's, as Kodi reports it, so a
   letterboxed 2.39 film encoded at 16:9 shows 1.78.
 - Re-sorting a 5,000-movie list by cast takes about 3.5 s the first time on the development

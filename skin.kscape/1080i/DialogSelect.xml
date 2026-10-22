@@ -41,7 +41,7 @@
 					</include>
 				</control>
 				<control type="list" id="6">
-					<description>Detailed list: same look, Label2 on the right</description>
+					<description>Detailed list: a thumbnail when the item has art, Label2 on the right</description>
 					<top>84</top>
 					<width>800</width>
 					<height>560</height>
@@ -50,10 +50,10 @@
 					<onright>9001</onright>
 					<onleft>9001</onleft>
 					<scrolltime tween="cubic" easing="out">160</scrolltime>
-					<include content="SystemListRow">
+					<include content="SystemDetailRow">
 						<param name="id" value="6"/>
 						<param name="width" value="800"/>
-						<param name="height" value="70"/>
+						<param name="height" value="96"/>
 					</include>
 				</control>
 				<control type="image">

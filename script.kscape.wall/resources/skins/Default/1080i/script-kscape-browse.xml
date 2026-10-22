@@ -68,12 +68,12 @@
 					<top>88</top>
 					<control type="group">
 						<visible>String.IsEqual(Window.Property(shape),square)</visible>
-						<control type="image">
+						<control type="image" id="161">
 							<width>420</width>
 							<height>420</height>
 							<texture colordiffuse="FF1A1A1F">kscape-white.png</texture>
 						</control>
-						<control type="textbox">
+						<control type="textbox" id="162">
 							<left>24</left>
 							<top>24</top>
 							<width>372</width>
@@ -85,7 +85,7 @@
 							<label>$INFO[Window.Property(title)]</label>
 							<visible>String.IsEmpty(Window.Property(art))</visible>
 						</control>
-						<control type="image">
+						<control type="image" id="163">
 							<width>420</width>
 							<height>420</height>
 							<aspectratio>scale</aspectratio>
@@ -95,12 +95,12 @@
 					</control>
 					<control type="group">
 						<visible>String.IsEqual(Window.Property(shape),poster)</visible>
-						<control type="image">
+						<control type="image" id="171">
 							<width>420</width>
 							<height>630</height>
 							<texture colordiffuse="FF1A1A1F">kscape-white.png</texture>
 						</control>
-						<control type="textbox">
+						<control type="textbox" id="172">
 							<left>24</left>
 							<top>24</top>
 							<width>372</width>
@@ -112,7 +112,7 @@
 							<label>$INFO[Window.Property(title)]</label>
 							<visible>String.IsEmpty(Window.Property(art))</visible>
 						</control>
-						<control type="image">
+						<control type="image" id="173">
 							<width>420</width>
 							<height>630</height>
 							<aspectratio>scale</aspectratio>
