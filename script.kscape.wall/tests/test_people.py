@@ -176,6 +176,38 @@ class Art(unittest.TestCase):
         self.assertEqual(artchoice.candidates('poster', None, None), [])
 
 
+class Wikipedia(unittest.TestCase):
+    def test_titles_follow_the_department(self):
+        md = _metadata()
+        self.assertEqual(md.wiki_titles('Sam Liu', 'Directing')[:2], ['Sam Liu (director)', 'Sam Liu (film director)'])
+        self.assertEqual(md.wiki_titles('Ann Lee', 'Acting')[0], 'Ann Lee')
+        self.assertEqual(len(md.wiki_titles('X', 'Acting')), len(set(md.wiki_titles('X', 'Acting'))))
+
+    def test_person_pages(self):
+        md = _metadata()
+        self.assertTrue(md.is_person_page({'type': 'standard', 'description': 'American actor (born 1978)', 'extract': 'x'}))
+        self.assertFalse(md.is_person_page({'type': 'disambiguation', 'description': 'actor', 'extract': ''}))
+        self.assertFalse(md.is_person_page({'type': 'standard', 'description': 'Village in Peru', 'extract': 'A village.'}))
+        self.assertFalse(md.is_person_page(None))
+
+    def test_dates_keep_their_precision(self):
+        md = _metadata()
+        claim = lambda t, p: {'P569': [{'mainsnak': {'datavalue': {'value': {'time': t, 'precision': p}}}}]}
+        self.assertEqual(md._wiki_time(claim('+1978-09-12T00:00:00Z', 11), 'P569'), '1978-09-12')
+        self.assertEqual(md._wiki_time(claim('+1978-09-00T00:00:00Z', 10), 'P569'), '1978-09')
+        self.assertEqual(md._wiki_time(claim('+2000-00-00T00:00:00Z', 9), 'P569'), '2000')
+        self.assertEqual(md._wiki_time({}, 'P569'), '')
+
+    def test_shape(self):
+        md = _metadata()
+        out = md.shape_wiki({'title': 'Al', 'description': 'American actor', 'extract': 'Short.',
+                             'thumbnail': {'source': 't.jpg'}}, 'Long intro.', born='1940-04-25', place='New York')
+        self.assertEqual(out['biography'], 'Long intro.')
+        self.assertEqual(out['image'], 't.jpg')
+        self.assertEqual(out['source'], 'Wikipedia')
+        self.assertNotIn('deathday', out)
+
+
 class Providers(unittest.TestCase):
     def test_movie_shape(self):
         md = _metadata()

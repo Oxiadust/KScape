@@ -147,11 +147,11 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
             items.append(('version', tr(32367), tr(32368).format(len(self.versions))))
         if d.get('trailer'):
             items.append(('trailer', tr(32069), ''))
-        items.append(('cast', tr(ST.CAST), '▶'))
-        items.append(('details', tr(ST.DETAILS), '▶'))
         if m.file:
             items.append(('scenes', tr(32301), '▶'))
         items += [('extra', tr(ST.PLAY_EXTRA), ''), ('art', tr(ST.CHOOSE_ART), ''), ('refresh', tr(ST.REFRESH), '')]
+        items.append(('cast', tr(ST.CAST), '▶'))
+        items.append(('details', tr(ST.DETAILS), '▶'))
         items.append(('explore', tr(32300), '▶'))
         menu_ctl = self.getControl(MENU)
         height = min(len(items) * MENU_ROW, MENU_BOTTOM - POSTER_Y - 16 - POSTER_MIN_H)

@@ -58,13 +58,15 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   best audio track (Dolby Atmos, DTS:X, Dolby TrueHD, DTS-HD MA, Dolby Digital Plus, DTS, Dolby
   Digital, PCM, FLAC, AAC), a **Ratings** row (certificate, TMDB, Rotten Tomatoes), then genres,
   cast, director and collection. The menu: **Return / Resume Movie / Play Movie / Play Trailer
-  / Cast & Crew / Details / Play Scenes / Play Extra / Choose Art / Refresh / Explore**. Resume and
+  / Play Scenes / Play Extra / Choose Art / Refresh / Cast & Crew / Details / Explore**. Resume and
   Trailer only appear when Kodi has a resume point or trailer for that movie. Everything comes from Kodi's library (stream details measured from the
   file, scraped ratings); anything missing is left out, never guessed.
 - **Cast & Crew** (movie info → Cast & Crew): the directors, writers and cast with their portraits.
   Select a person for their screen: portrait, role, the movies of theirs in your library (Select
-  opens one; **Show on the Wall** filters the wall by them) and, with a TMDB key, biography, birth
-  and filmography. TV shows and episodes have the same screens.
+  opens one; **Show on the Wall** filters the wall by them), their biography, birth date and place
+  and picture from Wikipedia / Wikidata (no key; **Look up biographies** in the add-on settings,
+  on by default) and, with a TMDB key, their filmography. If Estuary's script.embuary.info is
+  installed, **Full Information** opens its person page too. TV shows and episodes have the same screens.
 - **Details** (movie info → Details): every field Kodi holds - original title, tagline, release
   date, runtime, genres, directors, writers, studios, country, audio and subtitle languages,
   certification, ratings, your rating, Top 250 rank, tags, collection, video and audio streams,
@@ -73,7 +75,7 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   have a Details page too.
 - **Play Extra / Choose Art / Refresh** (after Play Scenes). *Play Extra* ends with **Add or Manage Extras…**, which opens Kodi's own extras manager (add an
   extra from a file, rename it, remove it, choose its art; the skin ships the manager and Kodi's
-  information dialog in KScape's look) and then lists the extras again. It lists the trailer, the
+  information dialog in KScape's look) and then lists the extras again. It lists the
   extras Kodi 21 holds for the movie, and the files beside it that follow the Jellyfin / Plex naming
   (an `Extras`, `Featurettes`, `Behind The Scenes`, `Deleted Scenes`, `Interviews`, `Trailers`,
   `Shorts` or `Scenes` folder, or a `-trailer`, `-featurette`, `-behindthescenes`, `-deleted`,
@@ -351,10 +353,11 @@ The wall's own options are stored as add-on settings of `script.kscape.wall` and
   sets the skin's own Reduce motion, so dialogs fade instead of sliding.
 
 Add-on settings → **Ratings**: an optional **OMDb API key** for Rotten Tomatoes scores and awards,
-and an optional **TMDB API key** for budget, box office, production companies, biographies and
-filmographies - Kodi's library has none of these (Estuary gets them from script.embuary.info). Both
-are empty by default: neither service is ever contacted without your key, and then only for the
-title or person on screen.
+an optional **TMDB API key** for budget, box office, production companies and filmographies, and
+**Look up biographies** (Wikipedia, no key). Kodi's library has none of these; Estuary gets them
+from the separate script.embuary.info add-on, which is not part of Kodi. The OMDb and TMDB keys are
+empty by default and neither service is contacted without one; Wikipedia is asked only when you
+open a person, by name, and you can turn that off.
 
 Motion timings and easing (`FRAME_TWEEN`: `back` for one soft overshoot, or `elastic` for a
 bouncier settle), sizes and the pool size live in

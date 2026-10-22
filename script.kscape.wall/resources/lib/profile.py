@@ -6,6 +6,7 @@ put in it and what each menu entry and row does; ProfileDialog shows it. Like th
 screens the dialog only reports what was chosen - ('movie', id), ('album', id), ('explore',
 filter), ('episode', id, resume)... - and whoever opened it acts on that once it is closed.
 """
+import xbmc
 import xbmcaddon
 import xbmcgui
 
@@ -147,15 +148,19 @@ def person(row, wall=True):
     count = (tr(S.P_MOVIES_ONE) if len(movies) == 1 else tr(S.P_MOVIES_N).format(len(movies))) if movies else ''
 
     def build(meta=None):
+        looked = meta is not None                     # the provider has answered (maybe with nothing)
         meta = meta or {}
         life = people.life_line(meta, tr)
-        facts = [f for f in (people.person_summary(row, tr), count, life) if f]
-        p.summary = ' · '.join(facts[:2]) + (f'\n{facts[2]}' if len(facts) > 2 else '')
+        facts = [f for f in (people.person_summary(row, tr), count, meta.get('description'), life) if f]
+        p.summary = ' · '.join(facts[:2]) + (f'\n{" · ".join(facts[2:])}' if len(facts) > 2 else '')
         if meta.get('image') and not p.art:
             p.art = meta['image']
         if meta.get('biography'):
-            p.plot = meta['biography']
-        elif not MD.tmdb_key():
+            credit = tr(S.P_SOURCE).format(meta['source']) if meta.get('source') else ''
+            p.plot = meta['biography'] + (f'\n[COLOR kscape_text_dim]{credit}[/COLOR]' if credit else '')
+        elif looked:
+            p.plot = tr(S.P_BIO_NONE)
+        elif not MD.person_source():
             p.plot = tr(S.P_NO_BIO)
         rows, targets = [], []
         for m in movies:
@@ -179,9 +184,11 @@ def person(row, wall=True):
         p.menu = [('return', tr(32066), '')]
         if movies and wall:
             p.menu.append(('wall', tr(S.SHOW_WALL), str(len(movies))))
+        if xbmc.getCondVisibility('System.AddonIsEnabled(script.embuary.info)'):
+            p.menu.append(('embuary', tr(S.P_FULL_INFO), ''))
 
     build()
-    if MD.tmdb_key():
+    if MD.person_source():
         p.plot = tr(S.P_LOOKING_UP)
 
     def found(meta):
@@ -192,6 +199,8 @@ def person(row, wall=True):
     def on_menu(dialog, key):
         if key == 'wall':
             return ('explore', E.Filter(cat, name))
+        if key == 'embuary':                          # Estuary's own source of person pages
+            xbmc.executebuiltin(f'RunScript(script.embuary.info,call=person,query={name})')
         return None
 
     def on_row(dialog, target):

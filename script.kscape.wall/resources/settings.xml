@@ -44,6 +44,11 @@
 					</constraints>
 					<control type="edit" format="string"/>
 				</setting>
+				<setting id="person_lookup" type="boolean" label="32548" help="32549">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
 				<setting id="tmdb_key" type="string" label="32590" help="32591">
 					<level>0</level>
 					<default/>

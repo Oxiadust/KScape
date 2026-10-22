@@ -280,10 +280,36 @@ class ListWindow(xbmcgui.WindowXML):
         resolver = self.explore.resolver if self.explore else None
         follow = self.kind.activate(movie, self.favs, library=library, page=page, resolver=resolver)
         self._sync_favourites()
+        self._apply_changes()
         if follow == 'search':
             self._search()
         elif isinstance(follow, tuple) and follow[0] == 'explore':
             self._explore(follow[1], movie.key)
+
+    def _apply_changes(self):
+        """Art or information edited on the info screen (Choose Art, Refresh): read those items
+        again and list them as they are now."""
+        from . import actions as A
+        keys = [i for media, i in A.take_changes() if media == self.kind.item_type]
+        if not keys:
+            return
+        with self.lock:
+            fresh = {}
+            for key in keys:
+                new = self.kind.fetch_one(key)
+                old = next((m for m in self.library or () if m.key == key), None) \
+                    or next((m for m in self.movies if m.key == key), None)
+                if new is not None:
+                    fresh[key] = self.kind.carry(new, old)
+            if not fresh:
+                return
+            swap = lambda items: [fresh.get(m.key, m) for m in items]
+            row = self._current()
+            self.movies = swap(self.movies)
+            if self.library is not None:
+                self.library = swap(self.library)
+            self.built, self.prebuilt = {}, None
+            self._load(row.movie.key if row else None)
 
     def _explore(self, f, origin):
         if self.explore is not None and self.query is None and self.explore.in_place:

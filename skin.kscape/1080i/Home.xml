@@ -87,7 +87,7 @@
 
 			<!-- ===== Submenu strip (above the bar) ===== -->
 			<control type="group">
-				<top>896</top>
+				<top>915</top>
 				<visible>String.IsEqual(Container(9000).ListItem.Property(hassub),true)</visible>
 				<animation effect="fade" start="0" end="100" time="200">Visible</animation>
 				<animation effect="fade" start="100" end="0" time="150">Hidden</animation>
@@ -216,26 +216,26 @@
 
 			<!-- ===== Bottom navigation bar ===== -->
 			<control type="image">
-				<top>984</top>
+				<top>1003</top>
 				<width>1920</width>
-				<height>96</height>
+				<height>77</height>
 				<texture colordiffuse="kscape_blue_bar">white.png</texture>
 			</control>
 			<control type="image">
 				<description>KScape wordmark, first element of the bar (left of the tabs; not focusable)</description>
 				<left>28</left>
-				<top>1005</top>
-				<width>288</width>
-				<height>54</height>
+				<top>1020</top>
+				<width>230</width>
+				<height>43</height>
 				<aspectratio>keep</aspectratio>
 				<texture>kscape-logo.png</texture>
 			</control>
 			<control type="list" id="9000">
 				<description>Main menu. Left/Right wrap around, as in SiLVO.</description>
 				<left>330</left>
-				<top>984</top>
+				<top>1003</top>
 				<width>1590</width>
-				<height>96</height>
+				<height>77</height>
 				<orientation>horizontal</orientation>
 				<onleft>9000</onleft>
 				<onright>9000</onright>
@@ -244,10 +244,10 @@
 				<onup condition="String.IsEqual(Container(9000).ListItem.Property(id),music) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9022,3,absolute)</onup>
 				<onup condition="String.IsEqual(Container(9000).ListItem.Property(id),tv) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9023,2,absolute)</onup>
 				<scrolltime tween="cubic" easing="out">240</scrolltime>
-				<itemlayout width="320" height="96">
+				<itemlayout width="320" height="77">
 					<control type="label">
 						<width>320</width>
-						<height>96</height>
+						<height>77</height>
 						<align>center</align>
 						<aligny>center</aligny>
 						<font>kscape_bar</font>
@@ -255,11 +255,11 @@
 						<label>$INFO[ListItem.Label]</label>
 					</control>
 				</itemlayout>
-				<focusedlayout width="320" height="96">
+				<focusedlayout width="320" height="77">
 					<control type="image">
 						<description>Lighter tile on the selected item (tab look)</description>
 						<width>320</width>
-						<height>96</height>
+						<height>77</height>
 						<texture colordiffuse="kscape_blue_focus">white.png</texture>
 						<visible>Control.HasFocus(9000)</visible>
 						<animation effect="fade" start="0" end="100" time="140">Visible</animation>
@@ -267,13 +267,13 @@
 					<control type="image">
 						<description>While the submenu has focus, a quieter tile keeps the parent visible</description>
 						<width>320</width>
-						<height>96</height>
+						<height>77</height>
 						<texture colordiffuse="kscape_blue_head">white.png</texture>
 						<visible>!Control.HasFocus(9000)</visible>
 					</control>
 					<control type="label">
 						<width>320</width>
-						<height>96</height>
+						<height>77</height>
 						<align>center</align>
 						<aligny>center</aligny>
 						<font>kscape_bar</font>

@@ -3,13 +3,16 @@ production companies of a movie, a person's biography, birth and filmography, a 
 
 None of it is built into Kodi (Estuary gets it from the script.embuary.info add-on), so KScape
 asks the providers behind Kodi's own scrapers - TMDB (themoviedb.org) and OMDb (omdbapi.com) -
-using the user's own free API keys from the add-on settings. One title or person at a time, only
-for the screen being looked at, answers kept in the add-on's profile folder (metadata.json) for a
-month. Without a key nothing is ever sent, and the screens simply leave those fields out. Kodi's
-library is never written to.
+using the user's own free API keys from the add-on settings, and, for a person's biography,
+birth and picture, Wikipedia / Wikidata (no key; switched off by the "Look up biographies"
+setting). One title or person at a time, only for the screen being looked at, answers kept in the
+add-on's profile folder (metadata.json) for a month. Without a key and with the lookup off
+nothing is ever sent, and the screens simply leave those fields out. Kodi's library is never
+written to.
 """
 import json
 import os
+import re
 import threading
 import time
 import urllib.parse
@@ -108,7 +111,8 @@ def tmdb_get(path, **params):
 def request(name, fetch, done):
     """Answer for cache entry `name`: what is cached goes to done(data) at once (from the calling
     thread); when it is stale or missing and a fetch is possible, `fetch()` runs on a worker
-    thread and its answer goes to done(data) again. done is never called with None."""
+    thread and its answer goes to done(data) again; when nothing is cached and the lookup fails or
+    finds nothing, done({}) says so. done is never called with None."""
     data, fresh = cached(name)
     if data:
         done(data)
@@ -130,8 +134,10 @@ def request(name, fetch, done):
                 _busy.discard(name)
         if fresh_data is not None:
             _store(name, fresh_data)
-            if fresh_data and fresh_data != data:
-                done(fresh_data)
+        if fresh_data and fresh_data != data:
+            done(fresh_data)
+        elif not data:
+            done({})
 
     threading.Thread(target=work, daemon=True).start()
 
@@ -236,16 +242,127 @@ def movie_extra(tmdb_id, imdb, done):
     request(f'movie:{tmdb_id or imdb}', fetch, done)
 
 
+def wiki_lookup_enabled():
+    try:
+        return ADDON.getSettingBool('person_lookup')
+    except Exception:
+        return True
+
+
+def person_source():
+    """Where a person's biography comes from: 'tmdb' (a key is set), 'wikipedia', or '' (none)."""
+    if tmdb_key():
+        return 'tmdb'
+    return 'wikipedia' if wiki_lookup_enabled() else ''
+
+
 def person(name, department, done):
-    """A person's biography and filmography, found by name."""
-    if not (tmdb_key() and name):
+    """A person's biography (and, with TMDB, filmography), found by name."""
+    source = person_source()
+    if not (source and name):
         return
 
-    def fetch():
+    def fetch_tmdb():
         found = tmdb_get('/search/person', query=name).get('results')
         hit = pick_person(found, name, department)
         if not hit:
             return {}
         return shape_person(tmdb_get(f'/person/{hit["id"]}', append_to_response='combined_credits'))
 
-    request(f'person:{name.casefold()}', fetch, done)
+    if source == 'tmdb':
+        request(f'person:{name.casefold()}', fetch_tmdb, done)
+    else:
+        request(f'wiki:{name.casefold()}:{department}', lambda: wiki_person(name, department), done)
+
+
+# ---- Wikipedia / Wikidata: a person without any key --------------------------------------------
+
+WIKI = 'https://en.wikipedia.org'
+WIKIDATA = 'https://www.wikidata.org'
+FILM_WORDS = ('actor', 'actress', 'director', 'producer', 'screenwriter', 'writer', 'filmmaker', 'comedian',
+              'voice', 'singer', 'musician', 'composer', 'cinematograph', 'animator', 'stunt', 'presenter',
+              'television', 'film', 'model', 'rapper')
+SUFFIXES = {'Acting': ('', ' (actor)', ' (actress)', ' (voice actor)'),
+            'Directing': (' (director)', ' (film director)', ''),
+            'Writing': (' (screenwriter)', ' (writer)', '')}
+
+
+def wiki_titles(name, department):
+    """Page titles to try, most likely first: the plain name, then the disambiguated ones."""
+    order = SUFFIXES.get(department) or SUFFIXES['Acting']
+    more = [s for kind in SUFFIXES.values() for s in kind if s and s not in order]
+    return [f'{name}{s}' for s in list(order) + more]
+
+
+def is_person_page(summary):
+    """A real article about someone in film or music (not a disambiguation page or a namesake)."""
+    if not summary or summary.get('type') != 'standard':
+        return False
+    text = f'{summary.get("description") or ""} {(summary.get("extract") or "")[:400]}'.lower()
+    return any(w in text for w in FILM_WORDS)
+
+
+def _wiki_time(claims, prop):
+    """A Wikidata date as precise as Wikidata is: '1978-09-12', '1978-09' or '1978'."""
+    for c in claims.get(prop) or []:
+        value = ((c.get('mainsnak') or {}).get('datavalue') or {}).get('value') or {}
+        t = (value.get('time') or '').lstrip('+')
+        if t:
+            precision = value.get('precision') or 11
+            return t[:10] if precision >= 11 else t[:7] if precision == 10 else t[:4]
+    return ''
+
+
+def shape_wiki(summary, intro, born='', died='', place=''):
+    """The person record the screens use (see shape_person), from Wikipedia's summary and intro."""
+    image = ((summary.get('originalimage') or summary.get('thumbnail') or {}).get('source')) or ''
+    thumb = (summary.get('thumbnail') or {}).get('source') or ''
+    text = (intro or summary.get('extract') or '').strip()
+    if len(text) > 1800:
+        text = text[:1800].rsplit('. ', 1)[0] + '.'
+    description = re.sub(r'\s*\((born|d\.|\d{4}\s*[–-]).*?\)', '', summary.get('description') or '').strip()
+    out = {'name': summary.get('title') or '', 'biography': text, 'birthday': born, 'deathday': died,
+           'place': place, 'description': description,
+           'image': thumb or image, 'source': 'Wikipedia'}
+    return {k: v for k, v in out.items() if v}
+
+
+def wiki_person(name, department):
+    """Biography, birth, death and picture from Wikipedia and Wikidata (no key). {} if none."""
+    summary = None
+    for title in wiki_titles(name, department):
+        try:
+            data = _get(f'{WIKI}/api/rest_v1/page/summary/{urllib.parse.quote(title.replace(" ", "_"))}')
+        except Exception:
+            continue
+        if is_person_page(data):
+            summary = data
+            break
+    if not summary:
+        return {}
+    title = summary.get('title') or name
+    intro = ''
+    try:
+        q = _get(f'{WIKI}/w/api.php?' + urllib.parse.urlencode({
+            'action': 'query', 'format': 'json', 'prop': 'extracts', 'exintro': 1, 'explaintext': 1,
+            'redirects': 1, 'titles': title}))
+        pages = (q.get('query') or {}).get('pages') or {}
+        intro = next(iter(pages.values()), {}).get('extract') or ''
+    except Exception:
+        pass
+    born = died = place = ''
+    item = summary.get('wikibase_item')
+    if item:
+        try:
+            claims = _get(f'{WIKIDATA}/wiki/Special:EntityData/{item}.json')['entities'][item].get('claims') or {}
+            born, died = _wiki_time(claims, 'P569'), _wiki_time(claims, 'P570')
+            where = (((claims.get('P19') or [{}])[0].get('mainsnak') or {}).get('datavalue') or {}).get('value') or {}
+            if where.get('id'):
+                labels = _get(f'{WIKIDATA}/w/api.php?' + urllib.parse.urlencode({
+                    'action': 'wbgetentities', 'format': 'json', 'ids': where['id'], 'props': 'labels',
+                    'languages': 'en'}))
+                place = ((labels.get('entities') or {}).get(where['id']) or {}).get('labels', {}) \
+                    .get('en', {}).get('value') or ''
+        except Exception:
+            pass
+    return shape_wiki(summary, intro, born, died, place)

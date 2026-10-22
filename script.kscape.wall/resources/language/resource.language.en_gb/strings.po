@@ -1791,7 +1791,7 @@ msgid "Died {}"
 msgstr ""
 
 msgctxt "#32533"
-msgid "Kodi's library holds no biography. Add your TMDB API key in KScape's settings to show biographies and filmographies."
+msgid "Kodi's library holds no biography. Turn on Look up biographies, or add your TMDB API key, in KScape's settings."
 msgstr ""
 
 msgctxt "#32534"
@@ -2000,4 +2000,24 @@ msgstr ""
 
 msgctxt "#32519"
 msgid "Kodi could not open its extras manager for this movie"
+msgstr ""
+
+msgctxt "#32545"
+msgid "No biography was found online for this person."
+msgstr ""
+
+msgctxt "#32546"
+msgid "Full Information (Embuary)"
+msgstr ""
+
+msgctxt "#32547"
+msgid "Source: {}"
+msgstr ""
+
+msgctxt "#32548"
+msgid "Look up biographies of cast and crew on Wikipedia"
+msgstr ""
+
+msgctxt "#32549"
+msgid "Kodi's library holds no biographies. When you open a person from Cast & Crew, KScape asks Wikipedia and Wikidata (no key needed) for their biography, birth and picture, by name, one person at a time, and keeps the answer for a month. Turn off to never contact them."
 msgstr ""

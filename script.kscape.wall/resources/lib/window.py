@@ -297,7 +297,8 @@ class LibraryMonitor(xbmc.Monitor):
 
     def onNotification(self, sender, method, data):
         prefix = 'AudioLibrary' if self.kind.library == 'music' else 'VideoLibrary'
-        if method not in (f'{prefix}.OnUpdate', f'{prefix}.OnRemove'):
+        own = sender == 'script.kscape.wall' and method == 'Other.itemchanged'     # actions.announce_change
+        if method not in (f'{prefix}.OnUpdate', f'{prefix}.OnRemove') and not own:
             return
         try:
             info = json.loads(data or '{}')
@@ -306,8 +307,9 @@ class LibraryMonitor(xbmc.Monitor):
         item = info.get('item', info)
         if not item.get('id'):
             return
+        update = method.endswith('OnUpdate') or own
         if item.get('type') in self.kind.child_types:
-            if method.endswith('OnUpdate'):
+            if update:
                 from .library import parent_of
                 parent = parent_of(item['type'], int(item['id']))
                 if parent:
@@ -315,7 +317,7 @@ class LibraryMonitor(xbmc.Monitor):
             return
         if item.get('type') != self.kind.item_type:
             return
-        if method.endswith('OnUpdate'):
+        if update:
             self.on_item(int(item['id']))
         else:
             self.on_change()
@@ -643,6 +645,8 @@ class WallWindow(xbmcgui.WindowXML):
         follow = self._covered(lambda: self.kind.activate(item, self.favs, library=library, page=page,
                                                           resolver=self.resolver))
         self._after_favourites()
+        from . import actions
+        actions.take_changes()              # the monitor has patched the wall (actions.announce_change)
         if follow == 'search':
             self._search()
         elif isinstance(follow, tuple) and follow[0] == 'explore':

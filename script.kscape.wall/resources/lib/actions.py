@@ -53,6 +53,26 @@ NOTIFY = {'movie': 'VideoLibrary.OnUpdate', 'tvshow': 'VideoLibrary.OnUpdate', '
 REFRESH_WAIT_S = 90
 
 
+CHANGED = set()                    # (media type, id) changed here since a view last looked
+
+
+def announce_change(media, dbid):
+    """Tell the open views an item changed. Kodi announces most library edits itself but not a
+    change of art through JSON-RPC, so the views would keep showing the old cover: KScape
+    announces it (JSONRPC.NotifyAll, read by window.LibraryMonitor) and notes it in CHANGED for
+    views that rebuild their own copies (the list view)."""
+    CHANGED.add((media, int(dbid)))
+    rpc('JSONRPC.NotifyAll', {'sender': 'script.kscape.wall', 'message': 'itemchanged',
+                              'data': {'type': media, 'id': int(dbid)}})
+
+
+def take_changes():
+    """The (media type, id) pairs changed since the last call."""
+    found = set(CHANGED)
+    CHANGED.clear()
+    return found
+
+
 def art_label(arttype):
     sid = ART_LABELS.get(arttype)
     return _tr(sid) if sid else BACK_LABELS.get(arttype) or arttype.title()
@@ -155,6 +175,7 @@ def set_art(media, dbid, arttype, url):
     _, setter, idkey, _ = RPC[media]
     result = rpc(setter, {idkey: dbid, 'art': {arttype: url}})
     if result == 'OK':
+        announce_change(media, dbid)
         xbmcgui.Dialog().notification('KScape', _tr(S.M_ART_UPDATED if url else S.M_REMOVED),
                                       xbmcgui.NOTIFICATION_INFO, 2500, False)
         return True
@@ -193,6 +214,8 @@ def refresh(media, dbid, title=''):
             return False
         waited += 0.2
     done = waiter.seen
+    if done:
+        CHANGED.add((media, int(dbid)))
     xbmcgui.Dialog().notification('KScape', _tr(S.M_REFRESHED if done else S.M_REFRESH_FAILED),
                                   xbmcgui.NOTIFICATION_INFO if done else xbmcgui.NOTIFICATION_WARNING, 3000, False)
     return done
@@ -205,11 +228,9 @@ def _listing(directory):
 
 
 def find_extras(details):
-    """The movie's extras: [{'category', 'label', 'file'}], trailer first. See extras.py for the
-    naming followed; Kodi 21 'Extras' assets of the movie are included."""
+    """The movie's extras: [{'category', 'label', 'file'}], never the trailer (Play Trailer has it).
+    See extras.py for the naming followed; Kodi 21 'Extras' assets of the movie are included."""
     out = []
-    if details.get('trailer'):
-        out.append({'category': S.X_TRAILER, 'label': _tr(S.X_TRAILER), 'file': details['trailer']})
     path = details.get('file') or ''
     if path and not path.startswith(('stack://', 'bluray://', 'plugin://', 'videodb://')):
         folder = path.rsplit('/', 1)[0] + '/' if '/' in path else ''
@@ -231,7 +252,7 @@ def find_extras(details):
         out.append({'category': S.X_OTHER, 'label': name or _tr(S.X_OTHER), 'file': file})
     seen, unique = set(), []
     for e in out:
-        if e['file'] not in seen:
+        if e['category'] != S.X_TRAILER and e['file'] not in seen:       # Play Trailer has the trailer
             seen.add(e['file'])
             unique.append(e)
     return unique
