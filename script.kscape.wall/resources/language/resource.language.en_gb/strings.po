@@ -2033,7 +2033,3 @@ msgstr ""
 msgctxt "#32595"
 msgid "Create a Collection"
 msgstr ""
-
-msgctxt "#32596"
-msgid "More Options"
-msgstr ""

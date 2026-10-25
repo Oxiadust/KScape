@@ -67,7 +67,6 @@ SECTIONS = [  # (heading control, value control, string id, key)
     (260, 261, 32065, 'set'),
 ]
 S_RATINGS = 32339
-S_MORE = 32596
 DIM = 'FF9AB4E6'
 
 # Layout, in panel pixels (see script-kscape-info.xml).
@@ -151,8 +150,8 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
             items.append(('trailer', tr(32069), ''))
         if m.file:
             items.append(('scenes', tr(32301), '▶'))
+        items += [('extra', tr(ST.PLAY_EXTRA), ''), ('art', tr(ST.CHOOSE_ART), ''), ('refresh', tr(ST.REFRESH), '')]
         items.append(('collections', tr(collectionui.S_COLLECTIONS), '▶'))
-        items.append(('more', tr(S_MORE), ''))
         items.append(('cast', tr(ST.CAST), '▶'))
         items.append(('details', tr(ST.DETAILS), ''))
         items.append(('explore', tr(32300), '▶'))
@@ -522,12 +521,6 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
 
     # ---- Play Extra, Choose Art, Refresh ----------------------------------------------------
 
-    def _more_options(self):
-        """Play Extra, Choose Art and Refresh, in a list of their own."""
-        names = [tr(ST.PLAY_EXTRA), tr(ST.CHOOSE_ART), tr(ST.REFRESH)]
-        i = xbmcgui.Dialog().select(tr(S_MORE), names)
-        (self._play_extra, self._choose_art, self._refresh)[i]() if i >= 0 else None
-
     def _title(self):
         return self.details.get('title') or self.movie.title
 
@@ -546,11 +539,11 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
 
     def _choose_art(self):
         if A.choose_art('movie', self.movie.movieid, self._title()):
-            self._reload('more')
+            self._reload('art')
 
     def _refresh(self):
         if A.refresh('movie', self.movie.movieid, self._title()):
-            self._reload('more')
+            self._reload('refresh')
 
     def _selected_key(self):
         item = self.getControl(MENU).getSelectedItem()
@@ -656,8 +649,12 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
                 self._open_details_page()
             elif key == 'collections':
                 self._open_collections()
-            elif key == 'more':
-                self._more_options()
+            elif key == 'extra':
+                self._play_extra()
+            elif key == 'art':
+                self._choose_art()
+            elif key == 'refresh':
+                self._refresh()
             else:
                 self.choice = None if key == 'return' else key
                 self._close()

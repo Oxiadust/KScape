@@ -58,7 +58,7 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   best audio track (Dolby Atmos, DTS:X, Dolby TrueHD, DTS-HD MA, Dolby Digital Plus, DTS, Dolby
   Digital, PCM, FLAC, AAC), a **Ratings** row (certificate, TMDB, Rotten Tomatoes), then genres,
   cast, director and collection. The menu: **Return / Resume Movie / Play Movie / Play Trailer
-  / Play Scenes / Collections / More Options / Cast & Crew / Details / Explore**. The poster is
+  / Play Scenes / Play Extra / Choose Art / Refresh / Collections / Cast & Crew / Details / Explore**. The poster is
   always full size, so the menu under it shows four rows and scrolls. Resume and
   Trailer only appear when Kodi has a resume point or trailer for that movie. Everything comes from Kodi's library (stream details measured from the
   file, scraped ratings); anything missing is left out, never guessed.
@@ -78,7 +78,7 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   *Favourites* (Kodi's favourites) and *Played* (watched in Kodi). **Your Collections**: each of
   yours, ticked where the movie is; Select adds it or takes it out. **Create a Collection** asks
   for a name and puts the movie in it.
-- **Play Extra / Choose Art / Refresh** (under **More Options**, which lists the three). *Play Extra* ends with **Add or Manage Extras…**, which opens Kodi's own extras manager (add an
+- **Play Extra / Choose Art / Refresh** (after Play Scenes). *Play Extra* ends with **Add or Manage Extras…**, which opens Kodi's own extras manager (add an
   extra from a file, rename it, remove it, choose its art; the skin ships the manager and Kodi's
   information dialog in KScape's look) and then lists the extras again. It lists the
   extras Kodi 21 holds for the movie, and the files beside it that follow the Jellyfin / Plex naming
