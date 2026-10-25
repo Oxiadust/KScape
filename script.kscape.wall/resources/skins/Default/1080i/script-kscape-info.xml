@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Movie info screen (resources/lib/details.py). Hand-written. The right-hand column has three
      pages, chosen by Window.Property(page): the movie's facts (group 200, empty), Explore (300),
-     Play Scenes (400), Cast &amp; Crew (500) and Details (600). Controls Python positions or shows (100, 150-154, 220-290) carry no
+     Play Scenes (400), Cast &amp; Crew (500), Details (600) and Collections (700). Controls Python positions or shows (100, 150-154, 220-290) carry no
      <visible> tags of their own; the badge and rating images inside grouplists 270 and 285 are
      shown by window properties and sized by Python (resources/lib/badges.py). -->
 <window>
@@ -113,9 +113,9 @@
 
 				<control type="list" id="100">
 					<description>Return / Resume / Play / Trailer / Play Scenes / Explore (placed by Python)</description>
-					<top>662</top>
+					<top>734</top>
 					<width>480</width>
-					<height>312</height>
+					<height>208</height>
 					<onup>100</onup>
 					<ondown>100</ondown>
 					<onleft>999</onleft>
@@ -139,7 +139,7 @@
 							<label>$INFO[ListItem.Label]</label>
 						</control>
 						<control type="label">
-							<left>300</left>
+							<right>30</right>
 							<width>150</width>
 							<height>52</height>
 							<align>right</align>
@@ -165,7 +165,7 @@
 							<label>$INFO[ListItem.Label]</label>
 						</control>
 						<control type="label">
-							<left>300</left>
+							<right>30</right>
 							<width>150</width>
 							<height>52</height>
 							<align>right</align>
@@ -711,6 +711,121 @@
 								<font>kscape_small</font>
 								<textcolor>FFFFFFFF</textcolor>
 								<label>$INFO[ListItem.Label2]</label>
+							</control>
+						</focusedlayout>
+					</control>
+				</control>
+				<control type="group" id="700">
+					<description>Page: Collections - system and own collections as ticks; Select adds the movie or takes it out</description>
+					<visible>String.IsEqual(Window.Property(page),collections)</visible>
+					<animation effect="fade" start="0" end="100" time="200">Visible</animation>
+					<animation effect="slide" start="60,0" end="0,0" time="260" tween="cubic" easing="out">Visible</animation>
+					<control type="list" id="710">
+						<left>480</left>
+						<top>80</top>
+						<width>1248</width>
+						<height>870</height>
+						<onup>999</onup>
+						<ondown>999</ondown>
+						<onleft>100</onleft>
+						<onright>999</onright>
+						<scrolltime tween="cubic" easing="out">200</scrolltime>
+						<itemlayout width="1248" height="58">
+							<control type="label">
+								<left>70</left>
+								<width>1100</width>
+								<height>58</height>
+								<aligny>bottom</aligny>
+								<font>kscape_info_label</font>
+								<textcolor>kscape_text_dim</textcolor>
+								<label>[UPPERCASE]$INFO[ListItem.Property(heading)][/UPPERCASE]</label>
+								<visible>!String.IsEmpty(ListItem.Property(heading))</visible>
+							</control>
+							<control type="label">
+								<left>110</left>
+								<width>900</width>
+								<height>58</height>
+								<aligny>center</aligny>
+								<font>kscape_menu</font>
+								<textcolor>kscape_tint_light</textcolor>
+								<label>$INFO[ListItem.Label]</label>
+								<visible>String.IsEmpty(ListItem.Property(heading))</visible>
+							</control>
+							<control type="image">
+								<left>1130</left>
+								<top>15</top>
+								<width>28</width>
+								<height>28</height>
+								<texture colordiffuse="kscape_tint_light">kscape-white.png</texture>
+								<visible>!String.IsEmpty(ListItem.Property(box))</visible>
+							</control>
+							<control type="image">
+								<left>1133</left>
+								<top>18</top>
+								<width>22</width>
+								<height>22</height>
+								<texture colordiffuse="kscape_blue">kscape-white.png</texture>
+								<visible>!String.IsEmpty(ListItem.Property(box))</visible>
+							</control>
+							<control type="image">
+								<left>1136</left>
+								<top>21</top>
+								<width>16</width>
+								<height>16</height>
+								<texture colordiffuse="kscape_tint_light">kscape-white.png</texture>
+								<visible>!String.IsEmpty(ListItem.Property(check))</visible>
+							</control>
+						</itemlayout>
+						<focusedlayout width="1248" height="58">
+							<control type="image">
+								<width>1248</width>
+								<height>58</height>
+								<texture colordiffuse="kscape_blue_light">kscape-white.png</texture>
+								<visible>String.IsEmpty(ListItem.Property(heading))</visible>
+							</control>
+							<control type="label">
+								<left>70</left>
+								<width>1100</width>
+								<height>58</height>
+								<aligny>bottom</aligny>
+								<font>kscape_info_label</font>
+								<textcolor>kscape_text_dim</textcolor>
+								<label>[UPPERCASE]$INFO[ListItem.Property(heading)][/UPPERCASE]</label>
+								<visible>!String.IsEmpty(ListItem.Property(heading))</visible>
+							</control>
+							<control type="label">
+								<left>110</left>
+								<width>900</width>
+								<height>58</height>
+								<aligny>center</aligny>
+								<font>kscape_menu</font>
+								<textcolor>FFFFFFFF</textcolor>
+								<label>$INFO[ListItem.Label]</label>
+								<visible>String.IsEmpty(ListItem.Property(heading))</visible>
+							</control>
+							<control type="image">
+								<left>1130</left>
+								<top>15</top>
+								<width>28</width>
+								<height>28</height>
+								<texture colordiffuse="FFFFFFFF">kscape-white.png</texture>
+								<visible>!String.IsEmpty(ListItem.Property(box))</visible>
+							</control>
+							<control type="image">
+								<left>1133</left>
+								<top>18</top>
+								<width>22</width>
+								<height>22</height>
+								<texture colordiffuse="kscape_blue_light">kscape-white.png</texture>
+								<visible>!String.IsEmpty(ListItem.Property(box))</visible>
+							</control>
+							<control type="image">
+								<left>1136</left>
+								<top>21</top>
+								<width>16</width>
+								<height>16</height>
+								<texture colordiffuse="FFFFFFFF">kscape-white.png</texture>
+								<visible>!String.IsEmpty(ListItem.Property(check))</visible>
 							</control>
 						</focusedlayout>
 					</control>

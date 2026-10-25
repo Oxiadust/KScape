@@ -58,7 +58,8 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   best audio track (Dolby Atmos, DTS:X, Dolby TrueHD, DTS-HD MA, Dolby Digital Plus, DTS, Dolby
   Digital, PCM, FLAC, AAC), a **Ratings** row (certificate, TMDB, Rotten Tomatoes), then genres,
   cast, director and collection. The menu: **Return / Resume Movie / Play Movie / Play Trailer
-  / Play Scenes / Play Extra / Choose Art / Refresh / Cast & Crew / Details / Explore**. Resume and
+  / Play Scenes / Collections / More Options / Cast & Crew / Details / Explore**. The poster is
+  always full size, so the menu under it shows four rows and scrolls. Resume and
   Trailer only appear when Kodi has a resume point or trailer for that movie. Everything comes from Kodi's library (stream details measured from the
   file, scraped ratings); anything missing is left out, never guessed.
 - **Cast & Crew** (movie info → Cast & Crew): the directors, writers and cast with their portraits.
@@ -73,7 +74,11 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
   play count, dates, database IDs and file - and, with a TMDB or OMDb key, budget, box office,
   production companies, original language and awards. Shows, episodes, albums, songs and artists
   have a Details page too.
-- **Play Extra / Choose Art / Refresh** (after Play Scenes). *Play Extra* ends with **Add or Manage Extras…**, which opens Kodi's own extras manager (add an
+- **Collections** (movie info → Collections): ticks like Kaleidescape's. **System Collections**:
+  *Favourites* (Kodi's favourites) and *Played* (watched in Kodi). **Your Collections**: each of
+  yours, ticked where the movie is; Select adds it or takes it out. **Create a Collection** asks
+  for a name and puts the movie in it.
+- **Play Extra / Choose Art / Refresh** (under **More Options**, which lists the three). *Play Extra* ends with **Add or Manage Extras…**, which opens Kodi's own extras manager (add an
   extra from a file, rename it, remove it, choose its art; the skin ships the manager and Kodi's
   information dialog in KScape's look) and then lists the extras again. It lists the
   extras Kodi 21 holds for the movie, and the files beside it that follow the Jellyfin / Plex naming
@@ -162,7 +167,9 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
     **Resume** resumes the version you were watching: Kodi keeps a resume point per version.
   - **Play Version** (movie info, when there are two or more) lists each version with its name,
     resolution, 3D, dynamic range and audio - `Director's Cut — 4K Ultra HD · 2160p · Dolby
-    Vision · Dolby TrueHD` - the one Play would start first; one with a resume point asks
+    Vision · Dolby TrueHD` - led by the movie's name; the file name is only added when nothing
+    else tells two versions apart. A file named `3D` (or Half-SBS, H-OU) counts as 3D, and `4K`,
+    `2160p`, `1080p`, `720p` in the name fill in a resolution Kodi hasn't measured. The one Play would start first; one with a resume point asks
     whether to resume it.
 - **Music.** The same wall with square album covers (missing artwork shows the album and artist
   on a dark card); the panel shows album and artist, and related albums (same artist, shared
@@ -304,6 +311,10 @@ tools/build_zips.sh          # writes dist/skin.kscape-<ver>.zip and dist/script
 
 In Kodi: **Settings → Add-ons → Install from zip file**, install `script.kscape.wall` first, then
 `skin.kscape`, and accept when Kodi asks to switch skins. (Allow "Unknown sources" if Kodi asks.)
+
+Kodi shows its own splash while it starts, before any skin loads. The wall add-on's service puts
+a KScape splash at `special://home/media/splash.png` (from `resources/media/splash.png`) for the
+next start; delete that file to get Kodi's back.
 
 ### By copying (development)
 

@@ -183,3 +183,9 @@ A_THUMB = _s(32588, 'Thumbnail')
 SET_TMDB = _s(32590, 'TMDB API key, for budget, biographies and filmographies (optional)')
 SET_TMDB_HELP = _s(32591, 'Kodi\'s library has no budget, box office, biographies or filmographies. With your own free key from themoviedb.org, KScape asks TMDB for the title or person you are looking at, one at a time, and keeps the answer for a month. Leave empty to never contact TMDB.')
 SET_INFO = _s(32592, 'Information screens')
+
+# Collections page of the info screen
+C_SYSTEM = _s(32593, 'System Collections')
+C_YOURS = _s(32594, 'Your Collections')
+C_CREATE = _s(32595, 'Create a Collection')
+C_MORE = _s(32596, 'More Options')

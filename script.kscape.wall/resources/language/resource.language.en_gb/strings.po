@@ -2021,3 +2021,19 @@ msgstr ""
 msgctxt "#32549"
 msgid "Kodi's library holds no biographies. When you open a person from Cast & Crew, KScape asks Wikipedia and Wikidata (no key needed) for their biography, birth and picture, by name, one person at a time, and keeps the answer for a month. Turn off to never contact them."
 msgstr ""
+
+msgctxt "#32593"
+msgid "System Collections"
+msgstr ""
+
+msgctxt "#32594"
+msgid "Your Collections"
+msgstr ""
+
+msgctxt "#32595"
+msgid "Create a Collection"
+msgstr ""
+
+msgctxt "#32596"
+msgid "More Options"
+msgstr ""

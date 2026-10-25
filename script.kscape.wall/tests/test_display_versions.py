@@ -40,8 +40,9 @@ class VersionsTest(unittest.TestCase):
     def test_labels(self):
         self.assertEqual(V.label(UHD), 'Standard Edition — 4K Ultra HD · 2160p · HDR10 · Dolby Atmos')
         self.assertEqual(V.label(B3D), '3D — Full HD · 1080p · 3D · SDR · DTS-HD MA')
-        same = V.labels((UHD, FHD))
-        self.assertTrue(same[0].startswith('Standard Edition (Avatar 2160p.mkv)'))
+        self.assertEqual(V.labels((UHD, FHD), 'Avatar')[0], 'Avatar (Standard Edition) — 4K Ultra HD · 2160p · HDR10 · Dolby Atmos')
+        twins = V.labels((UHD, UHD._replace(file='/m/Avatar copy.mkv')))   # nothing else tells them apart
+        self.assertIn('Avatar 2160p.mkv', twins[0])
 
     def test_cache_round_trip(self):
         self.assertEqual(V.Version.from_cache(UHD.to_cache()), UHD)

@@ -14,6 +14,7 @@ one (model.merge_duplicates); their copies become versions here too.
 Formats are worked out from the stream details Kodi measured; missing details give no format
 rather than a guess.
 """
+import re
 from typing import NamedTuple, Tuple
 
 from . import streaminfo as SI
@@ -56,6 +57,35 @@ class Version(NamedTuple):
         return cls(**dict(d, audio=tuple(d.get('audio') or ())))
 
 
+_NAME_3D = re.compile(r'(?<![a-z0-9])(3d|h-?sbs|half-?sbs|h-?tab|h-?ou|half-?ou)(?![a-z0-9])', re.I)
+_NAME_RES = ((re.compile(r'(?<![a-z0-9])(2160p|4k|uhd)(?![a-z0-9])', re.I), '4K'),
+             (re.compile(r'(?<![a-z0-9])1080[pi](?![a-z0-9])', re.I), '1080p'),
+             (re.compile(r'(?<![a-z0-9])720p(?![a-z0-9])', re.I), '720p'))
+
+
+def _base(path):
+    return (path or '').replace('\\', '/').rstrip('/').rsplit('/', 1)[-1]
+
+
+def name_3d(path):
+    """A file named ...3D... (or Half-SBS, H-OU...) is a 3D movie, whatever Kodi measured."""
+    return bool(_NAME_3D.search(_base(path)))
+
+
+def name_resolution(path):
+    """'4K' / '1080p' / '720p' if the file name says so, else ''."""
+    base = _base(path)
+    return next((r for rx, r in _NAME_RES if rx.search(base)), '')
+
+
+def is_3d(v):
+    return v.stereo or name_3d(v.file)
+
+
+def resolution_of(v):
+    return v.resolution or name_resolution(v.file)
+
+
 def is_dvd(path):
     """A DVD folder structure (an .iso could be DVD or Blu-ray, so it is not counted)."""
     p = (path or '').lower()
@@ -75,16 +105,16 @@ def formats(versions, resolution='', stereo=False, path=''):
     found = set()
     if versions:
         for v in versions:
-            f = format_of(v.resolution, v.file)
+            f = format_of(resolution_of(v), v.file)
             if f:
                 found.add(f)
-            if v.stereo:
+            if is_3d(v):
                 found.add('3D')
     else:
         f = format_of(resolution, path)
         if f:
             found.add(f)
-        if stereo:
+        if stereo or name_3d(path):
             found.add('3D')
     return tuple(f for f in FORMATS if f in found)
 
@@ -94,12 +124,12 @@ def order(versions, preference='4K', prefer_3d=False):
     the best down; 2D before 3D unless 3D is preferred; Kodi's default version first among
     equals. 'default' preference: Kodi's default version first."""
     if preference == 'default':
-        return sorted(versions, key=lambda v: (not v.default, v.stereo != prefer_3d))
+        return sorted(versions, key=lambda v: (not v.default, is_3d(v) != prefer_3d))
     pref = RES_RANK.get(preference, 0)
 
     def key(v):
-        rank = RES_RANK.get(v.resolution, 4)
-        return (v.stereo != prefer_3d, rank != pref, rank, not v.default)
+        rank = RES_RANK.get(resolution_of(v), 4)
+        return (is_3d(v) != prefer_3d, rank != pref, rank, not v.default)
     return sorted(versions, key=key)
 
 
@@ -114,24 +144,27 @@ def choose(versions, preference='4K', prefer_3d=False, resume=False):
     return ranked[0] if ranked else None
 
 
-def label(v, same_names=False):
-    """'Director's Cut — 4K Ultra HD · 2160p HDR10 · Dolby Atmos'. Unknown parts are left out;
-    when several versions share a name, the file name tells them apart."""
-    tech = [RES_LONG.get(format_of(v.resolution, v.file), '')]
-    if v.stereo:
+def label(v, same_names=False, title=''):
+    """'Sonic the Hedgehog 3 (Director's Cut) — 4K Ultra HD · 2160p · 3D · HDR10 · Dolby Atmos'.
+    The movie's name leads, then the version's; 3D and the resolution count if the file name says
+    so. Unknown parts are left out. The file name is only added (`same_names`) when nothing else
+    tells two versions apart."""
+    tech = [RES_LONG.get(format_of(resolution_of(v), v.file), '')]
+    if is_3d(v):
         tech.append('3D')
     if v.hdr:
         tech.append(SI.HDR_LABELS.get(v.hdr, ''))
     if v.audio:
         tech.append(SI.AUDIO_LABELS.get(v.audio[0], ''))
     tech = ' · '.join(t for t in tech if t)
-    name = v.name or ''
+    vname = v.name or ''
+    name = f'{title} ({vname})' if title and vname else (title or vname)
     if same_names or not name:
-        base = v.file.replace('\\', '/').rstrip('/').rsplit('/', 1)[-1]
+        base = _base(v.file)
         name = f'{name} ({base})' if name else base
     return f'{name} — {tech}' if tech else name
 
 
-def labels(versions):
-    names = [v.name for v in versions]
-    return [label(v, same_names=names.count(v.name) > 1) for v in versions]
+def labels(versions, title=''):
+    plain = [label(v, title=title) for v in versions]
+    return [label(v, same_names=plain.count(p) > 1, title=title) for v, p in zip(versions, plain)]

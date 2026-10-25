@@ -32,7 +32,7 @@ import xbmcaddon
 import xbmcgui
 
 from . import actions as A
-from . import badges, displayui, info, menu, metadata, modal, people, ratings
+from . import badges, collectionmodel as C, collectionui, displayui, info, menu, metadata, modal, people, ratings
 from . import profile as PF
 from . import s as ST
 from . import explore as E
@@ -53,9 +53,9 @@ UP_DOWN = (xbmcgui.ACTION_MOVE_UP, xbmcgui.ACTION_MOVE_DOWN, xbmcgui.ACTION_PAGE
 
 MENU = 100
 POSTER_CARD, POSTER_TEXT, POSTER_ART, POSTER_BADGE = 151, 152, 153, 154
-EXPLORE_LIST, SCENE_LIST, CAST_LIST, DETAILS_LIST = 310, 410, 510, 610
-PAGE_KEYS = ('explore', 'scenes', 'cast', 'details')
-PAGE_LISTS = (EXPLORE_LIST, SCENE_LIST, CAST_LIST, DETAILS_LIST)
+EXPLORE_LIST, SCENE_LIST, CAST_LIST, DETAILS_LIST, COLLECT_LIST = 310, 410, 510, 610, 710
+PAGE_KEYS = ('explore', 'scenes', 'cast', 'details', 'collections')
+PAGE_LISTS = (EXPLORE_LIST, SCENE_LIST, CAST_LIST, DETAILS_LIST, COLLECT_LIST)
 FACTS, RES_BADGE, HDR_BADGE, AUDIO_BADGE = 270, 272, 273, 274
 MORE_FORMATS = (275, 276, 277)          # further formats of other versions
 RATINGS_HEAD, RATINGS, TMDB_ICON, RT_ICON = 280, 285, 287, 289
@@ -67,6 +67,7 @@ SECTIONS = [  # (heading control, value control, string id, key)
     (260, 261, 32065, 'set'),
 ]
 S_RATINGS = 32339
+S_MORE = 32596
 DIM = 'FF9AB4E6'
 
 # Layout, in panel pixels (see script-kscape-info.xml).
@@ -78,8 +79,7 @@ HEADING_H = 44
 FACT_H = 44                    # the facts / badges line and the ratings line
 SECTION_GAP = 26
 ROW_GAP = 18
-MENU_ROW, MENU_BOTTOM = 52, 974
-POSTER_MIN_H = 330             # the menu scrolls rather than shrinking the poster below this
+MENU_ROW = 52
 POSTER_X, POSTER_Y, POSTER_W, POSTER_H = 30, 88, 420, 630
 
 
@@ -104,8 +104,10 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         self.explore_filters = []
         self.scene_rows = []
         self.cast_people = []
+        self.collection_rows = []       # (kind, id) per Collections row; None for a heading
         self.meta = {}                  # budget, revenue... from a provider (metadata.py)
         self.closed = False
+        self.store = collectionui.store(type('Kind', (), {'name': 'movies'}))
         # On a screen of another shape, Kodi stretches boxes but not text or artwork: boxes that
         # must keep a shape (the poster, badges) have their widths divided by the stretch.
         self.sx = displayui.current().sx
@@ -149,16 +151,13 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
             items.append(('trailer', tr(32069), ''))
         if m.file:
             items.append(('scenes', tr(32301), '▶'))
-        items += [('extra', tr(ST.PLAY_EXTRA), ''), ('art', tr(ST.CHOOSE_ART), ''), ('refresh', tr(ST.REFRESH), '')]
+        items.append(('collections', tr(collectionui.S_COLLECTIONS), '▶'))
+        items.append(('more', tr(S_MORE), ''))
         items.append(('cast', tr(ST.CAST), '▶'))
-        items.append(('details', tr(ST.DETAILS), '▶'))
+        items.append(('details', tr(ST.DETAILS), ''))
         items.append(('explore', tr(32300), '▶'))
         menu_ctl = self.getControl(MENU)
-        height = min(len(items) * MENU_ROW, MENU_BOTTOM - POSTER_Y - 16 - POSTER_MIN_H)
-        top = MENU_BOTTOM - height
-        menu_ctl.setPosition(0, top)              # sized before it is filled, so it never scrolls
-        menu_ctl.setHeight(height)
-        self._size_poster(top - 16 - POSTER_Y)
+        self._size_poster(POSTER_H)               # the menu's own size is fixed in the XML (4 rows)
         menu_ctl.reset()
         listitems = []
         for key, label, label2 in items:
@@ -362,19 +361,21 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
             except RuntimeError:                       # closed meanwhile
                 return
 
-    def _skip_headings(self):
+    def _skip_headings(self, control_id=EXPLORE_LIST):
         """Up/Down landed on a section heading: go on to the next entry that way (or back)."""
-        ctl = self.getControl(EXPLORE_LIST)
+        ctl = self.getControl(control_id)
+        rows, attr = ((self.explore_filters, 'explore_pos') if control_id == EXPLORE_LIST
+                      else (self.collection_rows, 'collection_pos'))
         pos = ctl.getSelectedPosition()
-        last = getattr(self, 'explore_pos', 1)
-        if 0 <= pos < len(self.explore_filters) and self.explore_filters[pos] is None:
+        last = getattr(self, attr, 1)
+        if 0 <= pos < len(rows) and rows[pos] is None:
             step = 1 if pos >= last else -1
             nxt = pos + step
-            if not (0 <= nxt < len(self.explore_filters)) or self.explore_filters[nxt] is None:
+            if not (0 <= nxt < len(rows)) or rows[nxt] is None:
                 nxt = last
             ctl.selectItem(nxt)
             pos = nxt
-        self.explore_pos = pos
+        setattr(self, attr, pos)
 
     # ---- cast & crew, details, provider data -------------------------------------------------
 
@@ -391,6 +392,83 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         self.meta = data
         if self.page == 'details':
             self._fill_details()
+
+    # ---- collections ---------------------------------------------------------------------------
+
+    def _copy_keys(self):
+        """Member keys of the movie and any duplicate copy of it in the library."""
+        m = self.movie
+        same = [c for c in (self.library or ()) if C.title_key(c) == C.title_key(m)] or [m]
+        return collectionui.keys_of(same)
+
+    def _open_collections(self):
+        self._fill_collections()
+        self._set_page('collections')
+        self.setFocusId(COLLECT_LIST)
+
+    def _fill_collections(self, select=None):
+        """System collections (Kodi's favourites, played) and the user's own, each with a tick;
+        headings are rows of their own, stepped over."""
+        self.store.poll()
+        keys = self._copy_keys()
+        rows = []
+
+        def heading(text):
+            li = xbmcgui.ListItem('')
+            li.setProperty('heading', text)
+            rows.append((None, None, li))
+
+        def entry(kind, cid, label, ticked=None):
+            li = xbmcgui.ListItem(label)
+            if ticked is not None:
+                li.setProperty('check', '1' if ticked else '')
+                li.setProperty('box', '1')
+            rows.append((kind, cid, li))
+
+        heading(tr(collectionui.S_SYSTEM))
+        if self.favs is not None and self.favs.supports(self.movie):
+            entry('fav', '', tr(32187), self.favs.contains(self.movie))
+        entry('played', '', tr(32153), bool(self.details.get('playcount')))
+        heading(tr(collectionui.S_YOURS))
+        for c in self.store.items:
+            entry('c', c['id'], c['name'], self.store.contains(c['id'], keys))
+        entry('new', '', tr(collectionui.S_CREATE))
+        self.collection_rows = [(k, cid) if k else None for k, cid, _ in rows]
+        ctl = self.getControl(COLLECT_LIST)
+        keep = select if select is not None else max(1, ctl.getSelectedPosition())
+        ctl.reset()
+        ctl.addItems([li for _, _, li in rows])
+        pos = min(keep, len(rows) - 1)
+        if self.collection_rows[pos] is None:
+            pos += 1
+        ctl.selectItem(pos)
+        self.collection_pos = pos
+
+    def _collection_clicked(self):
+        ctl = self.getControl(COLLECT_LIST)
+        i = ctl.getSelectedPosition()
+        if not 0 <= i < len(self.collection_rows) or self.collection_rows[i] is None:
+            return
+        kind, cid = self.collection_rows[i]
+        if kind == 'fav':
+            self.favs.toggle(self.movie)
+            self._mark_favourite()
+        elif kind == 'played':
+            played = bool(self.details.get('playcount'))
+            A.set_watched('movie', self.movie.movieid, not played)
+            self.details = dict(self.details, playcount=0 if played else 1)
+        elif kind == 'c':
+            keys = self._copy_keys()
+            if self.store.contains(cid, keys):
+                self.store.remove(cid, keys)
+            else:
+                self.store.add(cid, C.member_key(self.movie))
+        elif kind == 'new':
+            new = collectionui.create(self.store)
+            if new:
+                self.store.add(new, C.member_key(self.movie))
+                i = len(self.collection_rows) - 1
+        self._fill_collections(i)
 
     def _open_cast(self):
         if not self.cast_people:
@@ -444,6 +522,12 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
 
     # ---- Play Extra, Choose Art, Refresh ----------------------------------------------------
 
+    def _more_options(self):
+        """Play Extra, Choose Art and Refresh, in a list of their own."""
+        names = [tr(ST.PLAY_EXTRA), tr(ST.CHOOSE_ART), tr(ST.REFRESH)]
+        i = xbmcgui.Dialog().select(tr(S_MORE), names)
+        (self._play_extra, self._choose_art, self._refresh)[i]() if i >= 0 else None
+
     def _title(self):
         return self.details.get('title') or self.movie.title
 
@@ -462,11 +546,11 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
 
     def _choose_art(self):
         if A.choose_art('movie', self.movie.movieid, self._title()):
-            self._reload('art')
+            self._reload('more')
 
     def _refresh(self):
         if A.refresh('movie', self.movie.movieid, self._title()):
-            self._reload('refresh')
+            self._reload('more')
 
     def _selected_key(self):
         item = self.getControl(MENU).getSelectedItem()
@@ -483,6 +567,7 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         self.setProperty('poster', poster)
         self.cast_people = []
         self.meta = {}
+        self.store.poll()
         self._layout()
         self._fill_menu(select)
         self._ask_provider()
@@ -569,12 +654,10 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
                 self._open_cast()
             elif key == 'details':
                 self._open_details_page()
-            elif key == 'extra':
-                self._play_extra()
-            elif key == 'art':
-                self._choose_art()
-            elif key == 'refresh':
-                self._refresh()
+            elif key == 'collections':
+                self._open_collections()
+            elif key == 'more':
+                self._more_options()
             else:
                 self.choice = None if key == 'return' else key
                 self._close()
@@ -588,12 +671,14 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
             self._scene_clicked()
         elif control_id == CAST_LIST:
             self._person_clicked()
+        elif control_id == COLLECT_LIST:
+            self._collection_clicked()
 
     def onAction(self, action):
         aid = action.getId()
         focus = self.getFocusId()
-        if aid in UP_DOWN and focus == EXPLORE_LIST:
-            self._skip_headings()
+        if aid in UP_DOWN and focus in (EXPLORE_LIST, COLLECT_LIST):
+            self._skip_headings(focus)
         elif aid in BACK:
             if focus in PAGE_LISTS:
                 self.setFocusId(MENU)                 # onFocus returns to the facts page
@@ -609,6 +694,8 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
                 self._open_scenes()
             elif key == 'cast':
                 self._open_cast()
+            elif key == 'collections':
+                self._open_collections()
             elif key == 'details':
                 self._open_details_page()
         elif aid in PLAY:
@@ -650,7 +737,7 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         audio; the one Play would start is preselected. A version with a resume point asks
         whether to resume it."""
         order = VS.order(self.versions, *self.pref)
-        i = xbmcgui.Dialog().select(tr(32369), VS.labels(order), preselect=0)
+        i = xbmcgui.Dialog().select(tr(32369), VS.labels(order, self._title()), preselect=0)
         if i < 0:
             return
         v = order[i]
