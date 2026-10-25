@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Open straight onto the cover wall. The animated wall needs script.kscape.wall; without it,
-     fall back to the native poster wall. Closing the wall returns to Home. -->
+<!-- Kodi always starts on Home. The wall add-on is only told to sync its colour theme with the
+     skin settings; it opens a view when you choose one on Home. -->
 <window>
 	<onload>ReplaceWindow(Home)</onload>
-	<onload condition="System.AddonIsEnabled(script.kscape.wall)">RunScript(script.kscape.wall)</onload>
-	<onload condition="!System.AddonIsEnabled(script.kscape.wall)">ActivateWindow(Videos,videodb://movies/titles/,return)</onload>
+	<onload condition="System.AddonIsEnabled(script.kscape.wall)">RunScript(script.kscape.wall,startup)</onload>
 	<controls/>
 </window>

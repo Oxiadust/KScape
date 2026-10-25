@@ -153,7 +153,7 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
         items += [('extra', tr(ST.PLAY_EXTRA), ''), ('art', tr(ST.CHOOSE_ART), ''), ('refresh', tr(ST.REFRESH), '')]
         items.append(('collections', tr(collectionui.S_COLLECTIONS), '▶'))
         items.append(('cast', tr(ST.CAST), '▶'))
-        items.append(('details', tr(ST.DETAILS), ''))
+        items.append(('details', tr(ST.DETAILS), '▶'))
         items.append(('explore', tr(32300), '▶'))
         menu_ctl = self.getControl(MENU)
         self._size_poster(POSTER_H)               # the menu's own size is fixed in the XML (4 rows)
@@ -643,6 +643,10 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
                 self._open_scenes()
             elif key == 'version':
                 self._choose_version()
+            elif key == 'play' and len(self.versions) > 1:
+                self._choose_version()
+            elif key == 'resume' and len([v for v in self.versions if v.resume > 0]) > 1:
+                self._choose_version(resume_only=True)
             elif key == 'cast':
                 self._open_cast()
             elif key == 'details':
@@ -729,17 +733,25 @@ class DetailsDialog(xbmcgui.WindowXMLDialog):
                 self.choice = 'search'
                 self._close()
 
-    def _choose_version(self):
-        """Play Version: every version, labelled with its name, resolution, 3D, dynamic range and
-        audio; the one Play would start is preselected. A version with a resume point asks
-        whether to resume it."""
+    def _choose_version(self, resume_only=False):
+        """Pick a version (Play Version, and Play Movie / Resume Movie when there are several):
+        every version, labelled with its name, resolution, 3D, dynamic range and audio, and where
+        it was left off; the one Play would start is preselected. Resume lists only the versions
+        with a resume point and resumes the one picked; Play asks whether to resume one that has
+        a resume point."""
         order = VS.order(self.versions, *self.pref)
-        i = xbmcgui.Dialog().select(tr(32369), VS.labels(order, self._title()), preselect=0)
+        names = dict(zip(order, VS.labels(order, self._title())))
+        if resume_only:
+            paused = VS.choose(self.versions, *self.pref, resume=True)
+            order = [v for v in order if v.resume > 0]
+        rows = [names[v] + (f'  ({tr(32370).format(info.clock(v.resume))})' if v.resume > 0 else '') for v in order]
+        start = order.index(paused) if resume_only and paused in order else 0
+        i = xbmcgui.Dialog().select(tr(32369), rows, preselect=start)
         if i < 0:
             return
         v = order[i]
-        resume = False
-        if v.resume > 0:
+        resume = resume_only
+        if v.resume > 0 and not resume_only:
             j = xbmcgui.Dialog().contextmenu([tr(32370).format(info.clock(v.resume)), tr(32371)])
             if j < 0:
                 return

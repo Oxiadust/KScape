@@ -5,6 +5,8 @@ RunScript(script.kscape.wall,<kind>)             kind: movies, music or tv; view
 RunScript(script.kscape.wall,<kind>,<view>)      view: covers, list, collections or favorites
 RunScript(script.kscape.wall,<kind>,collections) that library's Collections view
 RunScript(script.kscape.wall,music,nowplaying)   Now Playing
+RunScript(script.kscape.wall,busytimeout)        Kodi's loading screen lasted 10 s: close it, stop the attempt
+RunScript(script.kscape.wall,startup)            Kodi started on Home: sync the colour theme, open nothing
 RunScript(script.kscape.wall,switchskin)         choose another installed skin and switch to it
 RunScript(script.kscape.wall,colours,<part>)     part: main or highlight - pick a theme colour
 RunScript(script.kscape.wall,display,<setting>)  aspect, rows, voffset, hoffset, safe, preview:
@@ -75,9 +77,18 @@ def main(args):
         from resources.lib import colours
         colours.choose(args[1] if len(args) > 1 else 'main')
         return
-    if not args:                         # the start-up wall: show the colour theme in Skin settings
+    if args == ['busytimeout']:          # Kodi's loading screen has been up for 10 s: give up
+        import xbmc
+        if xbmc.getCondVisibility('Window.IsActive(busydialog) | Window.IsActive(busydialognocancel)'):
+            xbmc.executebuiltin('Dialog.Close(busydialog,true)')
+            xbmc.executebuiltin('Dialog.Close(busydialognocancel,true)')
+            if not xbmc.getCondVisibility('Player.HasVideo | Player.HasAudio'):
+                xbmc.executebuiltin('PlayerControl(Stop)')
+        return
+    if args == ['startup']:              # Kodi started on Home: show the colour theme in Skin settings
         from resources.lib import colours
         colours.sync()
+        return
     if args == ['switchskin']:
         chosen = choose_skin()
         if chosen:

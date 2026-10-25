@@ -58,6 +58,7 @@ class Version(NamedTuple):
 
 
 _NAME_3D = re.compile(r'(?<![a-z0-9])(3d|h-?sbs|half-?sbs|h-?tab|h-?ou|half-?ou)(?![a-z0-9])', re.I)
+_NAME_IMAX = re.compile(r'(?<![a-z0-9])imax(?![a-z0-9])', re.I)
 _NAME_RES = ((re.compile(r'(?<![a-z0-9])(2160p|4k|uhd)(?![a-z0-9])', re.I), '4K'),
              (re.compile(r'(?<![a-z0-9])1080[pi](?![a-z0-9])', re.I), '1080p'),
              (re.compile(r'(?<![a-z0-9])720p(?![a-z0-9])', re.I), '720p'))
@@ -76,6 +77,10 @@ def name_resolution(path):
     """'4K' / '1080p' / '720p' if the file name says so, else ''."""
     base = _base(path)
     return next((r for rx, r in _NAME_RES if rx.search(base)), '')
+
+
+def name_imax(path):
+    return bool(_NAME_IMAX.search(_base(path)))
 
 
 def is_3d(v):
@@ -145,11 +150,14 @@ def choose(versions, preference='4K', prefer_3d=False, resume=False):
 
 
 def label(v, same_names=False, title=''):
-    """'Sonic the Hedgehog 3 (Director's Cut) — 4K Ultra HD · 2160p · 3D · HDR10 · Dolby Atmos'.
+    """'Sonic the Hedgehog 3 (Director's Cut) · 4K Ultra HD · 2160p · 3D · HDR10 · Dolby Atmos'.
     The movie's name leads, then the version's; 3D and the resolution count if the file name says
     so. Unknown parts are left out. The file name is only added (`same_names`) when nothing else
     tells two versions apart."""
     tech = [RES_LONG.get(format_of(resolution_of(v), v.file), '')]
+    vname = v.name or ''
+    if name_imax(v.file) and not _NAME_IMAX.search(f'{title} {vname}'):
+        tech.append('IMAX')
     if is_3d(v):
         tech.append('3D')
     if v.hdr:
@@ -157,12 +165,11 @@ def label(v, same_names=False, title=''):
     if v.audio:
         tech.append(SI.AUDIO_LABELS.get(v.audio[0], ''))
     tech = ' · '.join(t for t in tech if t)
-    vname = v.name or ''
     name = f'{title} ({vname})' if title and vname else (title or vname)
     if same_names or not name:
         base = _base(v.file)
         name = f'{name} ({base})' if name else base
-    return f'{name} — {tech}' if tech else name
+    return f'{name} · {tech}' if tech else name
 
 
 def labels(versions, title=''):

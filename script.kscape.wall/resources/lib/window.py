@@ -1242,7 +1242,7 @@ class WallWindow(xbmcgui.WindowXML):
             if item is None or current is None:
                 self._start_reload()              # added or vanished: needs a full re-read
                 return
-            if self.kind.has_extra and not self.cast_complete:
+            if self.kind.has_extra:               # cast and versions are not in a single-movie fetch
                 item = self.kind.carry(item, current)
             was_in = self.collection is not None and self._in_view(current)
             self.all_movies = [item if m.key == key else m for m in self.all_movies]

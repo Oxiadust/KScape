@@ -37,7 +37,7 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
     Hibernate, Reboot, Log off, master mode, idle shutdown, Favourites, Reload skin, Skin
     settings, Settings); its submenu is SiLVO's: Power off, Reboot, Suspend, Hibernate, Log off,
     Quit. Entries the system cannot do are hidden, as in SiLVO.
-- **Cover wall.** Opens at startup. About 9 × 3.6 covers are visible, bleeding off every edge,
+- **Cover wall.** Kodi always starts on Home; the wall opens from its Movies card. About 9 × 3.6 covers are visible, bleeding off every edge,
   in title order running down the columns and across to the right.
 - **Focus frame.** A thick amber frame hugs the selected cover, in front of the wall, filling
   the gutter to its neighbours.
@@ -166,9 +166,9 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
     default version), never a 3D version over a 2D one unless *Prefer 3D versions* is on.
     **Resume** resumes the version you were watching: Kodi keeps a resume point per version.
   - **Play Version** (movie info, when there are two or more) lists each version with its name,
-    resolution, 3D, dynamic range and audio - `Director's Cut — 4K Ultra HD · 2160p · Dolby
+    resolution, 3D, dynamic range and audio - `Director's Cut · 4K Ultra HD · 2160p · Dolby
     Vision · Dolby TrueHD` - led by the movie's name; the file name is only added when nothing
-    else tells two versions apart. A file named `3D` (or Half-SBS, H-OU) counts as 3D, and `4K`,
+    else tells two versions apart. A file named `3D` (or Half-SBS, H-OU) counts as 3D, `IMAX` in the name is added, and `4K`,
     `2160p`, `1080p`, `720p` in the name fill in a resolution Kodi hasn't measured. The one Play would start first; one with a resume point asks
     whether to resume it.
 - **Music.** The same wall with square album covers (missing artwork shows the album and artist
@@ -461,7 +461,7 @@ Back to Auto or 16:9 restores the original interface.
 ## Project layout
 
 ```
-skin.kscape/              Kodi skin: startup routing, Home (artwork + navigation), Kodi's
+skin.kscape/              Kodi skin: startup (always Home), Home (artwork + navigation), Kodi's
                           settings/system windows and dialogs (Includes_System.xml holds their
                           shared look), playback controls, fallback poster grid, colour
                           themes (colors/)

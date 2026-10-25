@@ -38,9 +38,9 @@ class VersionsTest(unittest.TestCase):
         self.assertEqual(V.choose((UHD, FHD), resume=True), UHD)
 
     def test_labels(self):
-        self.assertEqual(V.label(UHD), 'Standard Edition — 4K Ultra HD · 2160p · HDR10 · Dolby Atmos')
-        self.assertEqual(V.label(B3D), '3D — Full HD · 1080p · 3D · SDR · DTS-HD MA')
-        self.assertEqual(V.labels((UHD, FHD), 'Avatar')[0], 'Avatar (Standard Edition) — 4K Ultra HD · 2160p · HDR10 · Dolby Atmos')
+        self.assertEqual(V.label(UHD), 'Standard Edition · 4K Ultra HD · 2160p · HDR10 · Dolby Atmos')
+        self.assertEqual(V.label(B3D), '3D · Full HD · 1080p · 3D · SDR · DTS-HD MA')
+        self.assertEqual(V.labels((UHD, FHD), 'Avatar')[0], 'Avatar (Standard Edition) · 4K Ultra HD · 2160p · HDR10 · Dolby Atmos')
         twins = V.labels((UHD, UHD._replace(file='/m/Avatar copy.mkv')))   # nothing else tells them apart
         self.assertIn('Avatar 2160p.mkv', twins[0])
 
