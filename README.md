@@ -224,9 +224,9 @@ KScape is built only from Kodi's own skinning and Python APIs and your own libra
     copied; they are kept in the add-on's profile folder (`scenes.json`), apart from Kodi's
     metadata.
   - *The Scenes collection* (built in, after Played, in the Movies and TV Shows Collections):
-    every scene, grouped by movie (or episode) in order, with its artwork, the scene name, the
-    movie and the length. **Select** or **Play** plays the scene from its start and stops at
-    its end. **C**: Play / Edit / Rename Scene, Add to Demo Script… (one or several), Delete
+    one entry per movie (or episode) that has scenes, closed at first; **Select** on it shows
+    or hides its scenes. Each scene has its artwork, name, movie and length; **Select** or
+    **Play** plays it from its start and stops at its end. **C**: Play / Edit / Rename Scene, Add to Demo Script… (one or several), Delete
     Scene. A movie's (or show's) C menu offers **View Scenes** and **Add Scene to Demo Script…**
     when it has scenes.
   - *The Demo Scripts collection* (built in, next to Scenes): ordered playlists of scenes from

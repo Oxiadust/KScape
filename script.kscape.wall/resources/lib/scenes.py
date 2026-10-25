@@ -344,16 +344,29 @@ class Row:
         self.year = 0
 
 
-def scene_rows(st, media, library_keys=None, posters=None):
-    """Scenes of `media`, grouped by movie or episode; scenes whose video left the library say so.
+def scene_rows(st, media, library_keys=None, posters=None, expanded=None):
+    """Scenes of `media`, each movie's (or episode's) under a heading row of its own (kind
+    'heading': Select opens or closes it). Only the scenes of the movies in `expanded` (a set of
+    ids) are listed; None lists them all. Scenes whose video left the library say so.
     `posters` ({dbid: artwork}) stands in for scenes saved without artwork."""
-    rows = []
+    groups = {}
     for s in SM.by_media(st.scenes, media):
-        gone = library_keys is not None and s['dbid'] not in library_keys
-        detail = tr(32277) if gone else s.get('title', '')
-        art = s.get('thumbnail') or s.get('poster') or (posters or {}).get(s['dbid'], '')
-        rows.append(Row('scene', s, s['name'], art,
-                        f'{detail}  ·  {SM.clock(SM.duration(s))}'))
+        groups.setdefault(s['dbid'], []).append(s)
+    rows = []
+    for dbid, scenes in groups.items():
+        first = scenes[0]
+        is_open = expanded is None or dbid in expanded
+        rows.append(Row('heading', {'id': f'heading-{dbid}', 'dbid': dbid},
+                        f'{"▼" if is_open else "▶"}  {first.get("title", "")}',
+                        first.get('thumbnail') or first.get('poster') or (posters or {}).get(dbid, ''),
+                        count_text(len(scenes), 32213, 32212)))
+        if not is_open:
+            continue
+        for s in scenes:
+            gone = library_keys is not None and dbid not in library_keys
+            art = s.get('thumbnail') or s.get('poster') or (posters or {}).get(dbid, '')
+            rows.append(Row('scene', s, s['name'], art,
+                            f'{tr(32277) if gone else s.get("title", "")}  ·  {SM.clock(SM.duration(s))}'))
     return rows
 
 

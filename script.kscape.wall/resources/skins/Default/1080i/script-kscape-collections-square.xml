@@ -46,6 +46,18 @@
 						<textcolor>kscape_tint_row</textcolor>
 						<label>$INFO[ListItem.Label]</label>
 					<aligny>center</aligny>
+						<visible>String.IsEmpty(ListItem.Property(heading))</visible>
+					</control>
+					<control type="label">
+						<left>112</left>
+						<top>0</top>
+						<width>1048</width>
+						<height>54</height>
+						<font>kscape_list_head</font>
+						<textcolor>kscape_amber</textcolor>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
+					<aligny>bottom</aligny>
+						<visible>!String.IsEmpty(ListItem.Property(heading))</visible>
 					</control>
 					<control type="image">
 						<left>112</left>

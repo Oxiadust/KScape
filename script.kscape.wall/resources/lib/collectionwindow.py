@@ -80,6 +80,7 @@ class CollectionsWindow(xbmcgui.WindowXML):
         self.store = collectionui.store(self.kind)
         self.media = S.MEDIA_OF_KIND.get(self.kind.name)      # scenes of movies or episodes
         self.scenes = S.store() if self.media else None
+        self.expanded = set()                    # movies whose scenes the Scenes tab lists
         self.episode_ids = S.library_episode_ids() if self.media == 'episode' else None
         self.favs = Favourites(rpc, FAVOURITES_FILE)
         self.favs_seen = self.favs.version
@@ -142,7 +143,7 @@ class CollectionsWindow(xbmcgui.WindowXML):
                 posters = {m.key: m.poster for m in self.all_movies}
             else:
                 keys, posters = self.episode_ids, None
-            return [(r, None) for r in S.scene_rows(self.scenes, self.media, keys, posters)]
+            return [(r, None) for r in S.scene_rows(self.scenes, self.media, keys, posters, self.expanded)]
         if cid == 'demos':
             return [(r, None) for r in S.script_rows(self.scenes)]
         shown = self._shown() if shown is None else shown
@@ -162,7 +163,7 @@ class CollectionsWindow(xbmcgui.WindowXML):
         last_builtin = max(i for i, c in enumerate(self.collections) if c[2])
         for i, (cid, name, builtin) in enumerate(self.collections):
             li = xbmcgui.ListItem(name, offscreen=True)
-            li.setProperties({'count': str(len(self._members(cid, shown))), 'builtin': '1' if builtin else '',
+            li.setProperties({'count': str(self._scene_total() if cid == 'scenes' else len(self._members(cid, shown))), 'builtin': '1' if builtin else '',
                               'divider': '1' if i == last_builtin and i < len(self.collections) - 1 else ''})
             items.append(li)
         self.tabs.reset()
@@ -182,7 +183,8 @@ class CollectionsWindow(xbmcgui.WindowXML):
             self.list.selectItem(max(0, min(index or 0, len(self.rows) - 1)))
         name = collectionui.name_of(self.cid, self.store)
         self.setProperty('heading', name)
-        n = len(self.rows)
+        shown_rows = [r for r in self.rows if not self._is_heading(r)]
+        n = self._scene_total() if self.cid == 'scenes' else len(self.rows)
         if self.cid == 'scenes':
             self.setProperty('count', S.count_text(n, 32213, 32212))
             self.setProperty('kindlabel', tr(32293))
@@ -195,13 +197,34 @@ class CollectionsWindow(xbmcgui.WindowXML):
         self.setProperty('builtin', '1' if builtin else '')
         self.setProperty('empty', '' if self.rows else self._empty_text())
         for i in range(PREVIEWS):
-            self.setProperty(f'preview{i}', self.rows[i][0].poster if i < len(self.rows) else '')
-        self.setProperty('previews', str(min(len(self.rows), PREVIEWS)))
+            self.setProperty(f'preview{i}', shown_rows[i][0].poster if i < len(shown_rows) else '')
+        self.setProperty('previews', str(min(len(shown_rows), PREVIEWS)))
         if not self.rows and self.getFocusId() == MOVIES:
             self.setFocusId(TABS)
 
+    def _scene_total(self):
+        """How many scenes there are, open or not."""
+        return len(S.scene_rows(self.scenes, self.media)) - len({s['dbid'] for s in self.scenes.scenes if s.get('media') == self.media})
+
+    def _toggle(self, row):
+        """Select on a movie in the Scenes tab: show or hide its scenes."""
+        dbid = row.data['dbid']
+        with self.lock:
+            self.expanded ^= {dbid}
+            self._fill_movies(focus_key=row.key)
+
+    def _is_heading(self, pos_or_row):
+        """Whether a row (or the row at an index) is a movie's heading in the Scenes list."""
+        row = self.rows[pos_or_row] if isinstance(pos_or_row, int) and 0 <= pos_or_row < len(self.rows) else pos_or_row
+        return isinstance(row, tuple) and getattr(row[0], 'kind', '') == 'heading'
+
     def _item(self, movie):
         li = xbmcgui.ListItem(movie.title, offscreen=True)
+        if getattr(movie, 'kind', '') == 'heading':
+            li.setProperty('heading', '1')
+            li.setProperty('sub', movie.sub)
+            li.setProperty('poster', movie.poster)
+            return li
         sub = movie.sub if isinstance(movie, S.Row) else C.describe(self.cid, movie, tr)
         li.setProperties({'sub': sub, 'poster': movie.poster,
                           'badge': movie.badge, 'fav': '1' if self.favs.contains(movie) else ''})
@@ -293,7 +316,9 @@ class CollectionsWindow(xbmcgui.WindowXML):
         if what == 'play':
             self.kind.play(arg)
         elif what == 'playrow':
-            if arg.kind == 'scene':
+            if arg.kind == 'heading':
+                self._toggle(arg)
+            elif arg.kind == 'scene':
                 S.play_scene(arg.key)
             else:
                 S.play_script(self.scenes, arg.key)
@@ -425,6 +450,9 @@ class CollectionsWindow(xbmcgui.WindowXML):
         elif choice in S.ITEM_CHOICES:
             target = S.handle_item_choice(self.kind, movie, choice, self.scenes)
             if target:                               # View Scenes: here, on the Scenes tab
+                found = self.scenes.by_id().get(target)
+                if found:
+                    self.expanded.add(found['dbid'])
                 self.cid = 'scenes'
                 self._fill_tabs()
                 self._fill_movies(focus_key=target)
@@ -436,6 +464,8 @@ class CollectionsWindow(xbmcgui.WindowXML):
     def _row_menu(self, row):
         """C on a scene or a Demo Script."""
         st = self.scenes
+        if row.kind == 'heading':
+            return None
         if row.kind == 'scene':
             entries = [('play', tr(32247)), ('edit', tr(32248)), ('rename', tr(32249)),
                        ('addscript', tr(32250)), ('delete', tr(32252))]

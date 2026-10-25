@@ -112,7 +112,7 @@ def movie_list():
 			<movement>{FOCUS_POS}</movement>
 			<scrolltime tween="cubic" easing="out">200</scrolltime>
 			<itemlayout width="{LIST_W}" height="{ROW_H}">
-{lab(TEXT_X, 0, LIST_W - TEXT_X - 80, ROW_H, '$INFO[ListItem.Label]', 'kscape_list_row', ROW_COLOR, f'{i5}<aligny>center</aligny>{chr(10)}', i5)}{heart(TEXT_X - 38, (ROW_H - 24) // 2, i5)}			</itemlayout>
+{lab(TEXT_X, 0, LIST_W - TEXT_X - 80, ROW_H, '$INFO[ListItem.Label]', 'kscape_list_row', ROW_COLOR, f'{i5}<aligny>center</aligny>{chr(10)}' + vis('String.IsEmpty(ListItem.Property(heading))', i5), i5)}{lab(TEXT_X - 38, 0, LIST_W - TEXT_X - 42, ROW_H, '[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]', 'kscape_list_head', AMBER, f'{i5}<aligny>bottom</aligny>{chr(10)}' + vis('!String.IsEmpty(ListItem.Property(heading))', i5), i5)}{heart(TEXT_X - 38, (ROW_H - 24) // 2, i5)}			</itemlayout>
 			<focusedlayout width="{LIST_W}" height="{BAND_H}">
 				<control type="group">
 {vis(LIST_FOCUS, i5)}{band(BAND, i5 + chr(9))}				</control>
