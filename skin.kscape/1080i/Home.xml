@@ -60,30 +60,6 @@
 				<content sortby="random" limit="60">videodb://movies/titles/</content>
 			</control>
 
-			<control type="label">
-				<description>Clock</description>
-				<right>80</right>
-				<top>40</top>
-				<width>600</width>
-				<height>60</height>
-				<align>right</align>
-				<font>kscape_title</font>
-				<textcolor>kscape_text</textcolor>
-				<label>$INFO[System.Time]</label>
-				<visible>!Skin.HasSetting(HomeNoClock)</visible>
-			</control>
-			<control type="label">
-				<description>Which movie the background shows</description>
-				<right>80</right>
-				<top>846</top>
-				<width>1200</width>
-				<height>44</height>
-				<align>right</align>
-				<font>kscape_small</font>
-				<textcolor>kscape_text_dim</textcolor>
-				<label>$INFO[Container(9100).ListItem.Label]$INFO[Container(9100).ListItem.Year, (,)]</label>
-				<visible>!String.IsEmpty(Container(9100).ListItem.Art(fanart)) + !Skin.HasSetting(HomeNoArtwork) + !Skin.HasSetting(HomeNoCaption) + ![String.IsEqual(Container(9000).ListItem.Property(hasstack),true) + System.AddonIsEnabled(script.kscape.wall)]</visible>
-			</control>
 
 			<!-- ===== Submenu strip (above the bar) ===== -->
 			<control type="group">
@@ -108,9 +84,9 @@
 					<onright>Control.Move(9000,1)</onright>
 					<onright>SetFocus(9030)</onright>
 					<scrolltime tween="cubic" easing="out">240</scrolltime>
-					<itemlayout width="240" height="88">
+					<itemlayout width="340" height="88">
 						<control type="label">
-							<width>240</width>
+							<width>340</width>
 							<height>88</height>
 							<align>center</align>
 							<aligny>center</aligny>
@@ -119,16 +95,16 @@
 							<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 						</control>
 					</itemlayout>
-					<focusedlayout width="240" height="88">
+					<focusedlayout width="340" height="88">
 						<control type="image">
-							<width>240</width>
+							<width>340</width>
 							<height>88</height>
 							<texture colordiffuse="kscape_blue_focus">white.png</texture>
 							<visible>Control.HasFocus(9010)</visible>
 							<animation effect="fade" start="0" end="100" time="140">Visible</animation>
 						</control>
 						<control type="label">
-							<width>240</width>
+							<width>340</width>
 							<height>88</height>
 							<align>center</align>
 							<aligny>center</aligny>
@@ -212,6 +188,47 @@
 
 			<!-- ===== View cards above Movies / Music / TV Shows (generated: tools/gen_home_xml.py) ===== -->
 			<include>KScapeHomeCards</include>
+			<control type="group">
+				<description>Which movie the background shows: its logo, title and running time, and its
+				tagline. On the right, above the submenu strip; drawn over the cards' darkening, and hidden
+				while the Music or TV Shows cards (which reach that side) are up.</description>
+				<right>80</right>
+				<top>680</top>
+				<width>760</width>
+				<height>220</height>
+				<visible>!String.IsEmpty(Container(9100).ListItem.Art(fanart)) + !Skin.HasSetting(HomeNoArtwork) + !Skin.HasSetting(HomeNoCaption)</visible>
+				<visible>![[String.IsEqual(Container(9000).ListItem.Property(id),music) | String.IsEqual(Container(9000).ListItem.Property(id),tv)] + System.AddonIsEnabled(script.kscape.wall)]</visible>
+				<animation effect="fade" start="0" end="100" time="300">Visible</animation>
+				<animation effect="fade" start="100" end="0" time="200">Hidden</animation>
+				<control type="image">
+					<description>Clear logo, right-aligned just above the title</description>
+					<width>760</width>
+					<height>124</height>
+					<aspectratio align="right" aligny="bottom">keep</aspectratio>
+					<fadetime>400</fadetime>
+					<texture background="true">$INFO[Container(9100).ListItem.Art(clearlogo)]</texture>
+				</control>
+				<control type="label">
+					<top>134</top>
+					<width>760</width>
+					<height>48</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>kscape_title</font>
+					<textcolor>white</textcolor>
+					<label>$INFO[Container(9100).ListItem.Label]$INFO[Container(9100).ListItem.Year, (,)][COLOR kscape_text_dim]$VAR[KScapeHomeDuration][/COLOR]</label>
+				</control>
+				<control type="label">
+					<top>184</top>
+					<width>760</width>
+					<height>34</height>
+					<align>right</align>
+					<aligny>center</aligny>
+					<font>kscape_small</font>
+					<textcolor>kscape_text</textcolor>
+					<label>[I]$INFO[Container(9100).ListItem.Tagline][/I]</label>
+				</control>
+			</control>
 			<include>KScapeHomeNowPlaying</include>
 
 			<!-- ===== Bottom navigation bar ===== -->
@@ -230,11 +247,55 @@
 				<aspectratio>keep</aspectratio>
 				<texture>kscape-logo.png</texture>
 			</control>
+			<control type="grouplist">
+				<description>Time and weather, after the wordmark: the time, a hairline, the weather
+				icon and temperature (once the weather add-on has fetched them)</description>
+				<left>270</left>
+				<top>1003</top>
+				<width>270</width>
+				<height>77</height>
+				<orientation>horizontal</orientation>
+				<itemgap>8</itemgap>
+				<usecontrolcoords>true</usecontrolcoords>
+				<control type="label">
+					<width>auto</width>
+					<height>77</height>
+					<aligny>center</aligny>
+					<font>kscape_bar</font>
+					<textcolor>white</textcolor>
+					<label>$INFO[System.Time]</label>
+					<visible>!Skin.HasSetting(HomeNoClock)</visible>
+				</control>
+				<control type="image">
+					<top>27</top>
+					<width>2</width>
+					<height>24</height>
+					<texture colordiffuse="kscape_text_dim">white.png</texture>
+					<visible>!Skin.HasSetting(HomeNoClock) + Weather.IsFetched</visible>
+				</control>
+				<control type="image">
+					<top>20</top>
+					<width>36</width>
+					<height>36</height>
+					<aspectratio>keep</aspectratio>
+					<texture>$INFO[Weather.ConditionsIcon]</texture>
+					<visible>Weather.IsFetched</visible>
+				</control>
+				<control type="label">
+					<width>auto</width>
+					<height>77</height>
+					<aligny>center</aligny>
+					<font>kscape_list_value</font>
+					<textcolor>kscape_text</textcolor>
+					<label>$INFO[Weather.Temperature]</label>
+					<visible>Weather.IsFetched</visible>
+				</control>
+			</control>
 			<control type="list" id="9000">
 				<description>Main menu. Left/Right wrap around, as in SiLVO.</description>
-				<left>330</left>
+				<left>540</left>
 				<top>1003</top>
-				<width>1590</width>
+				<width>1380</width>
 				<height>77</height>
 				<orientation>horizontal</orientation>
 				<onleft>9000</onleft>
@@ -244,9 +305,9 @@
 				<onup condition="String.IsEqual(Container(9000).ListItem.Property(id),music) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9022,3,absolute)</onup>
 				<onup condition="String.IsEqual(Container(9000).ListItem.Property(id),tv) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9023,2,absolute)</onup>
 				<scrolltime tween="cubic" easing="out">240</scrolltime>
-				<itemlayout width="320" height="77">
+				<itemlayout width="276" height="77">
 					<control type="label">
-						<width>320</width>
+						<width>276</width>
 						<height>77</height>
 						<align>center</align>
 						<aligny>center</aligny>
@@ -255,10 +316,10 @@
 						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 					</control>
 				</itemlayout>
-				<focusedlayout width="320" height="77">
+				<focusedlayout width="276" height="77">
 					<control type="image">
 						<description>Lighter tile on the selected item (tab look)</description>
-						<width>320</width>
+						<width>276</width>
 						<height>77</height>
 						<texture colordiffuse="kscape_blue_focus">white.png</texture>
 						<visible>Control.HasFocus(9000)</visible>
@@ -266,13 +327,13 @@
 					</control>
 					<control type="image">
 						<description>While the submenu has focus, a quieter tile keeps the parent visible</description>
-						<width>320</width>
+						<width>276</width>
 						<height>77</height>
 						<texture colordiffuse="kscape_blue_head">white.png</texture>
 						<visible>!Control.HasFocus(9000)</visible>
 					</control>
 					<control type="label">
-						<width>320</width>
+						<width>276</width>
 						<height>77</height>
 						<align>center</align>
 						<aligny>center</aligny>

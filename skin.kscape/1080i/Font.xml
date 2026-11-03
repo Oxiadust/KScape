@@ -79,6 +79,12 @@
 			<size>44</size>
 		</font>
 		<font>
+			<description>Home view card names (LIST, COVERS...): kscape_list_title at 80 %</description>
+			<name>kscape_card_title</name>
+			<filename>arial.ttf</filename>
+			<size>35</size>
+		</font>
+		<font>
 			<name>kscape_bar</name>
 			<filename>arial.ttf</filename>
 			<size>27</size>

@@ -56,16 +56,21 @@ PANEL_BLUE = 'kscape_blue'
 CARD_BG = 'FF1A1A1F'
 WALL_BG = 'FF060607'
 
+# Home's bar (Home.xml): the logo, the time and weather, then the tabs. Each column of cards is
+# centred over its tab.
+TAB_LEFT, TAB_W = 540, 276
+TAB_X = {name: round(TAB_LEFT + i * TAB_W + (TAB_W - CARD_W) / 2) for i, name in enumerate(('movies', 'music', 'tv'))}
+
 KINDS = [
     # name, tab x, layout, art, list spec, list columns -> info label, band art, extra card
-    dict(name='movies', x=330, layout=G.POSTER, art='Art(poster)', spec=L.MOVIES, title='Label',
+    dict(name='movies', x=TAB_X['movies'], layout=G.POSTER, art='Art(poster)', spec=L.MOVIES, title='Label',
          cols={'genre': 'Genre', 'cast': 'Writer', 'director': 'Director', 'year': 'Year'},
          path='videodb://movies/titles/', sort='title', body='Plot', recent='videodb://recentlyaddedmovies/'),
-    dict(name='music', x=650, layout=G.SQUARE, art='Art(thumb)', spec=L.MUSIC, title='Artist',
+    dict(name='music', x=TAB_X['music'], layout=G.SQUARE, art='Art(thumb)', spec=L.MUSIC, title='Artist',
          cols={'album': 'Label', 'genre': 'Genre', 'year': 'Year'},
          path='musicdb://albums/', sort='artist', body='Artist', nowplaying=True,
          recent='musicdb://recentlyaddedalbums/'),
-    dict(name='tv', x=970, layout=G.POSTER, art='Art(poster)', spec=L.TV, title='Label',
+    dict(name='tv', x=TAB_X['tv'], layout=G.POSTER, art='Art(poster)', spec=L.TV, title='Label',
          cols={'genre': 'Genre', 'cast': 'Studio', 'network': 'Studio', 'year': 'Year'},
          path='videodb://tvshows/titles/', sort='title', body='Plot', recent='videodb://tvshows/titles/'),
 ]
@@ -397,7 +402,7 @@ def card_list(k, top, count):
     thin = bars(o, o, CARD_W, CARD_H, HAIRLINE, 'kscape_blue_focus', ind='\t\t\t\t\t')
     thin_unfocused = bars(o, o, CARD_W, CARD_H, HAIRLINE, 'kscape_blue_focus', ind='\t\t\t\t\t\t')
     amber = bars(0, 0, CARD_W + 2 * o, CARD_H + 2 * o, AMBER_T, 'kscape_amber', ind='\t\t\t\t\t\t')
-    lab = lambda color, ind: label(o + 352, o, 540, CARD_H, '[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]', 'kscape_list_title', color,
+    lab = lambda color, ind: label(o + 352, o, 540, CARD_H, '[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]', 'kscape_card_title', color,
                                    extra=f'{ind}\t<aligny>center</aligny>\n', ind=ind)
     return f'''			<control type="list" id="{lid}">
 				<left>{k["x"] - o}</left>

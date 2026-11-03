@@ -68,4 +68,10 @@
 	<variable name="KScapeHwDecoder">
 		<value condition="Player.Process(videohwdecoder)"> · HW</value>
 	</variable>
+	<!-- Home caption: the background movie's running time after its title ("  ·  1h 47m"). -->
+	<variable name="KScapeHomeDuration">
+		<value condition="String.IsEmpty(Container(9100).ListItem.Duration)"></value>
+		<value condition="Integer.IsGreater(Container(9100).ListItem.Duration(mins),59)">  ·  $INFO[Container(9100).ListItem.Duration(h)]h $INFO[Container(9100).ListItem.Duration(m)]m</value>
+		<value>  ·  $INFO[Container(9100).ListItem.Duration(mins)]m</value>
+	</variable>
 </includes>
