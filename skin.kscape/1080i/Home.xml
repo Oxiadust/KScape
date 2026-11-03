@@ -116,7 +116,7 @@
 							<aligny>center</aligny>
 							<font>kscape_sub</font>
 							<textcolor>kscape_text_dim</textcolor>
-							<label>$INFO[ListItem.Label]</label>
+							<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 						</control>
 					</itemlayout>
 					<focusedlayout width="240" height="88">
@@ -134,7 +134,7 @@
 							<aligny>center</aligny>
 							<font>kscape_sub</font>
 							<textcolor>white</textcolor>
-							<label>$INFO[ListItem.Label]</label>
+							<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 						</control>
 					</focusedlayout>
 					<content>
@@ -252,7 +252,7 @@
 						<aligny>center</aligny>
 						<font>kscape_bar</font>
 						<textcolor>kscape_text_dim</textcolor>
-						<label>$INFO[ListItem.Label]</label>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 					</control>
 				</itemlayout>
 				<focusedlayout width="320" height="77">
@@ -278,7 +278,7 @@
 						<aligny>center</aligny>
 						<font>kscape_bar</font>
 						<textcolor>white</textcolor>
-						<label>$INFO[ListItem.Label]</label>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 					</control>
 				</focusedlayout>
 				<content>

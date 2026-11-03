@@ -51,6 +51,16 @@ def screen():
     return xbmcgui.getScreenWidth(), xbmcgui.getScreenHeight()
 
 
+def pointer_size(height):
+    """The mouse pointer for a screen `height` pixels tall (Pointer.xml): Kodi draws the pointer
+    in screen pixels, not skin ones, so a 4K or Retina screen needs a bigger image."""
+    return 'large' if height >= 1800 else 'medium' if height >= 1300 else ''
+
+
+def publish_pointer():
+    HOME.setProperty('kscape.pointer', pointer_size(screen()[1]))
+
+
 def current(cover_pitch=303, values=None):
     """The stage for the screen Kodi draws on now and the display settings."""
     v = values or settings()

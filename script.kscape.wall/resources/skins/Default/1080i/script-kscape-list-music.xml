@@ -34,6 +34,14 @@
 				<animation effect="fade" start="100" end="35" time="90" condition="String.IsEqual(Window(Home).Property(kscape.list.jump),1)">Conditional</animation>
 				<scrolltime tween="cubic" easing="out">200</scrolltime>
 				<itemlayout width="1930" height="58">
+					<control type="image">
+						<description>Row under the mouse pointer (listwindow.py sets the item's hover)</description>
+						<left>40</left>
+						<width>1880</width>
+						<height>58</height>
+						<texture colordiffuse="1FFFFFFF">kscape-white.png</texture>
+						<visible>String.IsEqual(ListItem.Property(hover),1)</visible>
+					</control>
 					<control type="group">
 						<left>860</left>
 
@@ -69,6 +77,14 @@
 						<width>860</width>
 						<height>58</height>
 						<texture colordiffuse="kscape_bg">kscape-white.png</texture>
+					</control>
+					<control type="image">
+						<description>The hover highlight again over the title column (its background hides the first)</description>
+						<left>40</left>
+						<width>820</width>
+						<height>58</height>
+						<texture colordiffuse="1FFFFFFF">kscape-white.png</texture>
+						<visible>String.IsEqual(ListItem.Property(hover),1)</visible>
 					</control>
 					<control type="label">
 						<left>244</left>
@@ -292,6 +308,214 @@
 						<visible>String.IsEqual(ListItem.Property(fav),1)</visible>
 					</control>
 				</focusedlayout>
+			</control>
+			<control type="button" id="915">
+				<description>Mouse target: the row -5 from the band</description>
+				<left>0</left>
+				<top>8</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="916">
+				<description>Mouse target: the row -4 from the band</description>
+				<left>0</left>
+				<top>66</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="917">
+				<description>Mouse target: the row -3 from the band</description>
+				<left>0</left>
+				<top>124</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="918">
+				<description>Mouse target: the row -2 from the band</description>
+				<left>0</left>
+				<top>182</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="919">
+				<description>Mouse target: the row -1 from the band</description>
+				<left>0</left>
+				<top>240</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="920">
+				<description>Mouse target: the row +0 from the band</description>
+				<left>0</left>
+				<top>298</top>
+				<width>1920</width>
+				<height>236</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="921">
+				<description>Mouse target: the row +1 from the band</description>
+				<left>0</left>
+				<top>534</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="922">
+				<description>Mouse target: the row +2 from the band</description>
+				<left>0</left>
+				<top>592</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="923">
+				<description>Mouse target: the row +3 from the band</description>
+				<left>0</left>
+				<top>650</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="924">
+				<description>Mouse target: the row +4 from the band</description>
+				<left>0</left>
+				<top>708</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="925">
+				<description>Mouse target: the row +5 from the band</description>
+				<left>0</left>
+				<top>766</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="926">
+				<description>Mouse target: the row +6 from the band</description>
+				<left>0</left>
+				<top>824</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="927">
+				<description>Mouse target: the row +7 from the band</description>
+				<left>0</left>
+				<top>882</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="928">
+				<description>Mouse target: the row +8 from the band</description>
+				<left>0</left>
+				<top>940</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="929">
+				<description>Mouse target: the row +9 from the band</description>
+				<left>0</left>
+				<top>998</top>
+				<width>1920</width>
+				<height>58</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
+			</control>
+			<control type="button" id="930">
+				<description>Mouse target: the row +10 from the band</description>
+				<left>0</left>
+				<top>1056</top>
+				<width>1920</width>
+				<height>24</height>
+				<texturefocus/>
+				<texturenofocus/>
+				<onup>9000</onup>
+				<ondown>9000</ondown>
+				<onleft>9000</onleft>
+				<onright>9000</onright>
 			</control>
 			<control type="image">
 				<description>Fade the rows into the background at the top and bottom</description>

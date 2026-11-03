@@ -1,26 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Kodi requires image ids 1-4 (normal, drag, drag-alt, click). -->
+<!-- Kodi requires controls with ids 1-4 (normal, drag, drag-alt, click) and shows one at a time.
+     pointer.png (tools/gen_pointer.py) is an arrow whose tip is the image's top-left corner, where
+     Kodi puts the mouse position. Kodi draws this window in screen pixels, not skin ones, so the
+     arrow comes in three sizes picked by Window(Home).Property(kscape.pointer), which the KScape
+     service sets from the screen's height (displayui.pointer_size): 32 px for 1080 lines, 48 for
+     1440, 64 for 4K and Retina screens. aspectratio keep holds the arrow's shape. -->
 <window>
 	<controls>
-		<control type="image" id="1">
-			<width>24</width>
-			<height>24</height>
-			<texture>pointer.png</texture>
+		<control type="group" id="1">
+			<control type="image">
+				<width>32</width>
+				<height>32</height>
+				<aspectratio align="left" aligny="top">keep</aspectratio>
+				<texture>pointer.png</texture>
+				<visible>!String.IsEqual(Window(Home).Property(kscape.pointer),medium) + !String.IsEqual(Window(Home).Property(kscape.pointer),large)</visible>
+			</control>
+			<control type="image">
+				<width>48</width>
+				<height>48</height>
+				<aspectratio align="left" aligny="top">keep</aspectratio>
+				<texture>pointer.png</texture>
+				<visible>String.IsEqual(Window(Home).Property(kscape.pointer),medium)</visible>
+			</control>
+			<control type="image">
+				<width>64</width>
+				<height>64</height>
+				<aspectratio align="left" aligny="top">keep</aspectratio>
+				<texture>pointer.png</texture>
+				<visible>String.IsEqual(Window(Home).Property(kscape.pointer),large)</visible>
+			</control>
 		</control>
-		<control type="image" id="2">
-			<width>24</width>
-			<height>24</height>
-			<texture>pointer.png</texture>
+		<control type="group" id="2">
+			<control type="image">
+				<width>32</width>
+				<height>32</height>
+				<aspectratio align="left" aligny="top">keep</aspectratio>
+				<texture>pointer.png</texture>
+				<visible>!String.IsEqual(Window(Home).Property(kscape.pointer),medium) + !String.IsEqual(Window(Home).Property(kscape.pointer),large)</visible>
+			</control>
+			<control type="image">
+				<width>48</width>
+				<height>48</height>
+				<aspectratio align="left" aligny="top">keep</aspectratio>
+				<texture>pointer.png</texture>
+				<visible>String.IsEqual(Window(Home).Property(kscape.pointer),medium)</visible>
+			</control>
+			<control type="image">
+				<width>64</width>
+				<height>64</height>
+				<aspectratio align="left" aligny="top">keep</aspectratio>
+				<texture>pointer.png</texture>
+				<visible>String.IsEqual(Window(Home).Property(kscape.pointer),large)</visible>
+			</control>
 		</control>
-		<control type="image" id="3">
-			<width>24</width>
-			<height>24</height>
-			<texture>pointer.png</texture>
+		<control type="group" id="3">
+			<control type="image">
+				<width>32</width>
+				<height>32</height>
+				<aspectratio align="left" aligny="top">keep</aspectratio>
+				<texture>pointer.png</texture>
+				<visible>!String.IsEqual(Window(Home).Property(kscape.pointer),medium) + !String.IsEqual(Window(Home).Property(kscape.pointer),large)</visible>
+			</control>
+			<control type="image">
+				<width>48</width>
+				<height>48</height>
+				<aspectratio align="left" aligny="top">keep</aspectratio>
+				<texture>pointer.png</texture>
+				<visible>String.IsEqual(Window(Home).Property(kscape.pointer),medium)</visible>
+			</control>
+			<control type="image">
+				<width>64</width>
+				<height>64</height>
+				<aspectratio align="left" aligny="top">keep</aspectratio>
+				<texture>pointer.png</texture>
+				<visible>String.IsEqual(Window(Home).Property(kscape.pointer),large)</visible>
+			</control>
 		</control>
-		<control type="image" id="4">
-			<width>24</width>
-			<height>24</height>
-			<texture colordiffuse="FFB0B0B0">pointer.png</texture>
+		<control type="group" id="4">
+			<control type="image">
+				<width>32</width>
+				<height>32</height>
+				<aspectratio align="left" aligny="top">keep</aspectratio>
+				<texture colordiffuse="kscape_amber">pointer.png</texture>
+				<visible>!String.IsEqual(Window(Home).Property(kscape.pointer),medium) + !String.IsEqual(Window(Home).Property(kscape.pointer),large)</visible>
+			</control>
+			<control type="image">
+				<width>48</width>
+				<height>48</height>
+				<aspectratio align="left" aligny="top">keep</aspectratio>
+				<texture colordiffuse="kscape_amber">pointer.png</texture>
+				<visible>String.IsEqual(Window(Home).Property(kscape.pointer),medium)</visible>
+			</control>
+			<control type="image">
+				<width>64</width>
+				<height>64</height>
+				<aspectratio align="left" aligny="top">keep</aspectratio>
+				<texture colordiffuse="kscape_amber">pointer.png</texture>
+				<visible>String.IsEqual(Window(Home).Property(kscape.pointer),large)</visible>
+			</control>
 		</control>
 	</controls>
 </window>

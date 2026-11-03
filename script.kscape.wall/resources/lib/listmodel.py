@@ -17,6 +17,13 @@ SCROLL_W = 1060                    # visible width right of the title column
 AMBER = 'kscape_amber'
 FULL_LINES = 4                     # values shown in the focused row's band
 
+# Row geometry (skin pixels; tools/gen_list_xml.py builds the list from these). The list is a
+# fixedlist: the focused row, the band, always sits FOCUS_POS rows down.
+LIST_TOP = 8
+ROW_H = 58
+BAND_H = 236
+FOCUS_POS = 5
+
 # Kodi's default sort tokens: titles sort as if these leading words were absent.
 SORT_TOKENS = ('the ', 'the.', 'the_')
 
@@ -64,6 +71,22 @@ def column_offsets(spec=None):
     for col in spec.columns:
         out[col.key] = x
         x += col.width
+    return out
+
+
+MOUSE_BASE = 920                   # mouse target of the row `offset` rows from the band: 920 + offset
+
+
+def mouse_rows(screen_h=1080):
+    """(offset, top, height) of the list's row slots on screen, `offset` rows from the band
+    (0 = the band, negative above it): where the window's mouse targets go (gen_list_xml)."""
+    out = [(-FOCUS_POS + i, LIST_TOP + i * ROW_H, ROW_H) for i in range(FOCUS_POS)]
+    band = LIST_TOP + FOCUS_POS * ROW_H
+    out.append((0, band, BAND_H))
+    top, k = band + BAND_H, 1
+    while top < screen_h:
+        out.append((k, top, min(ROW_H, screen_h - top)))
+        top, k = top + ROW_H, k + 1
     return out
 
 

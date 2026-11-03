@@ -9,7 +9,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from resources.lib import geometry as G  # noqa: E402
 from resources.lib.model import Movie, badge_for, merge_duplicates  # noqa: E402
 from resources.lib.ranking import rank_related, score  # noqa: E402
-from resources.lib.wallmodel import (Wall, _segment_hits_rect, camera_target, clip_outside,  # noqa: E402
+from resources.lib.wallmodel import (Wall, _segment_hits_rect, camera_target, cell_at, clip_outside,  # noqa: E402
+                                     in_opening_view,  # noqa: E402
                                      detour, ease_out_back, ease_out_cubic, grid_rows)
 
 
@@ -160,7 +161,40 @@ class WallTest(unittest.TestCase):
         cx, cy = camera_target(w, (20, 4))
         self.assertAlmostEqual(cx + G.SCREEN_W / 2, 20 * G.PITCH_X + G.COVER_W / 2, delta=1)
         lx, ly = camera_target(w, (0, 0))
-        self.assertEqual((lx, ly), (round(-G.PITCH_X * 0.5), round(-G.PITCH_Y * 0.25)))
+        self.assertEqual((lx, ly), (round(-G.PITCH_X * 0.5), -(G.PITCH_Y - G.COVER_H)))
+
+    def test_opening_view_keeps_first_row_whole(self):
+        w = self.make_wall(400, rows=8)
+        _, cy = camera_target(w, (3, 2), pin_top=True)
+        self.assertEqual(cy, -(G.PITCH_Y - G.COVER_H))         # first row whole, under the gutter
+        self.assertTrue(in_opening_view(w, (3, 2)))
+        self.assertFalse(in_opening_view(w, (3, 3)))
+
+    def test_top_row_is_never_cut(self):
+        """Down the wall the camera moves by whole rows: the top row on screen is always whole."""
+        w = self.make_wall(400, rows=8)
+        margin = G.PITCH_Y - G.COVER_H
+        cam = camera_target(w, (0, 0), pin_top=True)
+        for row in list(range(8)) + list(range(7, -1, -1)):
+            cam = camera_target(w, (5, row), cam)
+            self.assertEqual((cam[1] + margin) % G.PITCH_Y, 0)            # a row starts at the margin
+            top = (cam[1] + margin) // G.PITCH_Y
+            self.assertTrue(top <= row <= top + 2, (row, top))             # focused row is whole
+        self.assertEqual(camera_target(w, (5, 7), None)[1], 5 * G.PITCH_Y - margin)   # last rows
+        self.assertEqual(camera_target(w, (5, 2), None)[1], 1 * G.PITCH_Y - margin)   # centred row
+
+    def test_moving_across_keeps_the_rows(self):
+        w = self.make_wall(400, rows=8)
+        cam = camera_target(w, (3, 2), pin_top=True)
+        self.assertEqual(camera_target(w, (4, 2), cam)[1], cam[1])
+
+    def test_cell_at_finds_cover_under_pointer(self):
+        lay = G.POSTER
+        cam = (-100, -50)
+        self.assertEqual(cell_at(lay, cam, 100 + 10, 50 + 10), (0, 0))
+        self.assertEqual(cell_at(lay, cam, 100 + lay.pitch_x + 5, 50 + lay.pitch_y + 5), (1, 1))
+        self.assertIsNone(cell_at(lay, cam, 100 + lay.cover_w + 5, 50 + 10))    # gutter
+        self.assertIsNone(cell_at(lay, cam, 10, 10))                              # before the wall
 
     def test_small_wall_is_centred(self):
         w = self.make_wall(3, rows=3)

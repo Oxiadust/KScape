@@ -2634,7 +2634,7 @@
 						<height>192</height>
 						<font>kscape_list_title</font>
 						<textcolor>kscape_text</textcolor>
-						<label>$INFO[ListItem.Label]</label>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 						<aligny>center</aligny>
 					</control>
 				</itemlayout>
@@ -2710,7 +2710,7 @@
 						<height>192</height>
 						<font>kscape_list_title</font>
 						<textcolor>white</textcolor>
-						<label>$INFO[ListItem.Label]</label>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 						<aligny>center</aligny>
 					</control>
 				</focusedlayout>
@@ -5050,7 +5050,7 @@
 						<height>192</height>
 						<font>kscape_list_title</font>
 						<textcolor>kscape_text</textcolor>
-						<label>$INFO[ListItem.Label]</label>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 						<aligny>center</aligny>
 					</control>
 				</itemlayout>
@@ -5126,7 +5126,7 @@
 						<height>192</height>
 						<font>kscape_list_title</font>
 						<textcolor>white</textcolor>
-						<label>$INFO[ListItem.Label]</label>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 						<aligny>center</aligny>
 					</control>
 				</focusedlayout>
@@ -7994,7 +7994,7 @@
 						<height>192</height>
 						<font>kscape_list_title</font>
 						<textcolor>kscape_text</textcolor>
-						<label>$INFO[ListItem.Label]</label>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 						<aligny>center</aligny>
 					</control>
 				</itemlayout>
@@ -8070,7 +8070,7 @@
 						<height>192</height>
 						<font>kscape_list_title</font>
 						<textcolor>white</textcolor>
-						<label>$INFO[ListItem.Label]</label>
+						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 						<aligny>center</aligny>
 					</control>
 				</focusedlayout>

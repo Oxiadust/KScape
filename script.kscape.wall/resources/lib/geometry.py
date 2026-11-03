@@ -92,5 +92,10 @@ FLIGHT_DELAY_MAX_MS = 300
 FLIGHT_SHRINK = 72     # percent scale at mid-flight
 DEPART_MS = 900
 
+# The synopsis panel slides out from behind the selected cover and back (reference video
+# prompts/examples/animation.mp4: ~8 frames at 30 fps, a fast start and a soft landing).
+PANEL_IN_MS = 270
+PANEL_OUT_MS = 200
+
 WALL_MIN_ROWS = POSTER.min_rows
 WALL_MAX_ROWS = 10

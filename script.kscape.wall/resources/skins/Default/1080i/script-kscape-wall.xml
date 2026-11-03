@@ -23323,17 +23323,24 @@
 				</control>
 			</control>
 			<control type="group" id="1900">
-				<description>Info panel beside the focused cover</description>
+				<description>Info panel beside the focused cover (placed by Python)</description>
+				<left>-4000</left>
 				<width>608</width>
 				<height>323</height>
-				<animation effect="fade" start="0" end="100" time="320" tween="sine" easing="out">Visible</animation>
-				<animation effect="fade" start="100" end="0" time="180" tween="sine" easing="in">Hidden</animation>
-				<animation effect="slide" start="-26,0" end="0,0" time="320" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1) + String.IsEqual(Window.Property(kscape.panel.side),right)">Visible</animation>
-				<animation effect="zoom" start="96" end="100" center="0,161" time="320" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1) + String.IsEqual(Window.Property(kscape.panel.side),right)">Visible</animation>
-				<animation effect="slide" start="0,0" end="-13,0" time="180" tween="sine" easing="in" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1) + String.IsEqual(Window.Property(kscape.panel.side),right)">Hidden</animation>
-				<animation effect="slide" start="26,0" end="0,0" time="320" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1) + String.IsEqual(Window.Property(kscape.panel.side),left)">Visible</animation>
-				<animation effect="zoom" start="96" end="100" center="608,161" time="320" tween="cubic" easing="out" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1) + String.IsEqual(Window.Property(kscape.panel.side),left)">Visible</animation>
-				<animation effect="slide" start="0,0" end="13,0" time="180" tween="sine" easing="in" condition="!String.IsEqual(Window(Home).Property(kscape.reduced),1) + String.IsEqual(Window.Property(kscape.panel.side),left)">Hidden</animation>
+				<control type="grouplist">
+					<description>Clipping box: the body slides into it from the cover's side</description>
+					<width>608</width>
+					<height>323</height>
+					<orientation>vertical</orientation>
+					<usecontrolcoords>true</usecontrolcoords>
+					<itemgap>0</itemgap>
+					<control type="group" id="1905">
+						<description>Panel body: shown while Window.Property(kscape.panel.open) is set</description>
+						<width>608</width>
+						<height>323</height>
+						<visible>!String.IsEmpty(Window.Property(kscape.panel.open))</visible>
+						<animation effect="fade" start="0" end="100" time="160" condition="String.IsEqual(Window(Home).Property(kscape.reduced),1)">Visible</animation>
+						<animation effect="fade" start="100" end="0" time="120" condition="String.IsEqual(Window(Home).Property(kscape.reduced),1)">Hidden</animation>
 				<control type="image" id="1903">
 					<width>608</width>
 					<height>323</height>
@@ -23419,6 +23426,8 @@
 						<visible>!String.IsEmpty(Window.Property(p.rt))</visible>
 					</control>
 				</control>
+				</control>
+					</control>
 				</control>
 			</control>
 		</control>

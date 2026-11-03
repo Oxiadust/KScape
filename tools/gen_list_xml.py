@@ -33,10 +33,7 @@ import wrap_display  # noqa: E402
 W, H = 1920, 1080
 # Rows are laid out wider than the screen: Kodi skips layout controls that start outside the
 # item's width, so columns scrolled in from the right would never appear otherwise.
-ROW_H = 58
-BAND_H = 236
-FOCUS_POS = 5
-LIST_TOP = 8
+ROW_H, BAND_H, FOCUS_POS, LIST_TOP = L.ROW_H, L.BAND_H, L.FOCUS_POS, L.LIST_TOP
 TITLE_W = 860                  # title column; the scrolling columns start here
 TEXT_X = 244                   # title text (rows and band line up)
 BAND_X = 40
@@ -51,6 +48,7 @@ CELL = 'kscape_blue_focus'              # focused column
 TITLE_COLOR = 'FFFFFFFF'
 ROW_COLORS = {'cast': 'kscape_tint_cast', 'director': 'kscape_tint_director'}
 ROW_COLOR = 'kscape_tint_row'
+HOVER = '1FFFFFFF'                      # the row under the mouse pointer
 SLIDE_MS = 360
 # Band value lines (kscape_list_value, measured in Kodi 21.3 from screenshots of all four lines:
 # centre of the first line's capitals, and the line pitch), for the ▶ marker beside the value the
@@ -178,6 +176,31 @@ def heart(top):
 				</control>'''
 
 
+def mouse_targets():
+    """Invisible buttons over the list's row slots (listmodel.mouse_rows), for the mouse: one takes
+    the pointer instead of the fixedlist, which would otherwise scroll toward a pointer resting
+    above or below the band and run away under it. Hovering one focuses it and clicking clicks
+    it, so listwindow.py knows the row from the control id (listmodel.MOUSE_BASE + offset from
+    the band). Keys send the focus back to the list."""
+    out = ''
+    for off, top, h in L.mouse_rows(H):
+        out += f'''		<control type="button" id="{L.MOUSE_BASE + off}">
+			<description>Mouse target: the row {off:+d} from the band</description>
+			<left>0</left>
+			<top>{top}</top>
+			<width>{W}</width>
+			<height>{h}</height>
+			<texturefocus/>
+			<texturenofocus/>
+			<onup>9000</onup>
+			<ondown>9000</ondown>
+			<onleft>9000</onleft>
+			<onright>9000</onright>
+		</control>
+'''
+    return out
+
+
 def build(spec):
     px, py, pw, ph = SQUARE if spec.square else POSTER
     ROW_W = row_w(spec)
@@ -214,6 +237,14 @@ def build(spec):
 			<animation effect="fade" start="100" end="35" time="90" condition="{is_("jump", 1)}">Conditional</animation>
 			<scrolltime tween="cubic" easing="out">200</scrolltime>
 			<itemlayout width="{ROW_W}" height="{ROW_H}">
+				<control type="image">
+					<description>Row under the mouse pointer (listwindow.py sets the item's hover)</description>
+					<left>{BAND_X}</left>
+					<width>{W - BAND_X}</width>
+					<height>{ROW_H}</height>
+					<texture colordiffuse="{HOVER}">kscape-white.png</texture>
+					<visible>String.IsEqual(ListItem.Property(hover),1)</visible>
+				</control>
 				<control type="group">
 					<left>{TITLE_W}</left>
 {scroll_anims('					', spec)}
@@ -223,6 +254,14 @@ def build(spec):
 					<width>{TITLE_W}</width>
 					<height>{ROW_H}</height>
 					<texture colordiffuse="{BG}">kscape-white.png</texture>
+				</control>
+				<control type="image">
+					<description>The hover highlight again over the title column (its background hides the first)</description>
+					<left>{BAND_X}</left>
+					<width>{TITLE_W - BAND_X}</width>
+					<height>{ROW_H}</height>
+					<texture colordiffuse="{HOVER}">kscape-white.png</texture>
+					<visible>String.IsEqual(ListItem.Property(hover),1)</visible>
 				</control>
 				<control type="label">
 					<left>{TEXT_X}</left>
@@ -306,7 +345,7 @@ def build(spec):
 {heart(60)}
 			</focusedlayout>
 		</control>
-		<control type="image">
+{mouse_targets()}		<control type="image">
 			<description>Fade the rows into the background at the top and bottom</description>
 			<width>{W}</width>
 			<height>150</height>

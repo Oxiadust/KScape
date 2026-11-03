@@ -83,24 +83,75 @@ def cell_origin(col, row, layout=G.POSTER):
     return col * layout.pitch_x, row * layout.pitch_y
 
 
-def camera_target(wall, cell):
-    """Camera (wall-pixel top-left of the screen) that centres `cell`, clamped to the wall."""
+def top_margin(layout):
+    """Gap above the top row on screen: the gutter between rows, so nothing of the row above
+    shows (a wider gap would show a strip of its covers). The focus frame fits in it."""
+    return layout.pitch_y - layout.cover_h
+
+
+def full_rows(layout):
+    """Rows whose covers (and focus frame) are whole on screen below the top margin."""
+    vh = G.view_size(layout)[1]
+    room = vh - top_margin(layout) - layout.cover_h - layout.frame
+    return max(1, int(room // layout.pitch_y) + 1)
+
+
+def camera_target(wall, cell, current=None, pin_top=False):
+    """Camera (wall-pixel top-left of the screen) for the focused `cell`.
+
+    Across, the cell is centred (clamped to the wall). Down, the wall scrolls by whole rows: a
+    row always sits whole at the top of the screen, never cut. The camera keeps its row
+    (`current`, the camera now) while the cell is on one of the whole rows; otherwise the cell's
+    row is put in the middle of them. `pin_top` shows the wall from its first row (it opens so).
+    A wall smaller than the screen is centred on that axis."""
     lay = wall.layout
-    x, y = cell_origin(*cell, layout=lay)
+    x, _ = cell_origin(*cell, layout=lay)
+    col, row = cell
     vw, vh = G.view_size(lay)
-    cx = x + lay.cover_w / 2 - vw / 2
-    cy = y + lay.cover_h / 2 - vh / 2
     wall_w = wall.cols * lay.pitch_x - (lay.pitch_x - lay.cover_w)
     wall_h = wall.rows * lay.pitch_y - (lay.pitch_y - lay.cover_h)
-    margin_x, margin_y = lay.pitch_x * 0.5, lay.pitch_y * 0.25
+    margin_x, margin_y = lay.pitch_x * 0.5, top_margin(lay)
 
-    def clamp(v, size, screen, margin):
-        if size + 2 * margin <= screen:
-            return (size - screen) / 2.0            # whole axis fits: centre it
-        return max(-margin, min(size - screen + margin, v))
+    if wall_w + 2 * margin_x <= vw:
+        cx = (wall_w - vw) / 2.0
+    else:
+        cx = max(-margin_x, min(wall_w - vw + margin_x, x + lay.cover_w / 2 - vw / 2))
 
-    return (round(clamp(cx, wall_w, vw, margin_x)),
-            round(clamp(cy, wall_h, vh, margin_y)))
+    if wall_h + 2 * margin_y <= vh:
+        cy = (wall_h - vh) / 2.0
+    else:
+        n = full_rows(lay)
+        last_top = max(0, wall.rows - n)
+        if pin_top:
+            top = 0
+        else:
+            top = None
+            if current is not None:
+                top = int(round((current[1] + margin_y) / lay.pitch_y))
+                if not top <= row <= top + n - 1:
+                    top = None
+            if top is None:
+                top = row - (n - 1) // 2
+        top = max(0, min(last_top, top))
+        cy = top * lay.pitch_y - margin_y
+    return round(cx), round(cy)
+
+
+def in_opening_view(wall, cell):
+    """True if `cell` is whole on screen when the wall shows its first row."""
+    return cell[1] < full_rows(wall.layout)
+
+
+def cell_at(layout, camera, x, y):
+    """The grid cell whose cover is under view point (x, y) when the camera is at `camera`
+    (wall pixels), or None over a gutter."""
+    wx, wy = x + camera[0], y + camera[1]
+    col, row = int(wx // layout.pitch_x), int(wy // layout.pitch_y)
+    if wx < 0 or wy < 0:
+        return None
+    if wx - col * layout.pitch_x > layout.cover_w or wy - row * layout.pitch_y > layout.cover_h:
+        return None
+    return col, row
 
 
 def ease_out_cubic(p):

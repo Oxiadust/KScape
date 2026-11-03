@@ -21,7 +21,9 @@ Control ids (k = 0..POOL-1, POOL = the layout's pool_cols x pool_rows):
   1990 / 1991  the pools' data lists (slot(): poster art, properties on, text, badge, bw, fav)
   1002-1005    focus frame bars (top, bottom, left, right); 1903 panel background
   20000+k      pool B, same offsets
-  1900         info panel group; 1901 title (a label; a two-line textbox for albums);
+  1900         info panel: placed by Python; 1905 its body, shown while Window.Property(kscape.panel.open)
+               is set, slid by Python out from behind the cover inside a clipping grouplist
+               (panel(), window.PanelSlide); 1901 title (a label; a two-line textbox for albums);
                1902 synopsis (posters) or artist (albums), placed below the title by Python
                1909 group of the 1910 grouplist under the synopsis (posters): 1911 resolution badge, 1912 TMDB
                icon + 1913 score, 1914 Rotten Tomatoes icon + 1915 Tomatometer - each shown by a
@@ -48,8 +50,7 @@ BADGE_W, BADGE_H = 58, 28     # reference: small amber-outlined "HDR"/"UHD" tag,
 HEART_BOX, HEART = 40, 26     # favourite marker, top right of the cover
 FACT_ROW_H, BADGE_IMG_H = 34, 26   # badge and ratings row under the synopsis (badges.py widths)
 CAPTION_H = 62
-PANEL_IN_MS, PANEL_OUT_MS = 320, 180   # synopsis panel entrance and exit
-PANEL_SLIDE, PANEL_ZOOM = 26, 96       # px it slides out from the cover; % it grows from
+PANEL_FADE_IN_MS, PANEL_FADE_OUT_MS = 160, 120     # the info panel with Reduce motion
 
 
 SX = 1.0                      # the screen's horizontal stretch while build() runs (display.stage)
@@ -205,7 +206,7 @@ def focus_frame(L):
 
 
 def panel_text(L, panel_w):
-    if L is G.SQUARE:
+    if L.name == 'square':           # (an adapted layout is a copy: compare names)
         # Album: title on up to two lines, artist below it (positioned by window.py).
         return f'''				<control type="textbox" id="1901">
 					<left>{x(34)}</left>
@@ -338,23 +339,49 @@ def caption():
 '''
 
 
-def panel_animations(L, panel_w, panel_h, ind='\t\t\t\t'):
-    """The synopsis panel eases in beside the selected cover: a fade, a short slide out from the
-    cover's side and a slight scale, then eases out the same way, faster. The side comes from the
-    window property kscape.panel.side (window.py sets it before showing the panel). With reduced
-    motion it only fades."""
-    full = '!String.IsEqual(Window(Home).Property(kscape.reduced),1)'
-    out = [f'{ind}<animation effect="fade" start="0" end="100" time="{PANEL_IN_MS}" tween="sine" easing="out">Visible</animation>',
-           f'{ind}<animation effect="fade" start="100" end="0" time="{PANEL_OUT_MS}" tween="sine" easing="in">Hidden</animation>']
-    for side, cx in (('right', 0), ('left', panel_w)):
-        dx = -PANEL_SLIDE if side == 'right' else PANEL_SLIDE
-        cond = f'{full} + String.IsEqual(Window.Property(kscape.panel.side),{side})'
-        out += [
-            f'{ind}<animation effect="slide" start="{dx},0" end="0,0" time="{PANEL_IN_MS}" tween="cubic" easing="out" condition="{cond}">Visible</animation>',
-            f'{ind}<animation effect="zoom" start="{PANEL_ZOOM}" end="100" center="{cx},{panel_h // 2}" time="{PANEL_IN_MS}" tween="cubic" easing="out" condition="{cond}">Visible</animation>',
-            f'{ind}<animation effect="slide" start="0,0" end="{dx // 2},0" time="{PANEL_OUT_MS}" tween="sine" easing="in" condition="{cond}">Hidden</animation>',
-        ]
-    return '\n'.join(out)
+def panel_animations(ind='\t\t\t\t\t\t'):
+    """With Reduce motion the panel body fades in and out instead of sliding (window.PanelSlide)."""
+    reduced = 'String.IsEqual(Window(Home).Property(kscape.reduced),1)'
+    return (f'{ind}<animation effect="fade" start="0" end="100" time="{PANEL_FADE_IN_MS}" condition="{reduced}">Visible</animation>\n'
+            f'{ind}<animation effect="fade" start="100" end="0" time="{PANEL_FADE_OUT_MS}" condition="{reduced}">Hidden</animation>')
+
+
+def panel(L):
+    """Info panel beside the focused cover. 1900 is placed by Python beside the focus frame; the
+    panel body 1905 shows while Window.Property(kscape.panel.open) is set, and slides (window.
+    PanelSlide) from behind the cover into the box between them: a grouplist, for its clipping.
+    Kodi clips a grouplist's children to its box, but only as they are placed - not as an
+    animation moves them - so the slide moves the body itself, a step per frame.
+    (A property rather than setVisible(): Kodi plays the Reduce motion fades only when a
+    visibility condition changes.)"""
+    panel_w, panel_h = G.panel_w(L), G.panel_h(L)
+    return f'''			<control type="group" id="1900">
+				<description>Info panel beside the focused cover (placed by Python)</description>
+				<left>-4000</left>
+				<width>{panel_w}</width>
+				<height>{panel_h}</height>
+				<control type="grouplist">
+					<description>Clipping box: the body slides into it from the cover's side</description>
+					<width>{panel_w}</width>
+					<height>{panel_h}</height>
+					<orientation>vertical</orientation>
+					<usecontrolcoords>true</usecontrolcoords>
+					<itemgap>0</itemgap>
+					<control type="group" id="1905">
+						<description>Panel body: shown while Window.Property(kscape.panel.open) is set</description>
+						<width>{panel_w}</width>
+						<height>{panel_h}</height>
+						<visible>!String.IsEmpty(Window.Property(kscape.panel.open))</visible>
+{panel_animations()}
+				<control type="image" id="1903">
+					<width>{panel_w}</width>
+					<height>{panel_h}</height>
+					<texture colordiffuse="{PANEL_BLUE}">kscape-white.png</texture>
+				</control>
+{panel_text(L, panel_w)}
+					</control>
+				</control>
+			</control>'''
 
 
 def build(L, sx=1.0):
@@ -368,7 +395,6 @@ def build(L, sx=1.0):
 
 
 def _build(L):
-    panel_w, panel_h = G.panel_w(L), G.panel_h(L)
     return f'''<?xml version="1.0" encoding="UTF-8"?>
 <!-- GENERATED by tools/gen_wall_xml.py from resources/lib/geometry.py ({L.name} covers). Do not edit by hand. -->
 <window>
@@ -395,18 +421,7 @@ def _build(L):
 {slot(10000, L)}
 {slot(20000, L)}
 {focus_frame(L)}
-			<control type="group" id="1900">
-				<description>Info panel beside the focused cover</description>
-				<width>{panel_w}</width>
-				<height>{panel_h}</height>
-{panel_animations(L, panel_w, panel_h)}
-				<control type="image" id="1903">
-					<width>{panel_w}</width>
-					<height>{panel_h}</height>
-					<texture colordiffuse="{PANEL_BLUE}">kscape-white.png</texture>
-				</control>
-{panel_text(L, panel_w)}
-			</control>
+{panel(L)}
 		</control>
 		</control>
 {masks()}

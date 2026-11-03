@@ -39,6 +39,7 @@ def follow_display():
             if now != seen:
                 seen = now
                 displayui.publish()
+                displayui.publish_pointer()
                 displayui.labels()
         except Exception as e:                       # never take the scene service down with it
             xbmc.log(f'kscape: display properties: {e}', xbmc.LOGWARNING)

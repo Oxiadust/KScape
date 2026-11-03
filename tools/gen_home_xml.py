@@ -397,7 +397,7 @@ def card_list(k, top, count):
     thin = bars(o, o, CARD_W, CARD_H, HAIRLINE, 'kscape_blue_focus', ind='\t\t\t\t\t')
     thin_unfocused = bars(o, o, CARD_W, CARD_H, HAIRLINE, 'kscape_blue_focus', ind='\t\t\t\t\t\t')
     amber = bars(0, 0, CARD_W + 2 * o, CARD_H + 2 * o, AMBER_T, 'kscape_amber', ind='\t\t\t\t\t\t')
-    lab = lambda color, ind: label(o + 352, o, 540, CARD_H, '$INFO[ListItem.Label]', 'kscape_list_title', color,
+    lab = lambda color, ind: label(o + 352, o, 540, CARD_H, '[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]', 'kscape_list_title', color,
                                    extra=f'{ind}\t<aligny>center</aligny>\n', ind=ind)
     return f'''			<control type="list" id="{lid}">
 				<left>{k["x"] - o}</left>

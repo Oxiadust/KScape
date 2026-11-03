@@ -45,8 +45,8 @@ from .listwindow import show_list
 from .model import copy_groups
 from .search import search
 from .ranking import rank_related
-from .wallmodel import (Wall, camera_target, cell_origin, clip_outside, detour, ease_out_back,
-                        ease_out_cubic)
+from .wallmodel import (Wall, camera_target, cell_at, cell_origin, clip_outside, detour, ease_out_back,
+                        ease_out_cubic, in_opening_view)
 
 MOVES = {
     xbmcgui.ACTION_MOVE_LEFT: (-1, 0),
@@ -55,6 +55,10 @@ MOVES = {
     xbmcgui.ACTION_MOVE_DOWN: (0, 1),
 }
 SELECT = (xbmcgui.ACTION_SELECT_ITEM,)
+MOUSE_MOVE = xbmcgui.ACTION_MOUSE_MOVE
+MOUSE_CLICK = xbmcgui.ACTION_MOUSE_LEFT_CLICK
+MOUSE_WHEEL = {xbmcgui.ACTION_MOUSE_WHEEL_UP: -1, xbmcgui.ACTION_MOUSE_WHEEL_DOWN: 1}
+CLICK_ECHO_S = 0.5               # a Select that follows a mouse click is that click's echo
 PLAY = (xbmcgui.ACTION_PLAYER_PLAY,)
 BACK = (xbmcgui.ACTION_NAV_BACK, xbmcgui.ACTION_PREVIOUS_MENU)
 MENU = (xbmcgui.ACTION_CONTEXT_MENU, xbmcgui.ACTION_SHOW_INFO)
@@ -191,6 +195,77 @@ class Pool:
         if self.group_on:
             self.group.setVisible(False)
             self.group_on = False
+
+
+class PanelSlide:
+    """Slides the info panel's body (1905) out from behind the selected cover, and back.
+
+    The body sits in a clipping box beside the cover (wallxml.panel). Kodi clips a box's
+    children only where they are placed, not where an XML animation moves them, so the slide
+    moves the body itself: a background thread places it once per frame (each control call
+    waits for Kodi's GUI lock, about a frame), at the position the easing gives for the time
+    elapsed, so a late frame never slows the slide down. A newer slide replaces a running one.
+    """
+
+    def __init__(self, control):
+        self.control = control
+        self.token = 0
+        self.x = 0                       # where the body was last placed
+        self.guard = threading.Lock()
+
+    def place(self, x):
+        """Place the body now (no slide), stopping any running slide."""
+        with self.guard:
+            self.token += 1
+        self._set(x)
+
+    def run(self, end, ms, ease, done=None):
+        """Slide from where the body is to `end` over `ms`; then call `done` (if not replaced)."""
+        with self.guard:
+            self.token += 1
+            token = self.token
+        threading.Thread(target=self._run, args=(token, self.x, end, ms, ease, done), daemon=True).start()
+
+    def _set(self, x):
+        try:
+            self.control.setPosition(int(x), 0)
+            self.x = int(x)
+        except RuntimeError:             # the window has closed
+            pass
+
+    def _run(self, token, start, end, ms, ease, done):
+        t0 = time.time()
+        while self.token == token:
+            p = min(1.0, (time.time() - t0) * 1000.0 / ms) if ms > 0 else 1.0
+            x = int(round(start + (end - start) * ease(p)))
+            if x != self.x:
+                self._set(x)             # blocks until Kodi's next frame
+            else:
+                time.sleep(0.004)
+            if p >= 1.0:
+                break
+        if done:
+            with self.guard:             # a slide started meanwhile (place/run) waits for this
+                if self.token == token:
+                    done()
+
+
+def ease_in_cubic(p):
+    """Matches Kodi's tween="cubic" easing="in"."""
+    p = max(0.0, min(1.0, p))
+    return p ** 3
+
+
+def _screen_size():
+    """The size Kodi renders at, in pixels: what mouse positions are reported in. (On a Retina
+    Mac that is the backing store, twice System.ScreenWidth / ScreenHeight.)"""
+    try:
+        w, h = xbmcgui.getScreenWidth(), xbmcgui.getScreenHeight()
+        if w > 0 and h > 0:
+            return w, h
+    except (AttributeError, RuntimeError):
+        pass
+    return G.SCREEN_W, G.SCREEN_H
 
 
 def badge_bucket(text):
@@ -361,7 +436,10 @@ class WallWindow(xbmcgui.WindowXML):
         self.pool_size = self.lay.pool_cols * self.lay.pool_rows
         self.camera = self.getControl(1000)
         self.frame = self.getControl(1001)
-        self.panel = self.getControl(1900)
+        self.panel = self.getControl(1900)          # placed beside the cover; its body shows
+                                                    # while kscape.panel.open is set (wallxml.panel)
+        self.panel_slide = PanelSlide(self.getControl(1905))
+        self.panel_away = 0                         # body x hidden behind the cover (PanelSlide)
         self.status = self.getControl(1950)
         self.caption = self.getControl(1960)
         self.caption.setVisible(False)
@@ -377,7 +455,7 @@ class WallWindow(xbmcgui.WindowXML):
         self._place_view()
         self.frame.setVisible(False)
         self.frame_on = False
-        self.panel.setVisible(False)
+        self.setProperty('kscape.panel.open', '')
         self.reduced = menu.reduced_motion()
         HOME.setProperty(PROP_REDUCED, '1' if self.reduced else '')
         self.auto_shuffle = ADDON.getSettingBool('auto_shuffle')
@@ -405,6 +483,9 @@ class WallWindow(xbmcgui.WindowXML):
         self.shuffle_until = 0.0
         self.panel_cells = ()
         self.panel_shown = False
+        self.panel_rect = None           # (x, y, w, h) of the shown panel, in wall pixels
+        self.clicked_at = 0.0
+        self.screen_px = _screen_size()
         self.shuffled_for = None
         self.last_input = time.time()
         self.heal_at = time.time() + HEAL_EVERY_S
@@ -429,11 +510,16 @@ class WallWindow(xbmcgui.WindowXML):
         if self.nested:
             last = str(self.session.trail[-1][1])     # the movie explored from, if it is shown
         start = self.wall.cell_of(int(last)) if last.lstrip('-').isdigit() else None
+        # The wall opens on its first row, whole: the remembered cover keeps the focus only when
+        # it is on screen from there (an explored movie is always shown, wherever it is).
+        top = not self.nested
+        if top and start and not in_opening_view(self.wall, start):
+            start = None
         self.focus = start or (0, 0)
         self._show_status()
         if visible:
             self._set_frame()
-            self._pan(camera_target(self.wall, self.focus), animate=False)
+            self._pan(camera_target(self.wall, self.focus, pin_top=top), animate=False)
         self.ready = True
         threading.Thread(target=self._dwell_loop, daemon=True).start()
         if cached and cached['stale']:
@@ -581,7 +667,15 @@ class WallWindow(xbmcgui.WindowXML):
         overlay = None
         with self.lock:
             empty = not self.wall.movies()
-            if aid in MOVES and not empty:
+            if aid == MOUSE_MOVE and not empty:
+                self._mouse_over(action)
+            elif aid == MOUSE_CLICK and not empty:
+                overlay = self._mouse_click(action)
+            elif aid in MOUSE_WHEEL and not empty:
+                self._wheel(MOUSE_WHEEL[aid])
+            elif aid in SELECT and time.time() - self.clicked_at < CLICK_ECHO_S:
+                pass                  # Kodi's own Select for the mouse click already handled above
+            elif aid in MOVES and not empty:
                 self._move(*MOVES[aid])
             elif aid in (SELECT + PLAY) and not empty and MS.is_set(self.wall.at(*self.focus)):
                 overlay = 'set'
@@ -621,6 +715,77 @@ class WallWindow(xbmcgui.WindowXML):
             self._view_scenes()
 
     # ---- overlays: info screen, list view, search -------------------------------------------
+
+    # ---- mouse -----------------------------------------------------------------------------
+
+    def _pointer(self, action):
+        """The pointer in view pixels (the wall's frame), or None outside the view. Kodi reports
+        it in screen pixels; the skin's 1920x1080 is stretched over the whole screen."""
+        sw, sh = self.screen_px
+        x = action.getAmount1() * G.SCREEN_W / sw - self.lay.view[0]
+        y = action.getAmount2() * G.SCREEN_H / sh - self.lay.view[1]
+        vw, vh = G.view_size(self.lay)
+        return (x, y) if 0 <= x < vw and 0 <= y < vh else None
+
+    def _camera_now(self):
+        """The camera as drawn this instant (wall pixels), mid-glide included."""
+        g = self.cam_glide
+        if g.pos is None:
+            return self.cam
+        v = g.visual(time.time())
+        return (-v[0], -v[1])
+
+    def _on_panel(self, x, y):
+        if not (self.panel_shown and self.panel_rect):
+            return False
+        cam = self._camera_now()
+        px, py, pw, ph = self.panel_rect
+        return px <= x + cam[0] < px + pw and py <= y + cam[1] < py + ph
+
+    def _pointed(self, action):
+        """(cell, on_panel) under the pointer; the panel hides the covers behind it."""
+        at = self._pointer(action)
+        if at is None:
+            return None, False
+        if self._on_panel(*at):
+            return None, True
+        cell = cell_at(self.lay, self._camera_now(), *at)
+        return (cell if cell and self.wall.at(*cell) is not None else None), False
+
+    def _mouse_over(self, action):
+        """Hovering a cover selects it: the frame glides over, the wall stays where it is."""
+        cell, _ = self._pointed(action)
+        if cell is not None and cell != self.focus:
+            self._select_cell(cell)
+
+    def _select_cell(self, cell):
+        self._finish_shuffle()
+        self.focus = cell
+        self.last_input = time.time()
+        self._hide_panel()
+        self._commit(frame=self._frame_plan(animate=True))
+
+    def _mouse_click(self, action):
+        """Click a cover (or the info panel beside it) to open it like Select does."""
+        cell, on_panel = self._pointed(action)
+        if cell is None and not on_panel:
+            return None
+        self.clicked_at = time.time()
+        if cell is not None and cell != self.focus:
+            self._select_cell(cell)
+        item = self.wall.at(*self.focus)
+        if item is None:
+            return None
+        return 'set' if MS.is_set(item) else 'details'
+
+    def _wheel(self, dy):
+        """The wheel moves the selection a row up or down (to the nearest cover when the column
+        ends there); the wall follows it like it does for the arrow keys."""
+        c, r = self.focus
+        for dc in (0, -1, 1, -2, 2):
+            if self.wall.at(c + dc, r + dy) is not None:
+                self._move(dc, dy)
+                return
 
     def _covered(self, fn):
         """Run `fn` (which may open other windows) with the wall's background work paused."""
@@ -686,7 +851,7 @@ class WallWindow(xbmcgui.WindowXML):
                 self._finish_shuffle()
                 self.focus = cell
                 self._set_frame()
-                self._pan(camera_target(self.wall, self.focus), animate=False)
+                self._pan(camera_target(self.wall, self.focus, self.cam), animate=False)
             if result == 'wall':
                 if not self.filtered:
                     state.save(**{view_key(self.kind): 'wall'})
@@ -735,7 +900,7 @@ class WallWindow(xbmcgui.WindowXML):
         # Frame and camera glides first, started together by one property write; the covers
         # the camera brings into the pool are bound after (they are still off-screen).
         frame = self._frame_plan(animate=True)
-        cam = self._cam_plan(camera_target(self.wall, self.focus))
+        cam = self._cam_plan(camera_target(self.wall, self.focus, self.cam))
         self._commit(frame=frame, cam=cam)
         self._rebind(self.front)
 
@@ -905,6 +1070,7 @@ class WallWindow(xbmcgui.WindowXML):
             px = x + lay.cover_w + G.fx(lay)                       # frame's right edge
         self.setProperty('kscape.panel.side', 'left' if cells[0][0] < c else 'right')   # entrance direction
         self.panel.setPosition(px, y - lay.frame)
+        self.panel_rect = (px, y - lay.frame, G.panel_w(lay), G.panel_h(lay))
         title, body = self.kind.panel(item)
         if lay.name == 'square':
             # Album title on one or two lines (a textbox), the artist right below it.
@@ -916,7 +1082,15 @@ class WallWindow(xbmcgui.WindowXML):
         self.getControl(1902).setText(body)
         if self.kind.explores:
             self._panel_facts(item)
-        self.panel.setVisible(True)
+        # Out from behind the cover: the body starts beyond the box's cover side (clipped away).
+        self.panel_away = G.panel_w(lay) if cells[0][0] < c else -G.panel_w(lay)
+        if self.reduced:
+            self.panel_slide.place(0)                   # Reduce motion: it fades in (XML)
+            self.setProperty('kscape.panel.open', '1')
+        else:
+            self.panel_slide.place(self.panel_away)
+            self.setProperty('kscape.panel.open', '1')
+            self.panel_slide.run(0, G.PANEL_IN_MS, ease_out_cubic)
         self.panel_cells = tuple(cells)
         self.panel_shown = True
 
@@ -943,7 +1117,12 @@ class WallWindow(xbmcgui.WindowXML):
 
     def _hide_panel(self):
         if self.panel_shown:
-            self.panel.setVisible(False)
+            if self.reduced:
+                self.setProperty('kscape.panel.open', '')     # fades out (XML)
+            else:
+                # Back behind the cover, then hidden (unless the panel has been shown again).
+                self.panel_slide.run(self.panel_away, G.PANEL_OUT_MS, ease_in_cubic,
+                                     done=lambda: self.setProperty('kscape.panel.open', ''))
             self.panel_shown = False
 
     def _dwell_loop(self):
@@ -1305,7 +1484,7 @@ class WallWindow(xbmcgui.WindowXML):
         self._show_status()
         if visible:
             self._set_frame()
-            self._pan(camera_target(self.wall, self.focus), animate=False)
+            self._pan(camera_target(self.wall, self.focus, self.cam), animate=False)
         else:
             self.frame.setVisible(False)
             self.frame_on = False
@@ -1336,7 +1515,7 @@ class WallWindow(xbmcgui.WindowXML):
         self.last_input = time.time()
         self._hide_panel()
         self._set_frame()
-        self._pan(camera_target(self.wall, self.focus))
+        self._pan(camera_target(self.wall, self.focus, self.cam))
 
     def _transition(self, new, anchor_key=None):
         """Fly every cover from where it is in the current wall to its cell in `new`."""

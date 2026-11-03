@@ -140,5 +140,16 @@ class ListModelTest(unittest.TestCase):
         self.assertEqual(L.scroll_stops(), [0, 280, 680, total - L.SCROLL_W])
 
 
+
+class MouseRows(unittest.TestCase):
+    def test_row_slots_cover_the_list(self):
+        rows = L.mouse_rows()
+        self.assertEqual(rows[0], (-L.FOCUS_POS, L.LIST_TOP, L.ROW_H))
+        self.assertEqual([r for r in rows if r[0] == 0], [(0, L.LIST_TOP + L.FOCUS_POS * L.ROW_H, L.BAND_H)])
+        for (o1, t1, h1), (o2, t2, _) in zip(rows, rows[1:]):
+            self.assertEqual((o2, t2), (o1 + 1, t1 + h1))                  # no gap, no overlap
+        self.assertEqual(rows[-1][1] + rows[-1][2], 1080)
+        self.assertLess(L.MOUSE_BASE + rows[-1][0], 1000)                  # ids stay clear of others
+
 if __name__ == '__main__':
     unittest.main()

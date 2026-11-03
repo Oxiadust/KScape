@@ -40,6 +40,7 @@ PAGING = (xbmcgui.ACTION_PAGE_UP, xbmcgui.ACTION_PAGE_DOWN, xbmcgui.ACTION_FIRST
 KEEP_SORTS = 3                   # built item lists kept for instant re-sorting
 JUMP_S = 0.25                    # list dimmed while it scrolls to a far row (see the XML)
 FAVOURITES_POLL_S = 1.0
+WHEEL = {xbmcgui.ACTION_MOUSE_WHEEL_UP: -1, xbmcgui.ACTION_MOUSE_WHEEL_DOWN: 1}
 BACK = (xbmcgui.ACTION_NAV_BACK, xbmcgui.ACTION_PREVIOUS_MENU)
 MENU = (xbmcgui.ACTION_CONTEXT_MENU, xbmcgui.ACTION_SHOW_INFO)
 PLAY = (xbmcgui.ACTION_PLAYER_PLAY,)
@@ -85,6 +86,8 @@ class ListWindow(xbmcgui.WindowXML):
         self.jumped = 0.0
         self.favs_checked = time.time()
         self.favs_seen = self.favs.version if self.favs else 0
+        self.hover = None                        # row index under the mouse pointer (highlighted)
+        self.hover_off = None                    # its slot: rows from the band (mouse target)
         self.built = {}                          # sort -> ListItems for self.rows, recent last
         self.prebuilt = None                     # (sort, ListItems) from the background thread
         self.prebuilder = None
@@ -201,6 +204,9 @@ class ListWindow(xbmcgui.WindowXML):
         with self.lock:
             if aid in STEPS:
                 self._step(STEPS[aid])
+            elif aid in WHEEL:
+                self._step(WHEEL[aid])
+                self._show_hover()               # the rows moved under the pointer
             elif aid in PAGING:
                 self._collapse()
                 self.cur = self.list.getSelectedPosition()
@@ -246,8 +252,10 @@ class ListWindow(xbmcgui.WindowXML):
             _set('settled', '')
 
     def _step(self, direction):
-        """Up/Down. Kodi has already moved the list one row; that is kept when it is the right
-        move, otherwise the list is re-sorted or sent to the item's next value from here."""
+        """Up/Down (keys or the mouse wheel). Kodi has usually moved the list one row already;
+        that is kept when it is the right move, otherwise the list is re-sorted or sent to the
+        item's next value from here. (Kodi has not moved it when the mouse surface had the
+        focus, and the wheel may scroll it differently: then the row is selected from here.)"""
         self._collapse()
         if not self.rows:
             return
@@ -256,8 +264,8 @@ class ListWindow(xbmcgui.WindowXML):
         if rows is not self.rows:
             self.sort, self.rows = sort, rows
             self._fill(target)
-        elif target == base + direction:
-            self.cur = self.list.getSelectedPosition()       # plain move: keep Kodi's scroll
+        elif target == base + direction and self.list.getSelectedPosition() == target:
+            self.cur = target                                # plain move: keep Kodi's scroll
         else:
             if abs(target - self.list.getSelectedPosition()) > 1:
                 self.jumped = time.time()
@@ -265,9 +273,65 @@ class ListWindow(xbmcgui.WindowXML):
             self.list.selectItem(target)
             self.cur = target
 
-    def onClick(self, control_id):
-        if control_id != LIST or not self.ready:
+    # ---- mouse ---------------------------------------------------------------------------------
+    # Invisible buttons lie over the row slots (tools/gen_list_xml.py, listmodel.mouse_rows): the
+    # pointer focuses the one it is over and a click clicks it, so the control id says which row
+    # (listmodel.MOUSE_BASE + rows from the band). The band stays put: this is a fixedlist.
+
+    def _slot_row(self, off):
+        """Index of the row `off` rows from the band, or None (no row there)."""
+        if off is None or not self.rows:
+            return None
+        i = self.list.getSelectedPosition() + off
+        return i if 0 <= i < len(self.rows) else None
+
+    def _set_hover(self, i):
+        if i == self.hover:
             return
+        for j, on in ((self.hover, ''), (i, '1')):
+            if j is not None and j < self.list.size():
+                self.list.getListItem(j).setProperty('hover', on)
+        self.hover = i
+
+    def _show_hover(self):
+        """Highlight the row under the pointer (not the band: it is highlighted already)."""
+        off = self.hover_off
+        self._set_hover(None if not off else self._slot_row(off))
+
+    def onFocus(self, control_id):
+        if not self.ready:
+            return
+        with self.lock:
+            off = control_id - L.MOUSE_BASE
+            self.hover_off = off if any(off == o for o, _, _ in L.mouse_rows()) else None
+            self._show_hover()
+
+    def _mouse_click(self, off):
+        """A click opens the row under the pointer, as Select does on the band: the band moves
+        to it first."""
+        i = self._slot_row(off)
+        if i is None:
+            return None
+        self._set_hover(None)
+        self.hover_off = None
+        if i != self.list.getSelectedPosition():
+            self._collapse()
+            self.list.selectItem(i)
+            self.cur = i
+        self.setFocusId(LIST)
+        return self.rows[i].movie
+
+    def onClick(self, control_id):
+        if not self.ready:
+            return
+        if control_id != LIST:
+            with self.lock:
+                movie = self._mouse_click(control_id - L.MOUSE_BASE)
+            if movie:
+                self._activate(movie)
+            return
+        self._collapse()                         # a click may select a row far from the last one
+        self.cur = self.list.getSelectedPosition()
         row = self._current()
         if row:
             self._activate(row.movie)
