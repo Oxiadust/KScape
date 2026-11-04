@@ -137,6 +137,33 @@ def camera_target(wall, cell, current=None, pin_top=False):
     return round(cx), round(cy)
 
 
+def camera_reveal(wall, cell, current):
+    """The camera that shows `cell` whole (with its frame) moving the wall as little as possible:
+    `current` itself when the cell is on screen already. Used by the mouse, whose pointer is on
+    the cell: centring it would carry it away from under the pointer. Rows keep the wall's whole
+    rows (camera_target) when the cell is cut off above or below."""
+    lay = wall.layout
+    x, y = cell_origin(*cell, layout=lay)
+    vw, vh = G.view_size(lay)
+    fx, fy = G.fx(lay), lay.frame
+    full = camera_target(wall, cell, current)
+    cx, cy = current
+    wall_w = wall.cols * lay.pitch_x - (lay.pitch_x - lay.cover_w)
+    if wall_w + lay.pitch_x <= vw:
+        cx = full[0]                                  # the wall fits across: it is centred
+    else:
+        lo, hi = x - fx, x + lay.cover_w + fx - vw    # camera range that shows the cell whole
+        gap = lay.pitch_x - lay.cover_w
+        if cx > lo:
+            cx = lo - gap
+        elif cx < hi:
+            cx = hi + gap
+        cx = max(-lay.pitch_x * 0.5, min(wall_w - vw + lay.pitch_x * 0.5, cx))
+    if y - fy < cy or y + lay.cover_h + fy > cy + vh:
+        cy = full[1]
+    return round(cx), round(cy)
+
+
 def in_opening_view(wall, cell):
     """True if `cell` is whole on screen when the wall shows its first row."""
     return cell[1] < full_rows(wall.layout)

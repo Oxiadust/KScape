@@ -45,7 +45,7 @@ from .listwindow import show_list
 from .model import copy_groups
 from .search import search
 from .ranking import rank_related
-from .wallmodel import (Wall, camera_target, cell_at, cell_origin, clip_outside, detour, ease_out_back,
+from .wallmodel import (Wall, camera_reveal, camera_target, cell_at, cell_origin, clip_outside, detour, ease_out_back,
                         ease_out_cubic, in_opening_view)
 
 MOVES = {
@@ -58,6 +58,7 @@ SELECT = (xbmcgui.ACTION_SELECT_ITEM,)
 MOUSE_MOVE = xbmcgui.ACTION_MOUSE_MOVE
 MOUSE_CLICK = xbmcgui.ACTION_MOUSE_LEFT_CLICK
 MOUSE_WHEEL = {xbmcgui.ACTION_MOUSE_WHEEL_UP: -1, xbmcgui.ACTION_MOUSE_WHEEL_DOWN: 1}
+MOUSE_STEP_PX = 28              # pointer travel (skin pixels) before it selects another cover
 CLICK_ECHO_S = 0.5               # a Select that follows a mouse click is that click's echo
 PLAY = (xbmcgui.ACTION_PLAYER_PLAY,)
 BACK = (xbmcgui.ACTION_NAV_BACK, xbmcgui.ACTION_PREVIOUS_MENU)
@@ -485,6 +486,8 @@ class WallWindow(xbmcgui.WindowXML):
         self.panel_shown = False
         self.panel_rect = None           # (x, y, w, h) of the shown panel, in wall pixels
         self.clicked_at = 0.0
+        self.mouse_at = None             # where the pointer last selected a cover
+        self.pointer_last = None         # the pointer's last position in the view (skin pixels)
         self.screen_px = _screen_size()
         self.shuffled_for = None
         self.last_input = time.time()
@@ -743,27 +746,33 @@ class WallWindow(xbmcgui.WindowXML):
         return px <= x + cam[0] < px + pw and py <= y + cam[1] < py + ph
 
     def _pointed(self, action):
-        """(cell, on_panel) under the pointer; the panel hides the covers behind it."""
+        """(cell, on_panel) under the pointer. Over the info panel the cell is the cover it hides
+        (a click there is for the panel, hovering for the cover)."""
         at = self._pointer(action)
         if at is None:
             return None, False
-        if self._on_panel(*at):
-            return None, True
+        on_panel = self._on_panel(*at)
         cell = cell_at(self.lay, self._camera_now(), *at)
-        return (cell if cell and self.wall.at(*cell) is not None else None), False
+        return (cell if cell and self.wall.at(*cell) is not None else None), on_panel
 
     def _mouse_over(self, action):
-        """Hovering a cover selects it: the frame glides over, the wall stays where it is."""
-        cell, _ = self._pointed(action)
-        if cell is not None and cell != self.focus:
-            self._select_cell(cell)
-
-    def _select_cell(self, cell):
-        self._finish_shuffle()
-        self.focus = cell
-        self.last_input = time.time()
-        self._hide_panel()
-        self._commit(frame=self._frame_plan(animate=True))
+        """Hovering a cover selects it: the frame lies under the pointer, and the wall moves only
+        when the cover is cut off at an edge (then just far enough to show it whole). A moved
+        wall (or a panel that has just appeared) leaves covers under a resting pointer, so the
+        next cover is taken only once the pointer has really moved."""
+        at = self._pointer(action)
+        self.pointer_last = at
+        cell, on_panel = self._pointed(action)
+        if cell is None or (cell == self.focus and not on_panel):
+            return
+        if self.mouse_at and at and math.hypot(at[0] - self.mouse_at[0], at[1] - self.mouse_at[1]) < MOUSE_STEP_PX:
+            return
+        self.mouse_at = at
+        if cell != self.focus:
+            self._go(cell, reveal=True)
+        else:
+            self.last_input = time.time()
+            self._hide_panel()               # over its own panel: it gives way to the covers
 
     def _mouse_click(self, action):
         """Click a cover (or the info panel beside it) to open it like Select does."""
@@ -771,8 +780,8 @@ class WallWindow(xbmcgui.WindowXML):
         if cell is None and not on_panel:
             return None
         self.clicked_at = time.time()
-        if cell is not None and cell != self.focus:
-            self._select_cell(cell)
+        if cell is not None and cell != self.focus and not on_panel:
+            self._go(cell, reveal=True)
         item = self.wall.at(*self.focus)
         if item is None:
             return None
@@ -893,14 +902,24 @@ class WallWindow(xbmcgui.WindowXML):
         c, r = self.focus[0] + dx, self.focus[1] + dy
         if self.wall.at(c, r) is None:
             return                        # wall edge or padding cell: stay put
+        self._go((c, r))
+
+    def _go(self, cell, reveal=False):
+        """Focus `cell`: the frame and the camera glide there (keys and wheel centre the cell;
+        the mouse, with `reveal`, moves the wall only as far as the cell needs to be whole, so
+        the frame stays under the pointer)."""
         self._finish_shuffle()
-        self.focus = (c, r)
+        self.focus = cell
         self.last_input = time.time()
         self._hide_panel()
         # Frame and camera glides first, started together by one property write; the covers
         # the camera brings into the pool are bound after (they are still off-screen).
         frame = self._frame_plan(animate=True)
-        cam = self._cam_plan(camera_target(self.wall, self.focus, self.cam))
+        if reveal:
+            target = camera_reveal(self.wall, self.focus, self.cam)
+        else:
+            target = camera_target(self.wall, self.focus, self.cam)
+        cam = self._cam_plan(target) if target != tuple(self.cam) else None
         self._commit(frame=frame, cam=cam)
         self._rebind(self.front)
 
@@ -1093,6 +1112,7 @@ class WallWindow(xbmcgui.WindowXML):
             self.panel_slide.run(0, G.PANEL_IN_MS, ease_out_cubic)
         self.panel_cells = tuple(cells)
         self.panel_shown = True
+        self.mouse_at = self.pointer_last    # the pointer rests here: moving on is what counts
 
     def _panel_facts(self, item):
         """Resolution badge, TMDB score and Tomatometer under the synopsis (when known)."""

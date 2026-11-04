@@ -58,7 +58,7 @@ WALL_BG = 'FF060607'
 
 # Home's bar (Home.xml): the logo, the time and weather, then the tabs. Each column of cards is
 # centred over its tab.
-TAB_LEFT, TAB_W = 540, 276
+TAB_LEFT, TAB_W = 770, 230
 TAB_X = {name: round(TAB_LEFT + i * TAB_W + (TAB_W - CARD_W) / 2) for i, name in enumerate(('movies', 'music', 'tv'))}
 
 KINDS = [

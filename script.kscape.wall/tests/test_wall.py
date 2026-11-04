@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from resources.lib import geometry as G  # noqa: E402
 from resources.lib.model import Movie, badge_for, merge_duplicates  # noqa: E402
 from resources.lib.ranking import rank_related, score  # noqa: E402
-from resources.lib.wallmodel import (Wall, _segment_hits_rect, camera_target, cell_at, clip_outside,  # noqa: E402
+from resources.lib.wallmodel import (Wall, _segment_hits_rect, camera_reveal, camera_target, cell_at, clip_outside,  # noqa: E402
                                      in_opening_view,  # noqa: E402
                                      detour, ease_out_back, ease_out_cubic, grid_rows)
 
@@ -187,6 +187,22 @@ class WallTest(unittest.TestCase):
         w = self.make_wall(400, rows=8)
         cam = camera_target(w, (3, 2), pin_top=True)
         self.assertEqual(camera_target(w, (4, 2), cam)[1], cam[1])
+
+    def test_reveal_moves_the_wall_only_as_far_as_needed(self):
+        w = self.make_wall(400, rows=8)
+        lay = G.POSTER
+        cam = camera_target(w, (10, 1), pin_top=True)
+        self.assertEqual(camera_reveal(w, (10, 1), cam), cam)               # on screen: stays put
+        vis = cam[0] + 960
+        col = int(vis // lay.pitch_x)
+        self.assertEqual(camera_reveal(w, (col, 1), cam), cam)              # mid screen
+        edge = int((cam[0] + G.SCREEN_W) // lay.pitch_x)                    # cut off at the right
+        rx, ry = camera_reveal(w, (edge, 1), cam)
+        self.assertGreater(rx, cam[0])
+        self.assertLess(rx - cam[0], lay.pitch_x + 2 * lay.frame)          # about one cover over
+        self.assertEqual(ry, cam[1])
+        self.assertGreaterEqual(edge * lay.pitch_x + lay.cover_w + G.fx(lay), 0)
+        self.assertLessEqual(edge * lay.pitch_x + lay.cover_w + G.fx(lay) - rx, G.SCREEN_W)   # whole now
 
     def test_cell_at_finds_cover_under_pointer(self):
         lay = G.POSTER

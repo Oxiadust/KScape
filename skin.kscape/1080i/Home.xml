@@ -194,7 +194,7 @@
 				while the Music or TV Shows cards (which reach that side) are up.</description>
 				<right>80</right>
 				<top>680</top>
-				<width>760</width>
+				<width>640</width>
 				<height>220</height>
 				<visible>!String.IsEmpty(Container(9100).ListItem.Art(fanart)) + !Skin.HasSetting(HomeNoArtwork) + !Skin.HasSetting(HomeNoCaption)</visible>
 				<visible>![[String.IsEqual(Container(9000).ListItem.Property(id),music) | String.IsEqual(Container(9000).ListItem.Property(id),tv)] + System.AddonIsEnabled(script.kscape.wall)]</visible>
@@ -202,25 +202,25 @@
 				<animation effect="fade" start="100" end="0" time="200">Hidden</animation>
 				<control type="image">
 					<description>Clear logo, right-aligned just above the title</description>
-					<width>760</width>
+					<width>640</width>
 					<height>124</height>
 					<aspectratio align="right" aligny="bottom">keep</aspectratio>
 					<fadetime>400</fadetime>
 					<texture background="true">$INFO[Container(9100).ListItem.Art(clearlogo)]</texture>
 				</control>
 				<control type="label">
-					<top>134</top>
-					<width>760</width>
-					<height>48</height>
+					<top>136</top>
+					<width>640</width>
+					<height>44</height>
 					<align>right</align>
 					<aligny>center</aligny>
-					<font>kscape_title</font>
+					<font>kscape_sub</font>
 					<textcolor>white</textcolor>
 					<label>$INFO[Container(9100).ListItem.Label]$INFO[Container(9100).ListItem.Year, (,)][COLOR kscape_text_dim]$VAR[KScapeHomeDuration][/COLOR]</label>
 				</control>
 				<control type="label">
 					<top>184</top>
-					<width>760</width>
+					<width>640</width>
 					<height>34</height>
 					<align>right</align>
 					<aligny>center</aligny>
@@ -250,52 +250,52 @@
 			<control type="grouplist">
 				<description>Time and weather, after the wordmark: the time, a hairline, the weather
 				icon and temperature (once the weather add-on has fetched them)</description>
-				<left>270</left>
+				<left>272</left>
 				<top>1003</top>
-				<width>270</width>
+				<width>492</width>
 				<height>77</height>
 				<orientation>horizontal</orientation>
-				<itemgap>8</itemgap>
+				<itemgap>12</itemgap>
 				<usecontrolcoords>true</usecontrolcoords>
 				<control type="label">
 					<width>auto</width>
 					<height>77</height>
 					<aligny>center</aligny>
-					<font>kscape_bar</font>
+					<font>kscape_clock_light</font>
 					<textcolor>white</textcolor>
 					<label>$INFO[System.Time]</label>
 					<visible>!Skin.HasSetting(HomeNoClock)</visible>
 				</control>
 				<control type="image">
-					<top>27</top>
+					<top>24</top>
 					<width>2</width>
-					<height>24</height>
+					<height>29</height>
 					<texture colordiffuse="kscape_text_dim">white.png</texture>
-					<visible>!Skin.HasSetting(HomeNoClock) + Weather.IsFetched</visible>
+					<visible>!Skin.HasSetting(HomeNoClock) + !String.IsEmpty(Window(Home).Property(kscape.weather))</visible>
 				</control>
 				<control type="image">
-					<top>20</top>
-					<width>36</width>
-					<height>36</height>
+					<top>21</top>
+					<width>35</width>
+					<height>35</height>
 					<aspectratio>keep</aspectratio>
 					<texture>$INFO[Weather.ConditionsIcon]</texture>
-					<visible>Weather.IsFetched</visible>
+					<visible>!String.IsEmpty(Window(Home).Property(kscape.weather))</visible>
 				</control>
 				<control type="label">
 					<width>auto</width>
 					<height>77</height>
 					<aligny>center</aligny>
-					<font>kscape_list_value</font>
+					<font>kscape_clock_light</font>
 					<textcolor>kscape_text</textcolor>
-					<label>$INFO[Weather.Temperature]</label>
-					<visible>Weather.IsFetched</visible>
+					<label>$INFO[Window(Home).Property(kscape.weather)]</label>
+					<visible>!String.IsEmpty(Window(Home).Property(kscape.weather))</visible>
 				</control>
 			</control>
 			<control type="list" id="9000">
 				<description>Main menu. Left/Right wrap around, as in SiLVO.</description>
-				<left>540</left>
+				<left>770</left>
 				<top>1003</top>
-				<width>1380</width>
+				<width>1150</width>
 				<height>77</height>
 				<orientation>horizontal</orientation>
 				<onleft>9000</onleft>
@@ -305,9 +305,9 @@
 				<onup condition="String.IsEqual(Container(9000).ListItem.Property(id),music) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9022,3,absolute)</onup>
 				<onup condition="String.IsEqual(Container(9000).ListItem.Property(id),tv) + System.AddonIsEnabled(script.kscape.wall)">SetFocus(9023,2,absolute)</onup>
 				<scrolltime tween="cubic" easing="out">240</scrolltime>
-				<itemlayout width="276" height="77">
+				<itemlayout width="230" height="77">
 					<control type="label">
-						<width>276</width>
+						<width>230</width>
 						<height>77</height>
 						<align>center</align>
 						<aligny>center</aligny>
@@ -316,10 +316,10 @@
 						<label>[UPPERCASE]$INFO[ListItem.Label][/UPPERCASE]</label>
 					</control>
 				</itemlayout>
-				<focusedlayout width="276" height="77">
+				<focusedlayout width="230" height="77">
 					<control type="image">
 						<description>Lighter tile on the selected item (tab look)</description>
-						<width>276</width>
+						<width>230</width>
 						<height>77</height>
 						<texture colordiffuse="kscape_blue_focus">white.png</texture>
 						<visible>Control.HasFocus(9000)</visible>
@@ -327,13 +327,13 @@
 					</control>
 					<control type="image">
 						<description>While the submenu has focus, a quieter tile keeps the parent visible</description>
-						<width>276</width>
+						<width>230</width>
 						<height>77</height>
 						<texture colordiffuse="kscape_blue_head">white.png</texture>
 						<visible>!Control.HasFocus(9000)</visible>
 					</control>
 					<control type="label">
-						<width>276</width>
+						<width>230</width>
 						<height>77</height>
 						<align>center</align>
 						<aligny>center</aligny>

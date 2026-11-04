@@ -29,7 +29,7 @@ def install_splash():
 def follow_display():
     """Publish the display transform at start, then whenever the screen or a display setting
     changes (a resolution change, the settings edited outside KScape's dialogs)."""
-    from resources.lib import displayui, versionsui
+    from resources.lib import displayui, versionsui, weatherchip
     versionsui.labels()
     mon = xbmc.Monitor()
     seen = None
@@ -43,6 +43,10 @@ def follow_display():
                 displayui.labels()
         except Exception as e:                       # never take the scene service down with it
             xbmc.log(f'kscape: display properties: {e}', xbmc.LOGWARNING)
+        try:
+            weatherchip.publish()
+        except Exception as e:
+            xbmc.log(f'kscape: weather chip: {e}', xbmc.LOGWARNING)
         if mon.waitForAbort(DISPLAY_CHECK_S):
             break
 
